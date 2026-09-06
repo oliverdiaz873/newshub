@@ -12,6 +12,7 @@ import {
 import type { FullNewsArticle } from '@/data/newsModels';
 import { SITE_URL, SITE_NAME, getLocalePrefix } from '@/shared/config/site';
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
+import { apiGet, toFullArticle, type ApiArticleDetail } from '@/lib/api';
 
 const allArticles: FullNewsArticle[] = [
   ...politicaArticles,
@@ -89,6 +90,16 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
+  // F1 adapter: API-sourced body when available (relatedNews stays local,
+  // see ArticlePageClient + src/lib/api.ts). Falls back to local silently.
+  // The mapped view keeps the LOCAL id so the next-intl presentation overlay
+  // (data.articles.<id>.*) resolves exactly as in the local path.
+  let initialArticle: FullNewsArticle | null = null;
+  const apiDetail = await apiGet<ApiArticleDetail>(`/articles/${slug}`, locale);
+  if (apiDetail && apiDetail.categorySlug === category) {
+    initialArticle = { ...toFullArticle(apiDetail, category, []), id: article.id };
+  }
+
   const baseUrl = SITE_URL;
   const localePath = getLocalePrefix(locale);
 
@@ -146,7 +157,7 @@ export default async function Page({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
         />
       )}
-      <Article />
+      <Article initialArticle={initialArticle} />
     </>
   );
 }

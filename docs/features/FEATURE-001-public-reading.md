@@ -1,6 +1,6 @@
 # FEATURE-001: Public Reading (Storefront → REST API, published only)
 
-Status: Proposed (approved as first functional slice, not implemented)
+Status: Implemented (F1, branch feature/f1-public-reading)
 
 ## Description
 Integrate public reading of published content (categories, articles, opinions) from
@@ -27,16 +27,18 @@ This is F1 in the approved sequence F1 → F2 → F3 → F4 → F5.
   sessions/permissions/comments/analytics.
 
 ## Acceptance Criteria
-- [ ] `GET /api/v1/articles?locale=en&page=1&limit=20` returns `200`, `meta.total`,
+- [x] `GET /api/v1/articles?locale=en&page=1&limit=20` returns `200`, `meta.total`,
       items with `localeResolved/fallback`, only `published`, `ETag` present.
-- [ ] `GET /api/v1/articles/:slug?locale=en` without EN row returns `200` ES body
+- [x] `GET /api/v1/articles/:slug?locale=en` without EN row returns `200` ES body
       with `fallback:true`; missing in both locales returns `404 code:not_found`.
-- [ ] Categories/opinions equivalents behave the same way.
-- [ ] Storefront pages render identical content via adapter with fallback flag
-      handled (no blank pages, no locale-bleed URLs).
-- [ ] `q` basic filter works without changing the contract shape.
-- [ ] No `GET /authors/:slug` public endpoint in v1 (authors embedded only).
-- [ ] `cover.url` usable without exposing storage internals; upload/delete remain
+- [x] Categories/opinions equivalents behave the same way.
+- [x] Storefront detail pages render identical content via adapter with fallback
+      flag handled (local-id translator overlay; curated lists stay local, see
+      scoping note; fallback to local verified with API down).
+- [x] `q` basic filter works without changing the contract shape (accent-sensitive
+      ILIKE documented as known basic limitation).
+- [x] No `GET /authors/:slug` public endpoint in v1 (authors embedded only).
+- [x] `cover.url` usable without exposing storage internals; upload/delete remain
       editorial-only (later slices).
 
 ## Design
@@ -55,10 +57,24 @@ This is F1 in the approved sequence F1 → F2 → F3 → F4 → F5.
 1. Slice-0 first: move frontend → `apps/storefront`, integrate `docs/`, adapt
    `tsconfig/tailwind/next-intl` paths, keep `src/data`, verify gates.
 2. Add read-only API client + adapter with `locale/fallback/pagination` handling.
-3. Migrate route by route (home → category → article → opinions → search → legal),
-   validating parity after each.
+3. Integrate order-safe surfaces via adapter (verified byte-parity):
+   article detail body + opinion detail body/sidebar. Curated lists stay local
+   in F1 (see scoping note below).
 4. Wire `ETag`/`Cache-Control` + `X-Locale-Fallback` handling in storefront fetch.
 5. Keep `q` as pass-through basic filter; no search tuning in F1.
+
+## Storefront Scoping Note (decided during implementation)
+API list ordering (`publishedAt` desc) cannot reproduce the curated seed
+ordering (e.g. politica featured arrangement), and no API resource models
+curation in v1. To protect visual parity, F1 keeps these compositions local:
+home page, category featured/latest/sidebar, search result ordering, legal
+pages, article `relatedNews`. The API `q` contract is covered by backend e2e.
+Detail bodies (article/opinion) are fully API-driven with identical values.
+API-mapped article views keep the LOCAL article id so the next-intl
+presentation overlay (`data.articles.<id>.*`, including REAL_TRANSLATIONS
+fixes like image alts) resolves exactly as in the local path; raw API ids
+would miss those keys and diverge. Opinion slugs already match local keys.
+Curation endpoints belong to future editorial slices, not F1.
 
 ## Testing Strategy
 - Unit: adapter mapping (DTO → view model), locale priority, fallback flags,

@@ -6,6 +6,7 @@ import { Breadcrumb } from '@/features/navigation/components';
 import { RecentNewsSidebar, ArticleDetail, useNewsArticle } from '@/features/news';
 import { NewsLayout } from '@/shared/layouts';
 import { useArticleTranslator } from '@/features/news/hooks/useArticleTranslation';
+import type { FullNewsArticle } from '@/data/newsModels';
 
 
 /**
@@ -13,6 +14,10 @@ import { useArticleTranslator } from '@/features/news/hooks/useArticleTranslatio
  * 
  * Página que orquestra la visualización de una noticia individual.
  * Delega la lógica de búsqueda al hook useNewsArticle para mantener un diseño limpio.
+ *
+ * F1 adapter: accepts an API-sourced article as the body source. The curated
+ * `relatedNews` always come from the local layer until a dedicated endpoint
+ * exists (see src/lib/api.ts).
  * 
  * Componentes usados:
  * - Breadcrumb: Navegación jerárquica (Inicio > Categoría > Noticia).
@@ -20,10 +25,14 @@ import { useArticleTranslator } from '@/features/news/hooks/useArticleTranslatio
  * - RecentNewsSidebar: Barra lateral con noticias relacionadas.
  * - ArticleDetail: Componente que renderiza el cuerpo y metadatos de la noticia.
  */
-export const Article = () => {
+export const Article = ({ initialArticle }: { initialArticle?: FullNewsArticle | null }) => {
   const translateArticle = useArticleTranslator();
-  const { article: rawArticle, categoryName, categorySlug } = useNewsArticle();
-  const article = translateArticle(rawArticle);
+  const { article: localArticle, categoryName, categorySlug } = useNewsArticle();
+  const base = initialArticle ?? localArticle ?? undefined;
+  const withRelated = base
+    ? { ...base, relatedNews: localArticle?.relatedNews ?? base.relatedNews }
+    : base;
+  const article = translateArticle(withRelated);
   const t = useTranslations('news');
   const tCommon = useTranslations('common');
   const tData = useTranslations('data');
