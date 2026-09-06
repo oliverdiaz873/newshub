@@ -1,8 +1,17 @@
 import type { Metadata } from 'next';
 import { opinionDetails } from '@/data';
+import type { ArticleContent } from '@/data/newsModels';
 import { Opinion } from '../../_components/OpinionPageClient';
 import { SITE_URL, SITE_NAME, getLocalePrefix } from '@/shared/config/site';
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
+import {
+  apiGet,
+  toOpinionArticle,
+  toOpinionDetail,
+  type ApiList,
+  type ApiOpinionDetail,
+  type ApiOpinionListItem,
+} from '@/lib/api';
 
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -54,7 +63,24 @@ export default async function Page({ params }: PageProps) {
   const { slug, locale } = await params;
   const article = opinionDetails[slug];
 
-  if (!article) {
+  // F1 adapter: API-sourced body + sidebar when available.
+  // Falls back to local silently.
+  let initialArticle: ArticleContent | null = null;
+  let initialSidebar: ReturnType<typeof toOpinionArticle>[] | null = null;
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const [detail, list] = await Promise.all([
+      apiGet<ApiOpinionDetail>(`/opinions/${slug}`, locale),
+      apiGet<ApiList<ApiOpinionListItem>>('/opinions?limit=10', locale),
+    ]);
+    if (detail) {
+      initialArticle = toOpinionDetail(detail);
+      initialSidebar = (list?.data ?? [])
+        .filter((item) => item.slug !== detail.slug)
+        .map(toOpinionArticle);
+    }
+  }
+
+  if (!article && !initialArticle) {
     notFound();
   }
   const baseUrl = SITE_URL;
@@ -110,7 +136,7 @@ export default async function Page({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
         />
       )}
-      <Opinion />
+      <Opinion initialArticle={initialArticle} initialSidebar={initialSidebar} />
     </>
   );
 }

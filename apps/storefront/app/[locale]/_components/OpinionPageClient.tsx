@@ -6,16 +6,28 @@ import { Breadcrumb } from '@/features/navigation/components';
 import { RecentNewsSidebar, ArticleDetail, useOpinion } from '@/features/news';
 import { NewsLayout } from '@/shared/layouts';
 import { useArticleTranslator } from '@/features/news/hooks/useArticleTranslation';
+import type { ArticleContent, OpinionArticle } from '@/data/newsModels';
 
 /**
  * Opinion Page - Client Component
  * 
  * Página que orquestra la visualización de una columna de opinión individual.
  * Utiliza la misma plantilla que las noticias para mantener la consistencia visual.
+ *
+ * F1 adapter: accepts API-sourced article + sidebar; falls back to the local
+ * hooks when absent (see src/lib/api.ts).
  */
-export const Opinion = () => {
+export const Opinion = ({
+  initialArticle,
+  initialSidebar,
+}: {
+  initialArticle?: ArticleContent | null;
+  initialSidebar?: OpinionArticle[] | null;
+}) => {
   const translateArticle = useArticleTranslator();
-  const { article: rawArticle, sidebarOpinions: rawSidebar } = useOpinion();
+  const { article: localArticle, sidebarOpinions: localSidebar } = useOpinion();
+  const rawArticle = initialArticle ?? localArticle;
+  const rawSidebar = initialSidebar ?? localSidebar;
   const article = translateArticle(rawArticle);
   const sidebarOpinions = rawSidebar?.map(translateArticle) || [];
   const t = useTranslations('news');

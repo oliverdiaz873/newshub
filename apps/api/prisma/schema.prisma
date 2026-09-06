@@ -1,0 +1,170 @@
+// Data Model v2 (locked) — Prisma schema, F1 public-reading subset.
+// Conventions: UUID PKs (@default(uuid()) client-side, no pgcrypto needed),
+// snake_case tables/columns, translations as separate tables, content as JSONB.
+// DB-level CHECKs and partial indexes are appended in the initial migration SQL.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String   @unique
+  displayName String   @map("display_name")
+  role        String
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  createdCategories Category[]   @relation("CategoryCreatedBy")
+  updatedCategories Category[]   @relation("CategoryUpdatedBy")
+  createdArticles   Article[]    @relation("ArticleCreatedBy")
+  updatedArticles   Article[]    @relation("ArticleUpdatedBy")
+  createdOpinions   Opinion[]    @relation("OpinionCreatedBy")
+  updatedOpinions   Opinion[]    @relation("OpinionUpdatedBy")
+  createdMedia      MediaAsset[] @relation("MediaCreatedBy")
+
+  @@map("users")
+}
+
+model Author {
+  id         String               @id @default(uuid()) @db.Uuid
+  slug       String               @unique
+  createdAt  DateTime             @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime             @updatedAt @map("updated_at") @db.Timestamptz
+  translations AuthorTranslation[]
+  articles   Article[]
+  opinions   Opinion[]
+
+  @@map("authors")
+}
+
+model AuthorTranslation {
+  authorId String @map("author_id") @db.Uuid
+  locale   String
+  name     String
+  bio      String?
+  author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@id([authorId, locale])
+  @@unique([locale, name])
+  @@map("author_translations")
+}
+
+model Category {
+  id          String                @id @default(uuid()) @db.Uuid
+  sort        Int                   @default(0)
+  createdById String?               @map("created_by") @db.Uuid
+  updatedById String?               @map("updated_by") @db.Uuid
+  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime              @updatedAt @map("updated_at") @db.Timestamptz
+  createdBy   User?                 @relation("CategoryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy   User?                 @relation("CategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  translations CategoryTranslation[]
+  articles    Article[]
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  categoryId  String   @map("category_id") @db.Uuid
+  locale      String
+  slug        String
+  label       String
+  description String?
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, locale])
+  @@unique([locale, slug])
+  @@map("category_translations")
+}
+
+model Article {
+  id           String               @id @default(uuid()) @db.Uuid
+  categoryId   String               @map("category_id") @db.Uuid
+  authorId     String?              @map("author_id") @db.Uuid
+  coverMediaId String?              @map("cover_media_id") @db.Uuid
+  status       String               @default("draft")
+  publishedAt  DateTime?            @map("published_at") @db.Timestamptz
+  createdById  String?              @map("created_by") @db.Uuid
+  updatedById  String?              @map("updated_by") @db.Uuid
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime             @updatedAt @map("updated_at") @db.Timestamptz
+  category     Category             @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  author       Author?              @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  cover        MediaAsset?          @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  createdBy    User?                @relation("ArticleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy    User?                @relation("ArticleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  translations ArticleTranslation[]
+
+  @@index([authorId])
+  @@map("articles")
+}
+
+model ArticleTranslation {
+  articleId String  @map("article_id") @db.Uuid
+  locale    String
+  slug      String
+  title     String
+  summary   String
+  coverAlt  String? @map("cover_alt")
+  content   Json
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, locale])
+  @@unique([locale, slug])
+  @@map("article_translations")
+}
+
+model Opinion {
+  id           String               @id @default(uuid()) @db.Uuid
+  authorId     String               @map("author_id") @db.Uuid
+  coverMediaId String?              @map("cover_media_id") @db.Uuid
+  status       String               @default("draft")
+  publishedAt  DateTime?            @map("published_at") @db.Timestamptz
+  createdById  String?              @map("created_by") @db.Uuid
+  updatedById  String?              @map("updated_by") @db.Uuid
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime             @updatedAt @map("updated_at") @db.Timestamptz
+  author       Author               @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  cover        MediaAsset?          @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  createdBy    User?                @relation("OpinionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy    User?                @relation("OpinionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  translations OpinionTranslation[]
+
+  @@index([authorId])
+  @@map("opinions")
+}
+
+model OpinionTranslation {
+  opinionId String  @map("opinion_id") @db.Uuid
+  locale    String
+  slug      String
+  title     String
+  summary   String
+  coverAlt  String? @map("cover_alt")
+  content   Json
+  opinion   Opinion @relation(fields: [opinionId], references: [id], onDelete: Cascade)
+
+  @@id([opinionId, locale])
+  @@unique([locale, slug])
+  @@map("opinion_translations")
+}
+
+model MediaAsset {
+  id          String    @id @default(uuid()) @db.Uuid
+  storageKey  String    @unique @map("storage_key")
+  mime        String
+  width       Int?
+  height      Int?
+  createdById String?   @map("created_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  createdBy   User?     @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  articles    Article[]
+  opinions    Opinion[]
+
+  @@map("media_assets")
+}
