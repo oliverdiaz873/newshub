@@ -27,6 +27,7 @@ export const ThemeToggle = () => {
   const menuId = useId();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional mount guard: prevents hydration mismatch by rendering null on the server/first paint; the pattern must stay, do not refactor into render
     setMounted(true);
   }, []);
 

@@ -28,6 +28,7 @@ export const useSearch = (overrideQuery?: string) => {
       });
       return () => { cancelled = true; };
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional cache reset: frees the EN translator when the query is cleared; results are already [] via the useMemo guard below, so no cascading render affects output
       setEnTranslator(null);
     }
   }, [query]);
