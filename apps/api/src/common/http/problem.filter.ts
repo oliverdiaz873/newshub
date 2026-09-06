@@ -50,13 +50,18 @@ export class ProblemExceptionFilter implements ExceptionFilter {
     payload: Record<string, unknown> | string,
     req: Request,
   ): ProblemBody {
+    const explicitCode =
+      typeof payload === 'object' && typeof payload['code'] === 'string'
+        ? (payload['code'] as string)
+        : undefined;
+    const code = explicitCode ?? this.code(status);
     const base = {
-      type: `https://newshub.local/problems/${this.slug(status)}`,
+      type: `https://newshub.local/problems/${code.replace(/_/g, '-')}`,
       title: typeof payload === 'object' && typeof payload['error'] === 'string'
         ? (payload['error'] as string)
         : this.title(status),
       status,
-      code: this.code(status),
+      code,
       detail: typeof payload === 'object' && typeof payload['message'] === 'string'
         ? (payload['message'] as string)
         : `${req.method} ${req.path}`,
@@ -74,10 +79,6 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       };
     }
     return base;
-  }
-
-  private slug(status: number): string {
-    return this.code(status).replace(/_/g, '-');
   }
 
   private title(status: number): string {

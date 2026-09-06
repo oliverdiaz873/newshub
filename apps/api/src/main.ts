@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -10,7 +11,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
   app.use(helmet());
-  app.enableCors();
+  app.use(cookieParser());
+  // Dashboard runs on another origin in dev (different port, same site for
+  // cookies). Production allowlist stays open (hosting decision).
+  app.enableCors({
+    origin: process.env.DASHBOARD_URL ?? 'http://localhost:3002',
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
