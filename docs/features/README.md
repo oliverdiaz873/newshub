@@ -11,6 +11,7 @@ This directory contains documentation for each feature in the project. Feature d
 | Theme | Implemented | — |
 | Internationalization | Implemented | — |
 | Data Layer | Implemented | — |
+| FEATURE-001 Public Reading | Proposed | [FEATURE-001-public-reading.md](FEATURE-001-public-reading.md) |
 
 ## Status Legend
 
