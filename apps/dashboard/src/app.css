@@ -1,0 +1,134 @@
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --text: #1c2333;
+  --muted: #68768d;
+  --accent: #dc3545;
+  --border: #e2e6ec;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.nh-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.nh-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.nh-topbar nav {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.nh-topbar a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nh-topbar a:hover {
+  color: var(--accent);
+}
+
+.nh-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.nh-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.nh-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.nh-field input,
+.nh-field textarea,
+.nh-field select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.nh-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.nh-btn {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.nh-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.nh-btn.danger {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.nh-error {
+  background: #fdecec;
+  border: 1px solid #f5c2c7;
+  color: #842029;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.nh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.nh-table th,
+.nh-table td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.nh-muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}

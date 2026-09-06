@@ -8,6 +8,7 @@
  * Run: npm run prisma:seed (DATABASE_URL must point at the target database)
  */
 import { PrismaClient } from '@prisma/client';
+import { hashPassword } from '../src/modules/auth/password';
 import { newsArticles } from '../../storefront/src/data/categories';
 import { opinionArticles } from '../../storefront/src/data/opinionArticles';
 import { opinionDetails } from '../../storefront/src/data/opinionDetails';
@@ -89,7 +90,7 @@ function atNoon(datetime: string): Date {
 
 async function main() {
   await prisma.$executeRawUnsafe(
-    'TRUNCATE "users", "authors", "categories", "articles", "opinions", "media_assets" RESTART IDENTITY CASCADE',
+    'TRUNCATE "users", "authors", "categories", "articles", "opinions", "media_assets", "user_credentials", "refresh_tokens" RESTART IDENTITY CASCADE',
   );
 
   const admin = await prisma.user.create({
@@ -97,6 +98,14 @@ async function main() {
   });
   await prisma.user.create({
     data: { email: 'editor@newshub.local', displayName: 'Editor', role: 'editor' },
+  });
+  // Dev-only credentials (documented, never production secrets).
+  await prisma.userCredential.create({
+    data: { userId: admin.id, passwordHash: await hashPassword('Admin123!') },
+  });
+  const editor = await prisma.user.findUniqueOrThrow({ where: { email: 'editor@newshub.local' } });
+  await prisma.userCredential.create({
+    data: { userId: editor.id, passwordHash: await hashPassword('Editor123!') },
   });
 
   const staff = await prisma.author.create({ data: { slug: STAFF_SLUG } });

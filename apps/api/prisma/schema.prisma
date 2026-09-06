@@ -26,6 +26,8 @@ model User {
   createdOpinions   Opinion[]    @relation("OpinionCreatedBy")
   updatedOpinions   Opinion[]    @relation("OpinionUpdatedBy")
   createdMedia      MediaAsset[] @relation("MediaCreatedBy")
+  credentials     UserCredential?
+  refreshTokens   RefreshToken[]
 
   @@map("users")
 }
@@ -167,4 +169,26 @@ model MediaAsset {
   opinions    Opinion[]
 
   @@map("media_assets")
+}
+
+model UserCredential {
+  userId       String   @id @map("user_id") @db.Uuid
+  passwordHash String   @map("password_hash")
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_credentials")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
 }
