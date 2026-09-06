@@ -41,7 +41,7 @@ export const Search = () => {
               <div className="row mb-4 mt-0">
                 <div className="col-12 border-bottom pb-3">
                   <h2 className="text-2xl font-bold">
-                    {t('resultsFor')} <span className="text-[#dc3545]">"{query}"</span>
+                    {t('resultsFor')} <span className="text-[#dc3545]">&quot;{query}&quot;</span>
                   </h2>
                   <p className="text-muted mt-2">{t('foundCount', { count })}</p>
                 </div>
