@@ -36,10 +36,13 @@ export default function OpinionsPage() {
   const { apiFetch } = useAuth();
   const [items, setItems] = useState<ListItem[]>([]);
   const [authors, setAuthors] = useState<Option[]>([]);
+  const [media, setMedia] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [authorId, setAuthorId] = useState('');
+  const [coverId, setCoverId] = useState('');
+  const [initialCover, setInitialCover] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [es, setEs] = useState<TranslationForm>({ ...EMPTY_TR });
   const [en, setEn] = useState<TranslationForm>({ ...EMPTY_TR });
@@ -56,7 +59,7 @@ export default function OpinionsPage() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = (await res.json()) as { data: ListItem[] };
     setItems(json.data);
-    const auths = await apiFetch('/authors');
+    const [auths, meds] = await Promise.all([apiFetch('/authors'), apiFetch('/media?limit=100')]);
     if (auths.ok) {
       const list = (await auths.json()) as Array<{
         id: string;
@@ -69,6 +72,10 @@ export default function OpinionsPage() {
           label: `${a.translations.find((t) => t.locale === 'es')?.name ?? a.slug} (${a.slug})`,
         })),
       );
+    }
+    if (meds.ok) {
+      const medJson = (await meds.json()) as { data: Array<{ id: string; mime: string }> };
+      setMedia(medJson.data.map((m) => ({ id: m.id, label: `${m.id.slice(0, 8)} (${m.mime})` })));
     }
   }
 
@@ -100,6 +107,11 @@ export default function OpinionsPage() {
               label: `${a.translations.find((t) => t.locale === 'es')?.name ?? a.slug} (${a.slug})`,
             })),
           );
+        }
+        const meds = await apiFetch('/media?limit=100');
+        if (!cancelled && meds.ok) {
+          const medJson = (await meds.json()) as { data: Array<{ id: string; mime: string }> };
+          setMedia(medJson.data.map((m) => ({ id: m.id, label: `${m.id.slice(0, 8)} (${m.mime})` })));
         }
       } catch (err) {
         if (cancelled) return;
@@ -138,6 +150,8 @@ export default function OpinionsPage() {
   function resetForm() {
     setEditing(null);
     setAuthorId('');
+    setCoverId('');
+    setInitialCover(null);
     setEs({ ...EMPTY_TR });
     setEn({ ...EMPTY_TR });
   }
@@ -151,7 +165,7 @@ export default function OpinionsPage() {
     }
     const res = await apiFetch('/opinions', {
       method: 'POST',
-      body: JSON.stringify({ authorId, translations: buildTranslations() }),
+      body: JSON.stringify({ authorId, coverMediaId: coverId || undefined, translations: buildTranslations() }),
     });
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
@@ -173,12 +187,15 @@ export default function OpinionsPage() {
     }
     const row = (await res.json()) as {
       authorId: string;
+      coverMediaId: string | null;
       translations: Array<{ locale: string; slug: string; title: string; summary: string; content: string[] }>;
     };
     const esT = row.translations.find((t) => t.locale === 'es');
     const enT = row.translations.find((t) => t.locale === 'en');
     setEditing(id);
     setAuthorId(row.authorId);
+    setCoverId(row.coverMediaId ?? '');
+    setInitialCover(row.coverMediaId ?? null);
     setEs({
       slug: esT?.slug ?? '',
       title: esT?.title ?? '',
@@ -199,7 +216,11 @@ export default function OpinionsPage() {
     setError(null);
     const res = await apiFetch(`/opinions/${editing}`, {
       method: 'PATCH',
-      body: JSON.stringify({ authorId, translations: buildTranslations() }),
+      body: JSON.stringify({
+        authorId,
+        coverMediaId: coverId === initialCover ? undefined : coverId || null,
+        translations: buildTranslations(),
+      }),
     });
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
@@ -270,6 +291,17 @@ export default function OpinionsPage() {
               {authors.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="nh-field">
+            <label htmlFor="cover">Portada (opcional, desde /media)</label>
+            <select id="cover" value={coverId} onChange={(e) => setCoverId(e.target.value)}>
+              <option value="">Sin portada</option>
+              {media.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
                 </option>
               ))}
             </select>

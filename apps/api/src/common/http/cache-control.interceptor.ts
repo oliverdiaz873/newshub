@@ -15,6 +15,8 @@ export class CacheControlInterceptor implements NestInterceptor {
     const req = ctx.getRequest<{ method: string }>();
     return next.handle().pipe(
       tap(() => {
+        // File downloads and manual @Res() handlers may have sent headers already.
+        if (res.headersSent) return;
         if (req.method === 'GET' && !res.getHeader('Cache-Control')) {
           res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
         }
