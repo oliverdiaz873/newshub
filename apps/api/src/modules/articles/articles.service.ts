@@ -7,6 +7,7 @@ import { MediaRepository } from '../media/media.repository';
 import type { CreateArticleDto, UpdateArticleDto } from '../editorial/dto/content-write.dto';
 import { DEFAULT_LOCALE, ResolvedLocale } from '../../common/locale';
 import { buildMeta, normalizePagination } from '../../common/pagination';
+import { resolveTransition, type TransitionAction } from '../../common/transitions';
 
 interface TranslationRow {
   locale: string;
@@ -164,7 +165,7 @@ export class ArticlesService {
   // ---- Editorial writes (F3: draft-only, auth + RBAC at the controller) ----
 
   async create(dto: CreateArticleDto, userId: string) {
-    this.requireDraft(dto.status);
+    this.requireCreateDraft(dto.status);
     this.requireSpanish(dto.translations);
     await this.assertReferences(dto.categoryId, dto.authorId, dto.coverMediaId);
     await this.assertSlugsFree(dto.translations);
@@ -185,7 +186,7 @@ export class ArticlesService {
   async update(id: string, dto: UpdateArticleDto, userId: string) {
     const existing = await this.articles.findByIdFull(id);
     if (!existing) throw new NotFoundException('Article not found.');
-    this.requireDraft(dto.status);
+    const targetStatus = this.resolvePatchStatus(existing.status, dto.status);
     if (dto.categoryId !== undefined && !(await this.categories.exists(dto.categoryId))) {
       throw new NotFoundException('Category not found.');
     }
@@ -209,6 +210,7 @@ export class ArticlesService {
       categoryId: dto.categoryId,
       authorId: dto.authorId,
       coverMediaId: dto.coverMediaId,
+      status: targetStatus,
       updatedById: userId,
     });
     const after = await this.articles.findByIdFull(id);
@@ -224,9 +226,59 @@ export class ArticlesService {
     await this.articles.deleteById(id);
   }
 
-  private requireDraft(status: string | undefined) {
+  /**
+   * Publishing transitions (F4). `firstPublishedAt` is set once on the first
+   * publish and never rewritten; unpublish keeps history; audit tracks the actor.
+   */
+  async transition(id: string, action: TransitionAction, userId: string) {
+    const row = await this.articles.findByIdFull(id);
+    if (!row) throw new NotFoundException('Article not found.');
+    const target = resolveTransition(row.status, action);
+    if (target === null) return this.read(id);
+    if (action === 'publish' && !row.translations.some((t) => t.locale === DEFAULT_LOCALE)) {
+      throw new UnprocessableEntityException('Spanish translation is required to publish.');
+    }
+    await this.articles.setStatus(id, {
+      status: target,
+      publishedAt: action === 'publish' && !row.publishedAt ? new Date() : undefined,
+      updatedById: userId,
+    });
+    return this.read(id);
+  }
+
+  /**
+   * PATCH status policy (documented F3 exception): only `review` may be set,
+   * and only from `draft` (idempotent when already `review`). Anything else
+   * must go through the transition endpoints.
+   */
+  private resolvePatchStatus(current: string, requested: string | undefined): string | undefined {
+    if (requested === undefined || requested === 'draft') {
+      if (requested === 'draft' && current !== 'draft') {
+        throw new ConflictException({
+          code: 'invalid_transition',
+          error: 'Conflict',
+          message: `Cannot set status to 'draft' from '${current}'. Use the transition endpoints.`,
+        });
+      }
+      return undefined;
+    }
+    if (requested === 'review') {
+      if (current === 'review') return undefined;
+      if (current !== 'draft') {
+        throw new ConflictException({
+          code: 'invalid_transition',
+          error: 'Conflict',
+          message: `Cannot set status to 'review' from '${current}'.`,
+        });
+      }
+      return 'review';
+    }
+    throw new UnprocessableEntityException('Only draft or review status is allowed via PATCH (F4 owns transitions).');
+  }
+
+  private requireCreateDraft(status: string | undefined) {
     if (status !== undefined && status !== 'draft') {
-      throw new UnprocessableEntityException('Only draft status is allowed in this slice (F4 owns transitions).');
+      throw new UnprocessableEntityException('Only draft status is allowed on create (F4 owns transitions).');
     }
   }
 

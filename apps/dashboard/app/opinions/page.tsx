@@ -40,11 +40,14 @@ export default function OpinionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [authorId, setAuthorId] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [es, setEs] = useState<TranslationForm>({ ...EMPTY_TR });
   const [en, setEn] = useState<TranslationForm>({ ...EMPTY_TR });
 
+  const statusQuery = statusFilter === 'all' ? '' : `&status=${statusFilter}`;
+
   async function load() {
-    const res = await apiFetch('/editorial/opinions?locale=es&limit=100');
+    const res = await apiFetch(`/editorial/opinions?locale=es&limit=100${statusQuery}`);
     if (res.status === 401) {
       setError('Sesión requerida. Accede primero.');
       setItems([]);
@@ -73,7 +76,7 @@ export default function OpinionsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await apiFetch('/editorial/opinions?locale=es&limit=100');
+        const res = await apiFetch(`/editorial/opinions?locale=es&limit=100${statusQuery}`);
         if (cancelled) return;
         if (res.status === 401) {
           setError('Sesión requerida. Accede primero.');
@@ -108,7 +111,7 @@ export default function OpinionsPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiFetch]);
+  }, [apiFetch, statusQuery]);
 
   function buildTranslations() {
     const translations = [
@@ -222,6 +225,32 @@ export default function OpinionsPage() {
     setLoading(false);
   }
 
+  async function runAction(row: ListItem, action: 'publish' | 'unpublish' | 'archive' | 'restore') {
+    const labels: Record<string, string> = {
+      publish: 'publicar',
+      unpublish: 'despublicar',
+      archive: 'archivar',
+      restore: 'restaurar',
+    };
+    if (!window.confirm(`${labels[action][0].toUpperCase()}${labels[action].slice(1)} «${row.title}»?`)) return;
+    setError(null);
+    const res = await apiFetch(`/opinions/${row.id}/${action}`, { method: 'POST' });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
+      setError(body?.code === 'invalid_transition' ? 'Transición no permitida desde su estado.' : (body?.detail ?? `HTTP ${res.status}`));
+      return;
+    }
+    setLoading(true);
+    await load();
+    setLoading(false);
+  }
+
+  function actionsFor(status: string): Array<'publish' | 'unpublish' | 'archive' | 'restore'> {
+    if (status === 'published') return ['unpublish', 'archive'];
+    if (status === 'archived') return ['restore'];
+    return ['publish', 'archive'];
+  }
+
   return (
     <main>
       <h1>Opiniones</h1>
@@ -293,6 +322,16 @@ export default function OpinionsPage() {
       </section>
       <section className="nh-card">
         <h2>Listado</h2>
+        <div className="nh-field">
+          <label htmlFor="statusFilter">Estado</label>
+          <select id="statusFilter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">Todos</option>
+            <option value="draft">Borrador</option>
+            <option value="review">Revisión</option>
+            <option value="published">Publicado</option>
+            <option value="archived">Archivado</option>
+          </select>
+        </div>
         {loading ? (
           <p className="nh-muted">Cargando…</p>
         ) : items.length === 0 ? (
@@ -316,6 +355,11 @@ export default function OpinionsPage() {
                   <td>{row.status}</td>
                   <td>
                     <div className="nh-row">
+                      {actionsFor(row.status).map((action) => (
+                        <button key={action} className="nh-btn" type="button" onClick={() => void runAction(row, action)}>
+                          {action === 'publish' ? 'Publicar' : action === 'unpublish' ? 'Despublicar' : action === 'archive' ? 'Archivar' : 'Restaurar'}
+                        </button>
+                      ))}
                       <button className="nh-btn" type="button" onClick={() => void startEdit(row.id)}>
                         Editar
                       </button>

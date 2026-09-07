@@ -8,6 +8,7 @@ import { CurrentUser, Roles } from '../auth/decorators';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import type { AccessClaims } from '../auth/tokens';
+import type { TransitionAction } from '../../common/transitions';
 
 @Controller('articles')
 export class ArticlesController {
@@ -57,5 +58,33 @@ export class ArticlesController {
   @Roles('admin', 'editor')
   async remove(@Param('id') id: string): Promise<void> {
     await this.articles.remove(id);
+  }
+
+  @Post(':id/publish')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'editor')
+  publish(@Param('id') id: string, @CurrentUser() user: AccessClaims) {
+    return this.articles.transition(id, 'publish' satisfies TransitionAction, user.sub);
+  }
+
+  @Post(':id/unpublish')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'editor')
+  unpublish(@Param('id') id: string, @CurrentUser() user: AccessClaims) {
+    return this.articles.transition(id, 'unpublish' satisfies TransitionAction, user.sub);
+  }
+
+  @Post(':id/archive')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'editor')
+  archive(@Param('id') id: string, @CurrentUser() user: AccessClaims) {
+    return this.articles.transition(id, 'archive' satisfies TransitionAction, user.sub);
+  }
+
+  @Post(':id/restore')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'editor')
+  restore(@Param('id') id: string, @CurrentUser() user: AccessClaims) {
+    return this.articles.transition(id, 'restore' satisfies TransitionAction, user.sub);
   }
 }

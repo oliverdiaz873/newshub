@@ -14,6 +14,7 @@ This directory contains documentation for each feature in the project. Feature d
 | FEATURE-001 Public Reading | Implemented | [FEATURE-001-public-reading.md](FEATURE-001-public-reading.md) |
 | FEATURE-002 Editorial Categories & Authors | Implemented | [FEATURE-002-editorial-categories-authors.md](FEATURE-002-editorial-categories-authors.md) |
 | FEATURE-003 Editorial Articles & Opinions | Implemented | [FEATURE-003-editorial-articles-opinions.md](FEATURE-003-editorial-articles-opinions.md) |
+| FEATURE-004 Publishing Workflow | Implemented | [FEATURE-004-publishing-workflow.md](FEATURE-004-publishing-workflow.md) |
 
 ## Status Legend
 

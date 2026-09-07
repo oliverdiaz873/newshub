@@ -43,15 +43,18 @@ export default function ArticlesPage() {
   const [editing, setEditing] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState('');
   const [authorId, setAuthorId] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [es, setEs] = useState<TranslationForm>({ ...EMPTY_TR });
   const [en, setEn] = useState<TranslationForm>({ ...EMPTY_TR });
+
+  const statusQuery = statusFilter === 'all' ? '' : `&status=${statusFilter}`;
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const [arts, cats, auths] = await Promise.all([
-        apiFetch('/editorial/articles?locale=es&limit=100'),
+        apiFetch(`/editorial/articles?locale=es&limit=100${statusQuery}`),
         apiFetch('/categories?locale=es&limit=100'),
         apiFetch('/authors'),
       ]);
@@ -81,12 +84,12 @@ export default function ArticlesPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, statusQuery]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const res = await apiFetch('/editorial/articles?locale=es&limit=100');
+      const res = await apiFetch(`/editorial/articles?locale=es&limit=100${statusQuery}`);
       if (cancelled) return;
       if (res.status === 401) {
         setError('Sesión requerida. Accede primero.');
@@ -125,7 +128,7 @@ export default function ArticlesPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiFetch]);
+  }, [apiFetch, statusQuery]);
 
   function buildTranslations() {
     const translations = [
@@ -244,6 +247,30 @@ export default function ArticlesPage() {
     await load();
   }
 
+  async function runAction(row: ListItem, action: 'publish' | 'unpublish' | 'archive' | 'restore') {
+    const labels: Record<string, string> = {
+      publish: 'publicar',
+      unpublish: 'despublicar',
+      archive: 'archivar',
+      restore: 'restaurar',
+    };
+    if (!window.confirm(`${labels[action][0].toUpperCase()}${labels[action].slice(1)} «${row.title}»?`)) return;
+    setError(null);
+    const res = await apiFetch(`/articles/${row.id}/${action}`, { method: 'POST' });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
+      setError(body?.code === 'invalid_transition' ? 'Transición no permitida desde su estado.' : (body?.detail ?? `HTTP ${res.status}`));
+      return;
+    }
+    await load();
+  }
+
+  function actionsFor(status: string): Array<'publish' | 'unpublish' | 'archive' | 'restore'> {
+    if (status === 'published') return ['unpublish', 'archive'];
+    if (status === 'archived') return ['restore'];
+    return ['publish', 'archive'];
+  }
+
   return (
     <main>
       <h1>Artículos</h1>
@@ -326,6 +353,16 @@ export default function ArticlesPage() {
       </section>
       <section className="nh-card">
         <h2>Listado</h2>
+        <div className="nh-field">
+          <label htmlFor="statusFilter">Estado</label>
+          <select id="statusFilter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">Todos</option>
+            <option value="draft">Borrador</option>
+            <option value="review">Revisión</option>
+            <option value="published">Publicado</option>
+            <option value="archived">Archivado</option>
+          </select>
+        </div>
         {loading ? (
           <p className="nh-muted">Cargando…</p>
         ) : items.length === 0 ? (
@@ -349,6 +386,11 @@ export default function ArticlesPage() {
                   <td>{row.status}</td>
                   <td>
                     <div className="nh-row">
+                      {actionsFor(row.status).map((action) => (
+                        <button key={action} className="nh-btn" type="button" onClick={() => void runAction(row, action)}>
+                          {action === 'publish' ? 'Publicar' : action === 'unpublish' ? 'Despublicar' : action === 'archive' ? 'Archivar' : 'Restaurar'}
+                        </button>
+                      ))}
                       <button className="nh-btn" type="button" onClick={() => void startEdit(row.id)}>
                         Editar
                       </button>
