@@ -18,6 +18,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <header className="nh-topbar">
               <strong>Newshub · Editorial</strong>
               <nav>
+                <Link href="/articles">Artículos</Link>
+                <Link href="/opinions">Opiniones</Link>
                 <Link href="/categories">Categorías</Link>
                 <Link href="/authors">Autores</Link>
                 <Link href="/login">Acceder</Link>

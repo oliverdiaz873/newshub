@@ -13,6 +13,7 @@ This directory contains documentation for each feature in the project. Feature d
 | Data Layer | Implemented | — |
 | FEATURE-001 Public Reading | Implemented | [FEATURE-001-public-reading.md](FEATURE-001-public-reading.md) |
 | FEATURE-002 Editorial Categories & Authors | Implemented | [FEATURE-002-editorial-categories-authors.md](FEATURE-002-editorial-categories-authors.md) |
+| FEATURE-003 Editorial Articles & Opinions | Implemented | [FEATURE-003-editorial-articles-opinions.md](FEATURE-003-editorial-articles-opinions.md) |
 
 ## Status Legend
 

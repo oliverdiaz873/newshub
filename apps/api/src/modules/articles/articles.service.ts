@@ -1,6 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { ArticlesRepository } from './articles.repository';
 import { AuthorsService } from '../authors/authors.service';
+import { CategoriesService } from '../categories/categories.service';
+import { MediaRepository } from '../media/media.repository';
+import type { CreateArticleDto, UpdateArticleDto } from '../editorial/dto/content-write.dto';
 import { DEFAULT_LOCALE, ResolvedLocale } from '../../common/locale';
 import { buildMeta, normalizePagination } from '../../common/pagination';
 
@@ -21,7 +25,7 @@ export interface ArticleListItem {
   summary: string;
   cover: { url: string; alt: string } | null;
   author: { slug: string; name: string; bio: string | null } | null;
-  firstPublishedAt: string;
+  firstPublishedAt: string | null;
   updatedAt: string;
   fallback: boolean;
 }
@@ -37,6 +41,8 @@ export class ArticlesService {
   constructor(
     @Inject(ArticlesRepository) private readonly articles: ArticlesRepository,
     @Inject(AuthorsService) private readonly authors: AuthorsService,
+    @Inject(CategoriesService) private readonly categories: CategoriesService,
+    @Inject(MediaRepository) private readonly media: MediaRepository,
   ) {}
 
   async list(
@@ -57,8 +63,7 @@ export class ArticlesService {
     };
   }
 
-  async detail(slug: string, locale: ResolvedLocale): Promise<ArticleDetail & { localeRequested: string; localeResolved: string }> {
-    const hit = await this.articles.findBySlug(slug, locale.resolved);
+  async detail(slug: string, locale: ResolvedLocale): Promise<ArticleDetail & { localeRequested: string; localeResolved: string }> {    const hit = await this.articles.findBySlug(slug, locale.resolved);
     if (!hit) {
       if (locale.resolved !== DEFAULT_LOCALE) {
         const es = await this.articles.findBySlug(slug, DEFAULT_LOCALE);
@@ -113,7 +118,7 @@ export class ArticlesService {
         alt: direct?.coverAlt ?? direct?.title ?? '',
       } : null,
       author: row.authorId ? await this.authors.viewFor(row.authorId as string, usedLocale) : null,
-      firstPublishedAt: (row.publishedAt as Date).toISOString(),
+      firstPublishedAt: row.publishedAt ? (row.publishedAt as Date).toISOString() : null,
       updatedAt: (row.updatedAt as Date).toISOString(),
       fallback: usedLocale !== locale.resolved,
     };
@@ -154,5 +159,166 @@ export class ArticlesService {
   private pickLabel(translations: Array<{ locale: string; label: string }>, locale: string): string {
     return translations.find((t) => t.locale === locale)?.label
       ?? translations.find((t) => t.locale === DEFAULT_LOCALE)?.label ?? '';
+  }
+
+  // ---- Editorial writes (F3: draft-only, auth + RBAC at the controller) ----
+
+  async create(dto: CreateArticleDto, userId: string) {
+    this.requireDraft(dto.status);
+    this.requireSpanish(dto.translations);
+    await this.assertReferences(dto.categoryId, dto.authorId, dto.coverMediaId);
+    await this.assertSlugsFree(dto.translations);
+    try {
+      const row = await this.articles.createWithTranslations({
+        categoryId: dto.categoryId,
+        authorId: dto.authorId ?? null,
+        coverMediaId: dto.coverMediaId ?? null,
+        createdById: userId,
+        translations: dto.translations,
+      });
+      return this.read(row.id);
+    } catch (err) {
+      throw this.asSlugConflict(err);
+    }
+  }
+
+  async update(id: string, dto: UpdateArticleDto, userId: string) {
+    const existing = await this.articles.findByIdFull(id);
+    if (!existing) throw new NotFoundException('Article not found.');
+    this.requireDraft(dto.status);
+    if (dto.categoryId !== undefined && !(await this.categories.exists(dto.categoryId))) {
+      throw new NotFoundException('Category not found.');
+    }
+    if (dto.authorId !== undefined && dto.authorId !== null && !(await this.authors.exists(dto.authorId))) {
+      throw new NotFoundException('Author not found.');
+    }
+    if (dto.coverMediaId !== undefined && dto.coverMediaId !== null && !(await this.media.findById(dto.coverMediaId))) {
+      throw new NotFoundException('Media asset not found.');
+    }
+    if (dto.translations) {
+      await this.assertSlugsFree(dto.translations, id);
+      for (const t of dto.translations) {
+        try {
+          await this.articles.upsertTranslation(id, t);
+        } catch (err) {
+          throw this.asSlugConflict(err);
+        }
+      }
+    }
+    await this.articles.updateFields(id, {
+      categoryId: dto.categoryId,
+      authorId: dto.authorId,
+      coverMediaId: dto.coverMediaId,
+      updatedById: userId,
+    });
+    const after = await this.articles.findByIdFull(id);
+    if (!after?.translations.some((t) => t.locale === DEFAULT_LOCALE)) {
+      throw new UnprocessableEntityException('Spanish translation is required.');
+    }
+    return this.read(id);
+  }
+
+  async remove(id: string) {
+    const existing = await this.articles.findByIdFull(id);
+    if (!existing) throw new NotFoundException('Article not found.');
+    await this.articles.deleteById(id);
+  }
+
+  private requireDraft(status: string | undefined) {
+    if (status !== undefined && status !== 'draft') {
+      throw new UnprocessableEntityException('Only draft status is allowed in this slice (F4 owns transitions).');
+    }
+  }
+
+  private requireSpanish(translations: Array<{ locale: string }>) {
+    if (!translations.some((t) => t.locale === DEFAULT_LOCALE)) {
+      throw new UnprocessableEntityException('Spanish translation is required.');
+    }
+  }
+
+  private async assertReferences(categoryId: string, authorId?: string | null, coverMediaId?: string | null) {
+    if (!(await this.categories.exists(categoryId))) {
+      throw new NotFoundException('Category not found.');
+    }
+    if (authorId && !(await this.authors.exists(authorId))) {
+      throw new NotFoundException('Author not found.');
+    }
+    if (coverMediaId && !(await this.media.findById(coverMediaId))) {
+      throw new NotFoundException('Media asset not found.');
+    }
+  }
+
+  private async assertSlugsFree(
+    translations: Array<{ locale: string; slug: string }>,
+    excludeArticleId?: string,
+  ) {
+    for (const t of translations) {
+      const hit = await this.articles.findTranslationBySlug(t.locale, t.slug);
+      if (hit && hit.articleId !== excludeArticleId) {
+        throw new ConflictException({
+          code: 'slug_taken',
+          error: 'Conflict',
+          message: `Slug '${t.slug}' is already taken for locale '${t.locale}'.`,
+        });
+      }
+    }
+  }
+
+  private asSlugConflict(err: unknown): never {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      throw new ConflictException({
+        code: 'slug_taken',
+        error: 'Conflict',
+        message: 'Slug is already taken for this locale.',
+      });
+    }
+    throw err;
+  }
+
+  // ---- Editorial reads (auth enforced at the editorial controller) ----
+
+  async listEditorial(
+    query: { page?: number; limit?: number; status?: string; category?: string; author?: string; q?: string },
+    locale: ResolvedLocale,
+  ) {
+    const { page, limit } = normalizePagination(query.page, query.limit);
+    const filters = await this.resolveFilters(query, locale);
+    const total = await this.articles.countAny({ ...filters, status: query.status });
+    const rows = await this.articles.listAny({ ...filters, status: query.status }, (page - 1) * limit, limit);
+    const data = await Promise.all(
+      rows.map(async (row) => ({ ...(await this.toListItem(row, locale)), status: row.status as string })),
+    );
+    return {
+      data,
+      meta: buildMeta(page, limit, total),
+      localeRequested: locale.requested,
+      localeResolved: locale.resolved,
+      fallback: data.some((item) => item.fallback),
+    };
+  }
+
+  async read(id: string) {
+    const row = await this.articles.findByIdFull(id);
+    if (!row) throw new NotFoundException('Article not found.');
+    return {
+      id: row.id,
+      categoryId: row.categoryId,
+      authorId: row.authorId,
+      coverMediaId: row.coverMediaId,
+      status: row.status,
+      firstPublishedAt: row.publishedAt ? row.publishedAt.toISOString() : null,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+      translations: row.translations.map((t) => ({
+        locale: t.locale,
+        slug: t.slug,
+        title: t.title,
+        summary: t.summary,
+        coverAlt: t.coverAlt,
+        content: Array.isArray(t.content)
+          ? (t.content as unknown[]).filter((p): p is string => typeof p === 'string')
+          : [],
+      })),
+    };
   }
 }
