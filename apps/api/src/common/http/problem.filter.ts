@@ -6,6 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { MulterError } from 'multer';
 
 interface ProblemBody {
   type: string;
@@ -27,7 +28,19 @@ export class ProblemExceptionFilter implements ExceptionFilter {
     const res = ctx.getResponse<Response>();
     const req = ctx.getRequest<Request>();
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof MulterError) {
+      const tooLarge = (exception as { code?: string }).code === 'LIMIT_FILE_SIZE';
+      const status = tooLarge ? HttpStatus.PAYLOAD_TOO_LARGE : HttpStatus.BAD_REQUEST;
+      const code = tooLarge ? 'file_too_large' : 'invalid_file';
+      res.status(status).json({
+        type: `https://newshub.local/problems/${code.replace(/_/g, '-')}`,
+        title: tooLarge ? 'Payload Too Large' : 'Bad Request',
+        status,
+        code,
+        detail: tooLarge ? 'File exceeds the 5 MB limit.' : 'Invalid file upload.',
+      });
+      return;
+    }    if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const payload = exception.getResponse() as Record<string, unknown> | string;
       const body = this.toProblem(status, payload, req);
@@ -88,6 +101,7 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       case 403: return 'Forbidden';
       case 404: return 'Not found';
       case 409: return 'Conflict';
+      case 413: return 'Payload Too Large';
       case 422: return 'Unprocessable entity';
       default: return 'Error';
     }
@@ -100,6 +114,9 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       case 403: return 'forbidden';
       case 404: return 'not_found';
       case 409: return 'conflict';
+      // The only 413 producer in this API is the upload size limit,
+      // regardless of which layer raised it (multer or Nest wrappers).
+      case 413: return 'file_too_large';
       case 422: return 'validation_failed';
       default: return 'error';
     }

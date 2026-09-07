@@ -38,11 +38,14 @@ export default function ArticlesPage() {
   const [items, setItems] = useState<ListItem[]>([]);
   const [categories, setCategories] = useState<Option[]>([]);
   const [authors, setAuthors] = useState<Option[]>([]);
+  const [media, setMedia] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState('');
   const [authorId, setAuthorId] = useState('');
+  const [coverId, setCoverId] = useState('');
+  const [initialCover, setInitialCover] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [es, setEs] = useState<TranslationForm>({ ...EMPTY_TR });
   const [en, setEn] = useState<TranslationForm>({ ...EMPTY_TR });
@@ -53,17 +56,18 @@ export default function ArticlesPage() {
     setLoading(true);
     setError(null);
     try {
-      const [arts, cats, auths] = await Promise.all([
+      const [arts, cats, auths, meds] = await Promise.all([
         apiFetch(`/editorial/articles?locale=es&limit=100${statusQuery}`),
         apiFetch('/categories?locale=es&limit=100'),
         apiFetch('/authors'),
+        apiFetch('/media?limit=100'),
       ]);
-      if (arts.status === 401 || cats.status === 401 || auths.status === 401) {
+      if (arts.status === 401 || cats.status === 401 || auths.status === 401 || meds.status === 401) {
         setError('Sesión requerida. Accede primero.');
         setItems([]);
         return;
       }
-      if (!arts.ok || !cats.ok || !auths.ok) throw new Error('Error cargando datos.');
+      if (!arts.ok || !cats.ok || !auths.ok || !meds.ok) throw new Error('Error cargando datos.');
       const articles = (await arts.json()) as { data: ListItem[] };
       setItems(articles.data);
       const catJson = (await cats.json()) as { data: Array<{ id: string; slug: string; label: string }> };
@@ -79,6 +83,8 @@ export default function ArticlesPage() {
           label: `${a.translations.find((t) => t.locale === 'es')?.name ?? a.slug} (${a.slug})`,
         })),
       );
+      const medJson = (await meds.json()) as { data: Array<{ id: string; mime: string }> };
+      setMedia(medJson.data.map((m) => ({ id: m.id, label: `${m.id.slice(0, 8)} (${m.mime})` })));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error de red.');
     } finally {
@@ -119,6 +125,11 @@ export default function ArticlesPage() {
           })),
         );
       }
+      const meds = await apiFetch('/media?limit=100');
+      if (!cancelled && meds.ok) {
+        const json = (await meds.json()) as { data: Array<{ id: string; mime: string }> };
+        setMedia(json.data.map((m) => ({ id: m.id, label: `${m.id.slice(0, 8)} (${m.mime})` })));
+      }
       if (!cancelled) setLoading(false);
     })().catch((err: unknown) => {
       if (cancelled) return;
@@ -156,6 +167,8 @@ export default function ArticlesPage() {
     setEditing(null);
     setCategoryId('');
     setAuthorId('');
+    setCoverId('');
+    setInitialCover(null);
     setEs({ ...EMPTY_TR });
     setEn({ ...EMPTY_TR });
   }
@@ -172,6 +185,7 @@ export default function ArticlesPage() {
       body: JSON.stringify({
         categoryId,
         authorId: authorId || undefined,
+        coverMediaId: coverId || undefined,
         translations: buildTranslations(),
       }),
     });
@@ -194,6 +208,7 @@ export default function ArticlesPage() {
     const row = (await res.json()) as {
       categoryId: string;
       authorId: string | null;
+      coverMediaId: string | null;
       translations: Array<{ locale: string; slug: string; title: string; summary: string; content: string[] }>;
     };
     const esT = row.translations.find((t) => t.locale === 'es');
@@ -201,6 +216,8 @@ export default function ArticlesPage() {
     setEditing(id);
     setCategoryId(row.categoryId);
     setAuthorId(row.authorId ?? '');
+    setCoverId(row.coverMediaId ?? '');
+    setInitialCover(row.coverMediaId ?? null);
     setEs({
       slug: esT?.slug ?? '',
       title: esT?.title ?? '',
@@ -224,6 +241,7 @@ export default function ArticlesPage() {
       body: JSON.stringify({
         categoryId: categoryId || undefined,
         authorId: authorId === '' ? undefined : authorId || null,
+        coverMediaId: coverId === initialCover ? undefined : coverId || null,
         translations: buildTranslations(),
       }),
     });
@@ -301,6 +319,17 @@ export default function ArticlesPage() {
               {authors.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="nh-field">
+            <label htmlFor="cover">Portada (opcional, desde /media)</label>
+            <select id="cover" value={coverId} onChange={(e) => setCoverId(e.target.value)}>
+              <option value="">Sin portada</option>
+              {media.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
                 </option>
               ))}
             </select>

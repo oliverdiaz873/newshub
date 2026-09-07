@@ -15,6 +15,7 @@ This directory contains documentation for each feature in the project. Feature d
 | FEATURE-002 Editorial Categories & Authors | Implemented | [FEATURE-002-editorial-categories-authors.md](FEATURE-002-editorial-categories-authors.md) |
 | FEATURE-003 Editorial Articles & Opinions | Implemented | [FEATURE-003-editorial-articles-opinions.md](FEATURE-003-editorial-articles-opinions.md) |
 | FEATURE-004 Publishing Workflow | Implemented | [FEATURE-004-publishing-workflow.md](FEATURE-004-publishing-workflow.md) |
+| FEATURE-005 Media Upload & Storage | Implemented | [FEATURE-005-media-upload-storage.md](FEATURE-005-media-upload-storage.md) |
 
 ## Status Legend
 

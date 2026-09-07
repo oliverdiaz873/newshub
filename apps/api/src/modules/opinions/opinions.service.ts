@@ -4,6 +4,7 @@ import { OpinionsRepository } from './opinions.repository';
 import { AuthorsService } from '../authors/authors.service';
 import { MediaRepository } from '../media/media.repository';
 import type { CreateOpinionDto, UpdateOpinionDto } from '../editorial/dto/content-write.dto';
+import { coverUrl } from '../media/cover-url';
 import { DEFAULT_LOCALE, ResolvedLocale } from '../../common/locale';
 import { buildMeta, normalizePagination } from '../../common/pagination';
 import { resolveTransition, type TransitionAction } from '../../common/transitions';
@@ -93,7 +94,7 @@ export class OpinionsService {
       title: direct?.title ?? '',
       summary: direct?.summary ?? '',
       cover: row.cover ? {
-        url: row.cover.storageKey as string,
+        url: coverUrl(row.cover as { id: string; storageKey: string }),
         alt: direct?.coverAlt ?? direct?.title ?? '',
       } : null,
       author,
