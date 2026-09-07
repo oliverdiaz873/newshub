@@ -1,0 +1,94 @@
+# Newshub CI — quality gates (Phase 6, P0-2).
+#
+# Three independent jobs, no matrices, no shared artifacts. Each job checks
+# out clean, installs its own app and runs its gates. No step depends on
+# local services or committed .env files: every external value comes from
+# job-scoped env below, so a clean checkout reproduces CI exactly.
+#
+# Branch protection (manual, GitHub Settings → Branches): require
+# api / storefront / dashboard checks on PRs to main. Merges stay manual.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  api:
+    name: api
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/newshub_test
+      MEDIA_DIR: ${{ runner.temp }}/nh-media
+      JWT_SECRET: ci-test-secret
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install PostgreSQL (no Docker)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql postgresql-contrib
+          sudo service postgresql start
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+          sudo -u postgres createdb newshub_test
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:e2e
+
+  storefront:
+    name: storefront
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/storefront
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/storefront/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run build
+
+  dashboard:
+    name: dashboard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/dashboard
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/dashboard/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run build
