@@ -10,7 +10,12 @@ export interface AccessClaims {
 function secret(): string {
   const value = process.env.JWT_SECRET;
   if (value) return value;
-  // Dev-only fallback; production must set JWT_SECRET (documented in .env.example).
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      '[auth] JWT_SECRET is required in production. Refusing to boot with a known fallback secret.',
+    );
+  }
+  // Dev/test fallback; production must set JWT_SECRET (documented in .env.example).
   console.warn('[auth] JWT_SECRET unset, using insecure dev fallback.');
   return 'dev-secret-change-me';
 }
