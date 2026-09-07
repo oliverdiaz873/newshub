@@ -96,6 +96,10 @@ export class CategoriesService {
 
   // ---- Editorial writes (F2, auth + RBAC enforced at the controller) ----
 
+  async exists(id: string): Promise<boolean> {
+    return (await this.categories.findByIdWithTranslations(id)) !== null;
+  }
+
   async create(dto: CreateCategoryDto, userId: string, locale: ResolvedLocale) {
     this.requireSpanish(dto.translations);
     await this.assertSlugsFree(dto.translations);

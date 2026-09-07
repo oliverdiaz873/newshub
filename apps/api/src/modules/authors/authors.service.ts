@@ -46,6 +46,10 @@ export class AuthorsService {
 
   // ---- Editorial writes (F2, auth + RBAC enforced at the controller) ----
 
+  async exists(id: string): Promise<boolean> {
+    return (await this.authors.findByIdFull(id)) !== null;
+  }
+
   async create(dto: CreateAuthorDto) {
     this.requireSpanish(dto.translations);
     await this.assertSlugFree(dto.slug);
