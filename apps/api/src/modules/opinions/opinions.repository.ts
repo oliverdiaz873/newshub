@@ -148,7 +148,7 @@ export class OpinionsRepository {
 
   updateFields(
     id: string,
-    input: { authorId?: string; coverMediaId?: string | null; updatedById: string },
+    input: { authorId?: string; coverMediaId?: string | null; status?: string; updatedById: string },
   ) {
     return this.prisma.opinion.update({
       where: { id },
@@ -159,6 +159,7 @@ export class OpinionsRepository {
             ? { cover: { disconnect: true } }
             : { cover: { connect: { id: input.coverMediaId } } }
           : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
         updatedBy: { connect: { id: input.updatedById } },
       },
     });
@@ -180,5 +181,16 @@ export class OpinionsRepository {
 
   deleteById(id: string) {
     return this.prisma.opinion.delete({ where: { id } });
+  }
+
+  setStatus(id: string, input: { status: string; publishedAt?: Date | null; updatedById: string }) {
+    return this.prisma.opinion.update({
+      where: { id },
+      data: {
+        status: input.status,
+        ...(input.publishedAt !== undefined ? { publishedAt: input.publishedAt } : {}),
+        updatedBy: { connect: { id: input.updatedById } },
+      },
+    });
   }
 }

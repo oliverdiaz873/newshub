@@ -184,7 +184,7 @@ export class ArticlesRepository {
 
   updateFields(
     id: string,
-    input: { categoryId?: string; authorId?: string | null; coverMediaId?: string | null; updatedById: string },
+    input: { categoryId?: string; authorId?: string | null; coverMediaId?: string | null; status?: string; updatedById: string },
   ) {
     return this.prisma.article.update({
       where: { id },
@@ -200,6 +200,7 @@ export class ArticlesRepository {
             ? { cover: { disconnect: true } }
             : { cover: { connect: { id: input.coverMediaId } } }
           : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
         updatedBy: { connect: { id: input.updatedById } },
       },
     });
@@ -221,5 +222,16 @@ export class ArticlesRepository {
 
   deleteById(id: string) {
     return this.prisma.article.delete({ where: { id } });
+  }
+
+  setStatus(id: string, input: { status: string; publishedAt?: Date | null; updatedById: string }) {
+    return this.prisma.article.update({
+      where: { id },
+      data: {
+        status: input.status,
+        ...(input.publishedAt !== undefined ? { publishedAt: input.publishedAt } : {}),
+        updatedBy: { connect: { id: input.updatedById } },
+      },
+    });
   }
 }
