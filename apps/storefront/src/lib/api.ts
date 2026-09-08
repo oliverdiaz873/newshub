@@ -95,14 +95,19 @@ export function getApiBase(): string | null {
   return base ? base.replace(/\/+$/, '') : null;
 }
 
-async function get<T>(path: string, locale: string, revalidate?: number): Promise<T | null> {
+async function get<T>(path: string, locale: string, revalidate?: number, noStore?: boolean): Promise<T | null> {
   const base = getApiBase();
   if (!base) return null;
   try {
     const separator = path.includes('?') ? '&' : '?';
+    const init = noStore
+      ? { cache: 'no-store' as const }
+      : revalidate === undefined
+        ? undefined
+        : { next: { revalidate } };
     const res = await fetch(
       `${base}${path}${separator}locale=${encodeURIComponent(locale)}`,
-      revalidate === undefined ? undefined : { next: { revalidate } },
+      init,
     );
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -114,6 +119,15 @@ async function get<T>(path: string, locale: string, revalidate?: number): Promis
 /** Server-side fetch with ISR (revalidate 60s, mirrors API Cache-Control). */
 export function apiGet<T>(path: string, locale: string): Promise<T | null> {
   return get<T>(path, locale, 60);
+}
+
+/**
+ * Publishing-sensitive detail: no Data Cache so publish/unpublish is
+ * visible on the next request instead of serving the 60s stale entry.
+ * Localized use only (article detail); lists keep apiGet ISR.
+ */
+export function apiGetNoStore<T>(path: string, locale: string): Promise<T | null> {
+  return get<T>(path, locale, undefined, true);
 }
 
 /** Client-side fetch (no ISR options). */

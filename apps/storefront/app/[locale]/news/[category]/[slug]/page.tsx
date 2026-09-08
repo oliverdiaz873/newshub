@@ -12,7 +12,7 @@ import {
 import type { FullNewsArticle } from '@/data/newsModels';
 import { SITE_URL, SITE_NAME, getLocalePrefix } from '@/shared/config/site';
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
-import { apiGet, toFullArticle, type ApiArticleDetail } from '@/lib/api';
+import { apiGetNoStore, toFullArticle, type ApiArticleDetail } from '@/lib/api';
 
 const allArticles: FullNewsArticle[] = [
   ...politicaArticles,
@@ -34,6 +34,8 @@ import { notFound } from 'next/navigation';
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug, category } = await params;
 
+  // NOTE (F5 scope): metadata still resolves from the local layer; API-only
+  // content falls back to the notFound strings until a metadata adapter slice.
   const article = allArticles.find((item) => item.href.endsWith(`/${slug}`) || item.id === slug);
 
   const tMeta = await getTranslations({ locale, namespace: 'metadata.article' });
@@ -84,20 +86,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Page({ params }: PageProps) {
   const { slug, locale, category } = await params;
-  const article = allArticles.find((item) => item.href.endsWith(`/${slug}`) || item.id === slug);
-
-  if (!article || article.href !== `/news/${category}/${slug}`) {
-    notFound();
-  }
+  const local = allArticles.find((item) => item.href.endsWith(`/${slug}`) || item.id === slug);
 
   // F1 adapter: API-sourced body when available (relatedNews stays local,
   // see ArticlePageClient + src/lib/api.ts). Falls back to local silently.
-  // The mapped view keeps the LOCAL id so the next-intl presentation overlay
-  // (data.articles.<id>.*) resolves exactly as in the local path.
+  // The mapped view keeps the LOCAL id when one exists so the next-intl
+  // presentation overlay (data.articles.<id>.*) resolves exactly as in the
+  // local path. API-only content (no local counterpart) still renders.
   let initialArticle: FullNewsArticle | null = null;
-  const apiDetail = await apiGet<ApiArticleDetail>(`/articles/${slug}`, locale);
+  // Publishing-sensitive: no Data Cache so unpublish 404s on next request.
+  const apiDetail = await apiGetNoStore<ApiArticleDetail>(`/articles/${slug}`, locale);
   if (apiDetail && apiDetail.categorySlug === category) {
-    initialArticle = { ...toFullArticle(apiDetail, category, []), id: article.id };
+    initialArticle = { ...toFullArticle(apiDetail, category, []), id: local?.id ?? apiDetail.slug };
+  }
+
+  const article = local ?? initialArticle;
+  if (!article || article.href !== `/news/${category}/${slug}`) {
+    notFound();
   }
 
   const baseUrl = SITE_URL;
