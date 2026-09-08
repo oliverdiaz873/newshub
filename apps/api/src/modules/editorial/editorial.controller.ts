@@ -1,11 +1,13 @@
 import { Controller, Get, Headers, Inject, Param, Query, UseGuards } from '@nestjs/common';
 import { ArticlesService } from '../articles/articles.service';
+import { CategoriesService } from '../categories/categories.service';
 import { OpinionsService } from '../opinions/opinions.service';
 import { Roles } from '../auth/decorators';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { DtoPipe } from '../../common/http/validation';
 import { resolveLocale } from '../../common/locale';
+import { ListQueryDto } from '../../common/dto/list-query.dto';
 import { EditorialArticlesQueryDto, EditorialOpinionsQueryDto } from './dto/editorial-query.dto';
 
 /**
@@ -18,8 +20,17 @@ import { EditorialArticlesQueryDto, EditorialOpinionsQueryDto } from './dto/edit
 export class EditorialController {
   constructor(
     @Inject(ArticlesService) private readonly articles: ArticlesService,
+    @Inject(CategoriesService) private readonly categories: CategoriesService,
     @Inject(OpinionsService) private readonly opinions: OpinionsService,
   ) {}
+
+  @Get('categories')
+  listCategories(
+    @Query(new DtoPipe(ListQueryDto)) query: ListQueryDto,
+    @Headers('accept-language') acceptLanguage?: string,
+  ) {
+    return this.categories.listEditorial(query, resolveLocale(query.locale, acceptLanguage));
+  }
 
   @Get('articles')
   listArticles(
