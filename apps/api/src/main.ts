@@ -15,7 +15,7 @@ async function bootstrap() {
   // Dashboard runs on another origin in dev (different port, same site for
   // cookies). Production allowlist stays open (hosting decision).
   app.enableCors({
-    origin: process.env.DASHBOARD_URL ?? 'http://localhost:3002',
+    origin: process.env.DASHBOARD_URL ?? 'http://localhost:3212',
     credentials: true,
   });
   app.useGlobalPipes(
