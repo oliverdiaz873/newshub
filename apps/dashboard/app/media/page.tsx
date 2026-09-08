@@ -174,7 +174,14 @@ export default function MediaPage() {
                 <tr key={row.id}>
                   <td>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={row.url} alt="" style={{ maxWidth: 120, borderRadius: 6 }} />
+                    <img
+                      src={row.url}
+                      alt=""
+                      style={{ maxWidth: 120, borderRadius: 6 }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
                   </td>
                   <td>
                     <span className="nh-muted">{row.mime}</span>
