@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AuthProvider } from '@/lib/auth';
+import { LogoutButton } from '@/components/LogoutButton';
 import '../src/app.css';
 
 export const metadata: Metadata = {
@@ -22,7 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/opinions">Opiniones</Link>
                 <Link href="/categories">Categorías</Link>
                 <Link href="/authors">Autores</Link>
+                <Link href="/media">Media</Link>
                 <Link href="/login">Acceder</Link>
+                <LogoutButton />
               </nav>
             </header>
             {children}
