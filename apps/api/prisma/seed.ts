@@ -8,6 +8,7 @@
  * Run: npm run prisma:seed (DATABASE_URL must point at the target database)
  */
 import { PrismaClient } from '@prisma/client';
+import { assertSeedAllowed, describeSeedTarget } from '../src/common/seed-guard';
 import { hashPassword } from '../src/modules/auth/password';
 import { newsArticles } from '../../storefront/src/data/categories';
 import { opinionArticles } from '../../storefront/src/data/opinionArticles';
@@ -89,6 +90,9 @@ function atNoon(datetime: string): Date {
 }
 
 async function main() {
+  // M9: before any connection or destructive statement.
+  assertSeedAllowed();
+  console.log(`Seed target: ${describeSeedTarget(process.env.DATABASE_URL)}`);
   await prisma.$executeRawUnsafe(
     'TRUNCATE "users", "authors", "categories", "articles", "opinions", "media_assets", "user_credentials", "refresh_tokens" RESTART IDENTITY CASCADE',
   );
