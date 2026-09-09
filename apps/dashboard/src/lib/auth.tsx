@@ -61,7 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const headers = new Headers(init.headers);
     const token = loadToken();
     if (token) headers.set('Authorization', `Bearer ${token}`);
-    if (init.body !== undefined && !headers.has('Content-Type')) {
+    // Never override Content-Type for FormData: the browser must set the
+    // multipart boundary itself, otherwise uploads break.
+    const isForm = typeof FormData !== 'undefined' && init.body instanceof FormData;
+    if (init.body !== undefined && !isForm && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
     let res = await fetch(`${API_BASE}${path}`, { ...init, headers, credentials: 'include' });
