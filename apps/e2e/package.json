@@ -1,0 +1,21 @@
+{
+  "name": "newshub-e2e",
+  "version": "0.1.0",
+  "description": "Newshub browser E2E — Playwright over dashboard + storefront + API (deterministic, isolated)",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "pretest": "node scripts/pretest.cjs",
+    "test": "playwright test",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@types/node": "^22.0.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^9.0.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
