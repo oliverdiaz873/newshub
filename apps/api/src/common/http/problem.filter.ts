@@ -103,6 +103,7 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       case 409: return 'Conflict';
       case 413: return 'Payload Too Large';
       case 422: return 'Unprocessable entity';
+      case 429: return 'Too Many Requests';
       default: return 'Error';
     }
   }
@@ -118,6 +119,7 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       // regardless of which layer raised it (multer or Nest wrappers).
       case 413: return 'file_too_large';
       case 422: return 'validation_failed';
+      case 429: return 'rate_limited';
       default: return 'error';
     }
   }
