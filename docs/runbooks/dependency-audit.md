@@ -42,5 +42,28 @@ High/Critical counts from `npm audit` per app (`e2e` was already clean).
 
 ## Deferred
 
-`npm audit --omit=dev` as a blocking CI gate: evaluate once the above
-exceptions are re-checked (post-major upgrades), not before.
+~~`npm audit --omit=dev` as a blocking CI gate: evaluate once the above
+exceptions are re-checked (post-major upgrades), not before.~~
+
+## CI audit gate (blocking)
+
+Since 2026-09-09 the `api`, `storefront` and `dashboard` CI jobs run
+`scripts/audit-gate.mjs` right after `npm ci`. The gate runs
+`npm audit --omit=dev --json`, resolves every High/Critical finding to
+advisory IDs (following `via` chains), and fails only on IDs **not**
+listed in that app's `audit-baseline.json`:
+
+```json
+{ "accept": { "GHSA-xxxx-xxxx-xxxx": "reason, traceable to this record" } }
+```
+
+- Matching is by advisory ID, so an accepted exception can never hide a
+  future, different advisory on the same package (verified by negative
+  control: empty baseline fails listing all 3 API findings individually).
+- Current baselines: api accepts `GHSA-GGR8-5VV4-36MX` (see exception
+  above); storefront and dashboard accept nothing.
+- The `e2e` job is excluded (dev-only harness, zero findings).
+- **When the gate fails:** do not run `npm audit fix`. Identify the new
+  advisory, assess exploitability in our threat model, then either apply
+  a directed bump (new commit, gates green) or add a justified exception
+  to the baseline (new commit, reason required).

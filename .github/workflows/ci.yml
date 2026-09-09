@@ -45,6 +45,7 @@ jobs:
           sudo -u postgres createdb newshub_test
 
       - run: npm ci
+      - run: node ../../scripts/audit-gate.mjs
       - run: npm run lint
       - run: npm run type-check
       - run: npm run build
@@ -68,6 +69,7 @@ jobs:
           cache-dependency-path: apps/storefront/package-lock.json
 
       - run: npm ci
+      - run: node ../../scripts/audit-gate.mjs
       - run: npm run lint
       - run: npm run type-check
       - run: npm run build
@@ -89,6 +91,7 @@ jobs:
           cache-dependency-path: apps/dashboard/package-lock.json
 
       - run: npm ci
+      - run: node ../../scripts/audit-gate.mjs
       - run: npm run lint
       - run: npm run type-check
       - run: npm run build
