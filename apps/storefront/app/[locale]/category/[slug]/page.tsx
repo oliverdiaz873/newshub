@@ -29,6 +29,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: label ? [label, 'noticias', 'información'] : undefined,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        es: `${baseUrl}/category/${slug}`,
+        en: `${baseUrl}/en/category/${slug}`,
+        'x-default': `${baseUrl}/category/${slug}`,
+      },
     },
     openGraph: {
       title: label ?? tMeta('notFound'),
