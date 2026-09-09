@@ -40,6 +40,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: article.summary,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        es: `${baseUrl}${article.href}`,
+        en: `${baseUrl}/en${article.href}`,
+        'x-default': `${baseUrl}${article.href}`,
+      },
     },
     openGraph: {
       type: 'article',
