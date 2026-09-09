@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 
@@ -38,24 +38,69 @@ function saveToken(token: string | null) {
   }
 }
 
+/**
+ * M1 single-flight: concurrent callers (boot restore racing a 401 retry)
+ * share one Promise and produce a single HTTP refresh. Rotation + reuse
+ * detection would burn the family on a double spend. Cleared on settle so
+ * later legitimate refreshes still work.
+ */
+let refreshInflight: Promise<string | null> | null = null;
+
 async function tryRefresh(): Promise<string | null> {
+  if (refreshInflight) return refreshInflight;
+  refreshInflight = (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) return null;
+      const body = (await res.json()) as { accessToken: string; user: SessionUser };
+      saveToken(body.accessToken);
+      return body.accessToken;
+    } catch {
+      return null;
+    }
+  })();
   try {
-    const res = await fetch(`${API_BASE}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    if (!res.ok) return null;
-    const body = (await res.json()) as { accessToken: string; user: SessionUser };
-    saveToken(body.accessToken);
-    return body.accessToken;
-  } catch {
-    return null;
+    return await refreshInflight;
+  } finally {
+    refreshInflight = null;
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [ready, setReady] = useState(false);
+  const booted = useRef(false);
+
+  // M1 silent restore: fresh tabs recover the session from the HttpOnly
+  // refresh cookie. Runs once per mount (StrictMode-safe); anonymous +
+  // ready when there is no valid session.
+  useEffect(() => {
+    if (booted.current) return;
+    booted.current = true;
+    (async () => {
+      try {
+        if (!loadToken()) {
+          const token = await tryRefresh();
+          if (token) {
+            try {
+              const me = await fetch(`${API_BASE}/auth/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include',
+              });
+              if (me.ok) setUser(((await me.json()) as SessionUser | null) ?? null);
+            } catch {
+              // Profile is best-effort; token alone still unlocks requests.
+            }
+          }
+        }
+      } finally {
+        setReady(true);
+      }
+    })();
+  }, []);
 
   const apiFetch = useCallback(async (path: string, init: RequestInit = {}): Promise<Response> => {
     const headers = new Headers(init.headers);
