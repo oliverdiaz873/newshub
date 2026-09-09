@@ -10,7 +10,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -32,7 +32,6 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   async login(
     @Body(new DtoPipe(LoginDto)) dto: LoginDto,
@@ -50,7 +49,6 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const session = await this.auth.refresh(req.cookies?.[REFRESH_COOKIE]);
