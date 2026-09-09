@@ -1,0 +1,5 @@
+{
+  "accept": {
+    "GHSA-GGR8-5VV4-36MX": "H5: deepmerge-ts stack exhaustion via @prisma/config; dev-controlled Prisma config merge only, fix requires Prisma major 7/8 (deferred)."
+  }
+}
