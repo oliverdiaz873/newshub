@@ -26,7 +26,7 @@ export default function CategoriesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/categories?locale=es&limit=100');
+      const res = await apiFetch('/editorial/categories?locale=es&limit=100');
       if (res.status === 401) {
         setError('Sesión requerida. Accede primero.');
         setItems([]);
@@ -44,7 +44,7 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch('/categories?locale=es&limit=100')
+    apiFetch('/editorial/categories?locale=es&limit=100')
       .then(async (res) => {
         if (cancelled) return;
         if (res.status === 401) {

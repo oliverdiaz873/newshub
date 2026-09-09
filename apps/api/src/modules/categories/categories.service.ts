@@ -94,6 +94,32 @@ export class CategoriesService {
     };
   }
 
+  // ---- Editorial reads (auth enforced at the editorial controller) ----
+
+  async listEditorial(query: { page?: number; limit?: number }, locale: ResolvedLocale) {
+    const { page, limit } = normalizePagination(query.page, query.limit);
+    const total = await this.categories.countAll();
+    const rows = await this.categories.listAll((page - 1) * limit, limit);
+    const data = await Promise.all(
+      rows.map(async (row) => {
+        const { item, usedLocale } = this.pick(row.translations, row, locale);
+        return {
+          ...item,
+          articleCount: await this.categories.countPublishedArticles(row.id),
+          localeResolved: usedLocale,
+          fallback: usedLocale !== locale.resolved,
+        };
+      }),
+    );
+    return {
+      data,
+      meta: buildMeta(page, limit, total),
+      localeRequested: locale.requested,
+      localeResolved: locale.resolved,
+      fallback: data.some((item) => item.fallback),
+    };
+  }
+
   // ---- Editorial writes (F2, auth + RBAC enforced at the controller) ----
 
   async exists(id: string): Promise<boolean> {

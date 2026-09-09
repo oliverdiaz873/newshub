@@ -44,6 +44,19 @@ export class CategoriesRepository {
     return this.prisma.article.count({ where: { categoryId, status: PUBLISHED } });
   }
 
+  countAll() {
+    return this.prisma.category.count();
+  }
+
+  listAll(skip: number, take: number) {
+    return this.prisma.category.findMany({
+      orderBy: [{ sort: 'asc' }, { createdAt: 'asc' }],
+      skip,
+      take,
+      include: { translations: true },
+    });
+  }
+
   countAllArticles(categoryId: string) {
     return this.prisma.article.count({ where: { categoryId } });
   }

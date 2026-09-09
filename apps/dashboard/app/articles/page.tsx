@@ -58,7 +58,7 @@ export default function ArticlesPage() {
     try {
       const [arts, cats, auths, meds] = await Promise.all([
         apiFetch(`/editorial/articles?locale=es&limit=100${statusQuery}`),
-        apiFetch('/categories?locale=es&limit=100'),
+        apiFetch('/editorial/categories?locale=es&limit=100'),
         apiFetch('/authors'),
         apiFetch('/media?limit=100'),
       ]);
@@ -106,7 +106,7 @@ export default function ArticlesPage() {
         const json = (await res.json()) as { data: ListItem[] };
         setItems(json.data);
       }
-      const cats = await apiFetch('/categories?locale=es&limit=100');
+      const cats = await apiFetch('/editorial/categories?locale=es&limit=100');
       if (!cancelled && cats.ok) {
         const json = (await cats.json()) as { data: Array<{ id: string; slug: string; label: string }> };
         setCategories(json.data.map((c) => ({ id: c.id, label: `${c.label} (${c.slug})` })));

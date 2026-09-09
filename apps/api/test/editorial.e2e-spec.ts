@@ -247,4 +247,26 @@ describe('F2 editorial (e2e)', () => {
       .set('Authorization', auth)
       .expect(409);
   });
+
+  it('lists all categories editorially, including empty ones', async () => {
+    const login = await loginAs('editor@newshub.local', 'Editor123!').expect(200);
+    const auth = `Bearer ${login.body.accessToken}`;
+    await request(app.getHttpServer())
+      .post('/api/v1/categories')
+      .set('Authorization', auth)
+      .send({ translations: [{ locale: 'es', slug: 'vacia', label: 'Vacia' }] })
+      .expect(201);
+    const list = await request(app.getHttpServer())
+      .get('/api/v1/editorial/categories?locale=es')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(list.body.meta.total).toBe(2);
+    expect(list.body.data.map((c: { slug: string }) => c.slug).sort()).toEqual(['politica', 'vacia']);
+    await request(app.getHttpServer()).get('/api/v1/editorial/categories?locale=es').expect(401);
+    const created = list.body.data.find((c: { slug: string }) => c.slug === 'vacia') as { id: string };
+    await request(app.getHttpServer())
+      .delete(`/api/v1/categories/${created.id}`)
+      .set('Authorization', auth)
+      .expect(204);
+  });
 });
