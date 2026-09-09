@@ -104,6 +104,7 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       case 413: return 'Payload Too Large';
       case 422: return 'Unprocessable entity';
       case 429: return 'Too Many Requests';
+      case 503: return 'Service Unavailable';
       default: return 'Error';
     }
   }
@@ -120,6 +121,7 @@ export class ProblemExceptionFilter implements ExceptionFilter {
       case 413: return 'file_too_large';
       case 422: return 'validation_failed';
       case 429: return 'rate_limited';
+      case 503: return 'service_unavailable';
       default: return 'error';
     }
   }
