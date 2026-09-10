@@ -147,10 +147,16 @@ describe('accent-insensitive search (e2e)', () => {
     expect(ops.body.data[0]).toMatchObject({ slug: 'acc-opinion' });
   });
 
-  it('folds ñ per the unaccent dictionary (nino matches niños)', async () => {
-    // Dictionary-dependent: PostgreSQL unaccent maps ñ->n. Pinned so a
-    // dictionary change surfaces explicitly rather than silently.
+  it('keeps ñ distinct from n (no match)', async () => {
+    // ñ is a distinct Spanish letter: the fold() guard shields it from
+    // unaccent, so `nino` must not match `niños`.
     const res = await get(`/api/v1/articles?locale=es&q=${encodeURIComponent('nino')}`);
+    expect(res.body.meta.total).toBe(0);
+    expect(res.body.data).toHaveLength(0);
+  });
+
+  it('matches niño with its tilde', async () => {
+    const res = await get(`/api/v1/articles?locale=es&q=${encodeURIComponent('niño')}`);
     expect(res.body.meta.total).toBe(1);
     expect(res.body.data[0]).toMatchObject({ slug: 'acc-politica' });
   });

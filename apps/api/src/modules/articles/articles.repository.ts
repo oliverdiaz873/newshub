@@ -51,9 +51,16 @@ export class ArticlesRepository {
    * Shared by the COUNT and page-id queries so total and results can
    * never diverge.
    */
+  private foldQExpr(expr: Prisma.Sql): Prisma.Sql {
+    // unaccent() folds ñ->n on our PostgreSQL build, but ñ is a distinct
+    // Spanish letter, so it is shielded through control chars (assumed
+    // absent from editorial content; slugs already forbid them via CHECK).
+    return Prisma.sql`replace(replace(unaccent(replace(replace(${expr}, 'ñ', chr(1)), 'Ñ', chr(2))), chr(1), 'ñ'), chr(2), 'Ñ')`;
+  }
+
   private qMatch(q: string): Prisma.Sql {
     const pattern = `%${q}%`;
-    return Prisma.sql`(unaccent("t"."title") ILIKE unaccent(${pattern}) OR unaccent("t"."summary") ILIKE unaccent(${pattern}))`;
+    return Prisma.sql`(${this.foldQExpr(Prisma.sql`"t"."title"`)} ILIKE ${this.foldQExpr(Prisma.sql`${pattern}`)} OR ${this.foldQExpr(Prisma.sql`"t"."summary"`)} ILIKE ${this.foldQExpr(Prisma.sql`${pattern}`)})`;
   }
 
   private qPredicates(
