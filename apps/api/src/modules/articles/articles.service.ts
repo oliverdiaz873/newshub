@@ -30,6 +30,8 @@ export interface ArticleListItem {
   firstPublishedAt: string | null;
   updatedAt: string;
   fallback: boolean;
+  isBreaking: boolean;
+  isFeatured: boolean;
 }
 
 export interface ArticleDetail extends ArticleListItem {
@@ -48,7 +50,7 @@ export class ArticlesService {
   ) {}
 
   async list(
-    query: { page?: number; limit?: number; category?: string; author?: string; q?: string; sort?: 'publishedAt:desc' | 'publishedAt:asc' },
+    query: { page?: number; limit?: number; category?: string; author?: string; q?: string; sort?: 'publishedAt:desc' | 'publishedAt:asc'; breaking?: boolean; featured?: boolean },
     locale: ResolvedLocale,
   ) {
     const { page, limit } = normalizePagination(query.page, query.limit);
@@ -77,7 +79,7 @@ export class ArticlesService {
   }
 
   private async resolveFilters(
-    query: { category?: string; author?: string; q?: string; sort?: 'publishedAt:desc' | 'publishedAt:asc' },
+    query: { category?: string; author?: string; q?: string; sort?: 'publishedAt:desc' | 'publishedAt:asc'; breaking?: boolean; featured?: boolean },
     locale: ResolvedLocale,
   ) {
     let categoryId: string | undefined;
@@ -98,6 +100,8 @@ export class ArticlesService {
       authorId,
       q: query.q?.trim() ? query.q.trim() : undefined,
       sort: query.sort ?? 'publishedAt:desc',
+      breaking: query.breaking,
+      featured: query.featured,
     };
   }
 
@@ -122,6 +126,8 @@ export class ArticlesService {
       firstPublishedAt: row.publishedAt ? (row.publishedAt as Date).toISOString() : null,
       updatedAt: (row.updatedAt as Date).toISOString(),
       fallback: usedLocale !== locale.resolved,
+      isBreaking: (row.isBreaking as boolean) ?? false,
+      isFeatured: (row.isFeatured as boolean) ?? false,
     };
   }
 
@@ -211,6 +217,8 @@ export class ArticlesService {
       authorId: dto.authorId,
       coverMediaId: dto.coverMediaId,
       status: targetStatus,
+      isBreaking: dto.isBreaking,
+      isFeatured: dto.isFeatured,
       updatedById: userId,
     });
     const after = await this.articles.findByIdFull(id);
@@ -330,7 +338,7 @@ export class ArticlesService {
   // ---- Editorial reads (auth enforced at the editorial controller) ----
 
   async listEditorial(
-    query: { page?: number; limit?: number; status?: string; category?: string; author?: string; q?: string },
+    query: { page?: number; limit?: number; status?: string; category?: string; author?: string; q?: string; breaking?: boolean; featured?: boolean },
     locale: ResolvedLocale,
   ) {
     const { page, limit } = normalizePagination(query.page, query.limit);
@@ -358,6 +366,8 @@ export class ArticlesService {
       authorId: row.authorId,
       coverMediaId: row.coverMediaId,
       status: row.status,
+      isBreaking: row.isBreaking,
+      isFeatured: row.isFeatured,
       firstPublishedAt: row.publishedAt ? row.publishedAt.toISOString() : null,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),

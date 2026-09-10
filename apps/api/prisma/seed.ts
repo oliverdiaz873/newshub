@@ -1,78 +1,75 @@
-/* eslint-disable no-console */
 /**
- * F1 seed: loads ES editorial content from the storefront static data layer
- * (apps/storefront/src/data) into PostgreSQL. ES rows only — no EN content is
+ * Seed: loads ES editorial content from the API-owned seed-data directory
+ * (apps/api/prisma/seed-data) into PostgreSQL. ES rows only — no EN content is
  * invented; EN fallback is resolved at the API layer. Re-runnable: truncates
  * the editorial tables first for a clean, reproducible seed.
  *
+ * Ownership: seed-data/*.json is the single source for seed content.
+ * apps/storefront/src/data/* is legacy and coexists temporarily during the
+ * migration, but it is NO LONGER consumed by this seed. Deletion of legacy
+ * files happens only after 0 consumers are proven (A1.8 quarantine).
+ *
  * Run: npm run prisma:seed (DATABASE_URL must point at the target database)
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import { assertSeedAllowed, describeSeedTarget } from '../src/common/seed-guard';
 import { hashPassword } from '../src/modules/auth/password';
-import { newsArticles } from '../../storefront/src/data/categories';
-import { opinionArticles } from '../../storefront/src/data/opinionArticles';
-import { opinionDetails } from '../../storefront/src/data/opinionDetails';
-import { politicaArticles } from '../../storefront/src/data/articleContent/politica';
-import { deporteArticles } from '../../storefront/src/data/articleContent/deporte';
-import { economiaArticles } from '../../storefront/src/data/articleContent/economia';
-import { internacionalArticles } from '../../storefront/src/data/articleContent/internacional';
-import { justiciaArticles } from '../../storefront/src/data/articleContent/justicia';
-import { climaArticles } from '../../storefront/src/data/articleContent/clima';
-import { saludArticles } from '../../storefront/src/data/articleContent/salud';
-import type { FullNewsArticle, NewsArticle } from '../../storefront/src/data/newsModels';
+
+interface SeedNewsArticle {
+  id: string;
+  title: string;
+  href: string;
+  category: string;
+  date: string;
+  datetime: string;
+  summary: string;
+  imageUrl: string;
+  alt: string;
+  isBreaking?: boolean;
+  isFeatured?: boolean;
+}
+
+interface SeedFullArticle extends SeedNewsArticle {
+  content: string[];
+}
+
+interface SeedOpinionArticle {
+  id: string;
+  slug?: string;
+  title: string;
+  href: string;
+  summary: string;
+  imageUrl: string;
+  alt: string;
+  datetime: string;
+}
+
+interface SeedOpinionDetail {
+  content: string[];
+}
+
+const SEED_DIR = join(__dirname, 'seed-data');
+
+function loadJson<T>(name: string): T {
+  return JSON.parse(readFileSync(join(SEED_DIR, name), 'utf8')) as T;
+}
 
 const prisma = new PrismaClient();
 const LOCALE = 'es';
 const STAFF_SLUG = 'redaccion';
 
-const CATEGORY_ORDER = [
-  'politica',
-  'internacional',
-  'economia',
-  'salud',
-  'deporte',
-  'clima',
-  'justicia',
-] as const;
+interface SeedCategories {
+  order: string[];
+  meta: Record<string, { label: string; description: string }>;
+}
 
-const CATEGORY_META: Record<string, { label: string; description: string }> = {
-  politica: {
-    label: 'Política',
-    description:
-      'Cobertura sobre gobierno, poder legislativo, partidos, transparencia y decisiones públicas con impacto nacional.',
-  },
-  internacional: {
-    label: 'Internacional',
-    description:
-      'Panorama global con enfoque en diplomacia, conflictos, alianzas estrategicas y movimientos geopoliticos clave.',
-  },
-  economia: {
-    label: 'Economía',
-    description:
-      'Mercados, inflación, empresas, empleo y decisiones financieras que marcan el ritmo económico del país y el mundo.',
-  },
-  salud: {
-    label: 'Salud',
-    description:
-      'Información sobre sistema sanitario, prevención, investigación médica y tendencias que impactan el bienestar colectivo.',
-  },
-  deporte: {
-    label: 'Deporte',
-    description:
-      'Actualidad deportiva con foco en resultados, figuras, torneos y el pulso competitivo de las principales disciplinas.',
-  },
-  clima: {
-    label: 'Clima',
-    description:
-      'Seguimiento meteorológico, alertas, fenómenos extremos y efectos ambientales en comunidades y sectores productivos.',
-  },
-  justicia: {
-    label: 'Justicia',
-    description:
-      'Procesos judiciales, investigación de delitos, reformas legales y decisiones institucionales en materia de justicia.',
-  },
-};
+const { order: CATEGORY_ORDER, meta: CATEGORY_META } = loadJson<SeedCategories>('categories.json');
+const newsArticles = loadJson<SeedNewsArticle[]>('articles.json');
+const opinionArticles = loadJson<SeedOpinionArticle[]>('opinions.json');
+const opinionDetails = loadJson<Record<string, SeedOpinionDetail>>('opinion-details.json');
+const allFullArticles = loadJson<SeedFullArticle[]>('article-contents.json');
 
 function mimeOf(path: string): string {
   if (path.endsWith('.avif')) return 'image/avif';
@@ -117,21 +114,11 @@ async function main() {
     data: { authorId: staff.id, locale: LOCALE, name: 'Redacción', bio: null },
   });
 
-  const fullById = new Map<string, FullNewsArticle>();
-  for (const list of [
-    politicaArticles,
-    deporteArticles,
-    economiaArticles,
-    internacionalArticles,
-    justiciaArticles,
-    climaArticles,
-    saludArticles,
-  ]) {
-    for (const full of list) fullById.set(full.id, full);
-  }
+  const fullById = new Map<string, SeedFullArticle>();
+  for (const full of allFullArticles) fullById.set(full.id, full);
 
   const imagePaths = new Set<string>();
-  for (const article of newsArticles as NewsArticle[]) imagePaths.add(article.imageUrl);
+  for (const article of newsArticles) imagePaths.add(article.imageUrl);
   for (const opinion of opinionArticles) imagePaths.add(opinion.imageUrl);
 
   const mediaByPath = new Map<string, string>();
@@ -161,7 +148,7 @@ async function main() {
   }
 
   let articleCount = 0;
-  for (const article of newsArticles as NewsArticle[]) {
+  for (const article of newsArticles) {
     const segments = article.href.split('/').filter(Boolean);
     const categorySlug = segments[1];
     const categoryId = categoryIds.get(categorySlug);
@@ -178,6 +165,8 @@ async function main() {
         status: 'published',
         publishedAt: atNoon(article.datetime),
         createdAt: atNoon(article.datetime),
+        isBreaking: article.isBreaking ?? false,
+        isFeatured: article.isFeatured ?? false,
         createdById: admin.id,
         updatedById: admin.id,
       },

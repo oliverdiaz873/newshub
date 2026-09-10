@@ -91,6 +91,8 @@ model Article {
   coverMediaId String?              @map("cover_media_id") @db.Uuid
   status       String               @default("draft")
   publishedAt  DateTime?            @map("published_at") @db.Timestamptz
+  isBreaking   Boolean              @default(false) @map("is_breaking")
+  isFeatured   Boolean              @default(false) @map("is_featured")
   createdById  String?              @map("created_by") @db.Uuid
   updatedById  String?              @map("updated_by") @db.Uuid
   createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz

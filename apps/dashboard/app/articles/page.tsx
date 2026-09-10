@@ -10,6 +10,8 @@ interface ListItem {
   title: string;
   status: string;
   categorySlug: string;
+  isBreaking: boolean;
+  isFeatured: boolean;
 }
 
 interface Option {
@@ -47,17 +49,23 @@ export default function ArticlesPage() {
   const [coverId, setCoverId] = useState('');
   const [initialCover, setInitialCover] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [curationFilter, setCurationFilter] = useState('all');
+  const [isBreaking, setIsBreaking] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
   const [es, setEs] = useState<TranslationForm>({ ...EMPTY_TR });
   const [en, setEn] = useState<TranslationForm>({ ...EMPTY_TR });
 
   const statusQuery = statusFilter === 'all' ? '' : `&status=${statusFilter}`;
+  const curationQuery =
+    curationFilter === 'breaking' ? '&breaking=true' : curationFilter === 'featured' ? '&featured=true' : '';
+  const listQuery = `${statusQuery}${curationQuery}`;
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const [arts, cats, auths, meds] = await Promise.all([
-        apiFetch(`/editorial/articles?locale=es&limit=100${statusQuery}`),
+        apiFetch(`/editorial/articles?locale=es&limit=100${listQuery}`),
         apiFetch('/editorial/categories?locale=es&limit=100'),
         apiFetch('/authors'),
         apiFetch('/media?limit=100'),
@@ -90,12 +98,12 @@ export default function ArticlesPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch, statusQuery]);
+  }, [apiFetch, listQuery]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const res = await apiFetch(`/editorial/articles?locale=es&limit=100${statusQuery}`);
+      const res = await apiFetch(`/editorial/articles?locale=es&limit=100${listQuery}`);
       if (cancelled) return;
       if (res.status === 401) {
         setError('Sesión requerida. Accede primero.');
@@ -139,7 +147,7 @@ export default function ArticlesPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiFetch, statusQuery]);
+  }, [apiFetch, listQuery]);
 
   function buildTranslations() {
     const translations = [
@@ -169,6 +177,8 @@ export default function ArticlesPage() {
     setAuthorId('');
     setCoverId('');
     setInitialCover(null);
+    setIsBreaking(false);
+    setIsFeatured(false);
     setEs({ ...EMPTY_TR });
     setEn({ ...EMPTY_TR });
   }
@@ -209,6 +219,8 @@ export default function ArticlesPage() {
       categoryId: string;
       authorId: string | null;
       coverMediaId: string | null;
+      isBreaking: boolean;
+      isFeatured: boolean;
       translations: Array<{ locale: string; slug: string; title: string; summary: string; content: string[] }>;
     };
     const esT = row.translations.find((t) => t.locale === 'es');
@@ -218,6 +230,8 @@ export default function ArticlesPage() {
     setAuthorId(row.authorId ?? '');
     setCoverId(row.coverMediaId ?? '');
     setInitialCover(row.coverMediaId ?? null);
+    setIsBreaking(row.isBreaking ?? false);
+    setIsFeatured(row.isFeatured ?? false);
     setEs({
       slug: esT?.slug ?? '',
       title: esT?.title ?? '',
@@ -242,6 +256,8 @@ export default function ArticlesPage() {
         categoryId: categoryId || undefined,
         authorId: authorId === '' ? undefined : authorId || null,
         coverMediaId: coverId === initialCover ? undefined : coverId || null,
+        isBreaking,
+        isFeatured,
         translations: buildTranslations(),
       }),
     });
@@ -334,6 +350,27 @@ export default function ArticlesPage() {
               ))}
             </select>
           </div>
+          <div className="nh-field">
+            <label>Curaduría Home (manual, sin expiración automática)</label>
+            <label htmlFor="isFeatured">
+              <input
+                id="isFeatured"
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+              />{' '}
+              Destacada (pool featured, orden publishedAt DESC: primary/secondary/grid)
+            </label>
+            <label htmlFor="isBreaking">
+              <input
+                id="isBreaking"
+                type="checkbox"
+                checked={isBreaking}
+                onChange={(e) => setIsBreaking(e.target.checked)}
+              />{' '}
+              Breaking (ticker, visible mientras sea true)
+            </label>
+          </div>
           <h3>Español (requerido)</h3>
           <div className="nh-field">
             <label htmlFor="esSlug">Slug</label>
@@ -392,6 +429,14 @@ export default function ArticlesPage() {
             <option value="archived">Archivado</option>
           </select>
         </div>
+        <div className="nh-field">
+          <label htmlFor="curationFilter">Curaduría</label>
+          <select id="curationFilter" value={curationFilter} onChange={(e) => setCurationFilter(e.target.value)}>
+            <option value="all">Todas</option>
+            <option value="featured">Destacadas</option>
+            <option value="breaking">Breaking</option>
+          </select>
+        </div>
         {loading ? (
           <p className="nh-muted">Cargando…</p>
         ) : items.length === 0 ? (
@@ -402,6 +447,7 @@ export default function ArticlesPage() {
               <tr>
                 <th>Título</th>
                 <th>Estado</th>
+                <th>Curaduría</th>
                 <th></th>
               </tr>
             </thead>
@@ -413,6 +459,11 @@ export default function ArticlesPage() {
                     <div className="nh-muted">{row.slug}</div>
                   </td>
                   <td>{row.status}</td>
+                  <td>
+                    {row.isFeatured ? 'Destacada' : ''}
+                    {row.isFeatured && row.isBreaking ? ' · ' : ''}
+                    {row.isBreaking ? 'Breaking' : row.isFeatured ? '' : '—'}
+                  </td>
                   <td>
                     <div className="nh-row">
                       {actionsFor(row.status).map((action) => (

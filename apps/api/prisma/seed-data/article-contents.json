@@ -1,0 +1,2040 @@
+[
+  {
+    "id": "politica-encuesta",
+    "title": "Encuestas Revelan Incremento en la Popularidad del Presidente",
+    "href": "/news/politica/encuestas-revelan-incremento-popularidad-presidente",
+    "category": "Política",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "Las últimas encuestas de opinión pública muestran un aumento significativo en la popularidad del presidente, reflejando un respaldo creciente de la ciudadanía hacia sus políticas y gestión gubernamental.",
+    "imageUrl": "/images/news/politica/presidente.avif",
+    "alt": "Gráfico mostrando el aumento de la aprobación presidencial en encuestas de opinión",
+    "content": [
+      "Según los datos recopilados por diversas firmas encuestadoras, la aprobación del mandatario ha subido varios puntos porcentuales en comparación con los últimos meses, lo que indica una percepción positiva de su desempeño.",
+      "Analistas políticos atribuyen este incremento a recientes iniciativas del gobierno en áreas clave como economía, salud y educación, así como a la comunicación efectiva de sus logros en medios de comunicación y redes sociales.",
+      "El incremento en popularidad también se observa en distintos segmentos de la población, incluyendo jóvenes, profesionales y votantes de regiones urbanas y rurales, lo que evidencia un respaldo más amplio y diversificado.",
+      "Por otro lado, algunos expertos destacan que este aumento podría estar influenciado por factores externos, como la estabilidad internacional y la cobertura mediática de ciertos eventos positivos relacionados con la administración.",
+      "El presidente y su equipo han aprovechado estas encuestas para reforzar su estrategia de comunicación y seguir promoviendo políticas que conecten con las necesidades y expectativas de la ciudadanía.",
+      "Mientras tanto, los partidos de oposición analizan estos resultados para ajustar sus campañas y propuestas, buscando contrarrestar la creciente popularidad del mandatario en el panorama político nacional.",
+      "En resumen, las encuestas recientes reflejan un momento positivo para el presidente, consolidando su imagen ante la población y marcando un aumento notable en su aprobación en comparación con períodos anteriores."
+    ],
+    "relatedNews": [
+      {
+        "id": "politica-casa-blanca",
+        "title": "Casa Blanca Confirma Cumbre Internacional",
+        "href": "/news/politica/casa-blanca-confirma-cumbre-internacional",
+        "category": "Política",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La Casa Blanca confirma cumbre internacional para esta semana para abordar temas globales.",
+        "imageUrl": "/images/news/politica/casa-blanca.jpg",
+        "alt": "Edificio de la Casa Blanca albergando la cumbre internacional"
+      },
+      {
+        "id": "politica-ley-ambiental",
+        "title": "Aprobación Histórica: Ley Ambiental",
+        "href": "/news/politica/aprobacion-historica-ley-ambiental",
+        "category": "Política",
+        "date": "2 de octubre de 2025",
+        "datetime": "2025-10-02",
+        "summary": "El Congreso da luz verde a la Ley de Protección Ambiental marcando un hito legislativo.",
+        "imageUrl": "/images/news/politica/congreso.avif",
+        "alt": "Miembros del Congreso votando la ley de protección ambiental"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Política",
+      "current": "Encuestas Revelan Incremento en la Popularidad del Presidente"
+    }
+  },
+  {
+    "id": "politica-casa-blanca",
+    "title": "Casa Blanca Confirma Cumbre Internacional",
+    "href": "/news/politica/casa-blanca-confirma-cumbre-internacional",
+    "category": "Política",
+    "date": "3 de octubre de 2025",
+    "datetime": "2025-10-03",
+    "summary": "La Casa Blanca confirma cumbre internacional para esta semana para abordar temas globales incluyendo cambio climático y seguridad económica.",
+    "imageUrl": "/images/news/politica/casa-blanca.jpg",
+    "alt": "Edificio de la Casa Blanca albergando la cumbre internacional",
+    "content": [
+      "La Casa Blanca ha confirmado oficialmente la realización de una cumbre internacional que se llevará a cabo esta semana, con la participación de líderes de más de 50 países para abordar los desafíos más urgentes a nivel global.",
+      "Entre los temas principales de la agenda se encuentran el cambio climático, la seguridad económica, la cooperación en salud pública y la estabilidad geopolítica en regiones conflictivas.",
+      "El presidente anfitrión destacó que esta cumbre representa una oportunidad única para construir consensos y establecer compromisos concretos que beneficien a todas las naciones participantes.",
+      "Expertos internacionales consideran que este encuentro podría marcar un punto de inflexión en la diplomacia multilateral, especialmente después de años de tensiones comerciales y políticas entre potencias mundiales.",
+      "Las organizaciones no gubernamentales y la sociedad civil también han sido invitadas a participar en sesiones paralelas, asegurando una representación más amplia de los intereses globales.",
+      "Los resultados de la cumbre serán monitoreados de cerca por los mercados financieros y las agencias de calificación, que esperan señales claras sobre las políticas económicas y ambientales futuras."
+    ],
+    "relatedNews": [
+      {
+        "id": "politica-encuesta",
+        "title": "Encuestas Revelan Incremento en la Popularidad del Presidente",
+        "href": "/news/politica/encuestas-revelan-incremento-popularidad-presidente",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Las últimas encuestas muestran un aumento significativo en la popularidad del presidente.",
+        "imageUrl": "/images/news/politica/presidente.avif",
+        "alt": "Gráfico mostrando el aumento de la aprobación presidencial en encuestas de opinión"
+      },
+      {
+        "id": "politica-ley-ambiental",
+        "title": "Aprobación Histórica: Ley Ambiental",
+        "href": "/news/politica/aprobacion-historica-ley-ambiental",
+        "category": "Política",
+        "date": "2 de octubre de 2025",
+        "datetime": "2025-10-02",
+        "summary": "El Congreso da luz verde a la Ley de Protección Ambiental marcando un hito legislativo.",
+        "imageUrl": "/images/news/politica/congreso.avif",
+        "alt": "Miembros del Congreso votando la ley de protección ambiental"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Política",
+      "current": "Casa Blanca Confirma Cumbre Internacional"
+    }
+  },
+  {
+    "id": "politica-ley-ambiental",
+    "title": "Aprobación Histórica: El Congreso Da Luz Verde a la Ley de Protección Ambiental",
+    "href": "/news/politica/aprobacion-historica-ley-proteccion-ambiental",
+    "category": "Política",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "El Congreso aprobó de manera histórica la Ley de Protección Ambiental, marcando un hito en la legislación del país y consolidando un compromiso firme con la conservación de los recursos naturales y la sostenibilidad.",
+    "imageUrl": "/images/news/politica/congreso.avif",
+    "alt": "Miembros del Congreso votando la ley de protección ambiental",
+    "content": [
+      "La votación contó con un amplio respaldo de los legisladores, quienes destacaron la importancia de esta ley para enfrentar los desafíos del cambio climático y proteger ecosistemas críticos para las futuras generaciones.",
+      "La nueva normativa establece medidas estrictas para la preservación de bosques, ríos, mares y áreas protegidas, así como regulaciones sobre emisiones contaminantes y manejo responsable de residuos.",
+      "Expertos en medio ambiente y organizaciones civiles celebraron la aprobación, señalando que esta ley podría servir como modelo para otros países de la región en materia de protección ambiental.",
+      "Entre los puntos más destacados se incluyen incentivos para empresas que adopten prácticas sostenibles, programas de educación ambiental y sanciones severas para quienes incumplan las regulaciones establecidas.",
+      "El presidente del Congreso declaró que esta ley representa un paso fundamental hacia un desarrollo económico más responsable, que no comprometa los recursos naturales ni la calidad de vida de las futuras generaciones.",
+      "La sociedad civil y los ciudadanos en general han mostrado gran interés en la implementación de la ley, esperando que sus beneficios se reflejen en la mejora de la calidad del aire, agua y conservación de la biodiversidad.",
+      "Se espera que la Ley de Protección Ambiental también impulse investigaciones científicas y proyectos de innovación tecnológica que contribuyan a la sostenibilidad y a la mitigación del impacto ambiental.",
+      "Con la aprobación de esta ley, el país refuerza su compromiso internacional con los acuerdos ambientales y se posiciona como líder regional en políticas de protección del medio ambiente.",
+      "Este avance legislativo será recordado como un momento histórico que refleja la responsabilidad del Congreso y la sociedad en la preservación del planeta para las próximas generaciones."
+    ],
+    "relatedNews": [
+      {
+        "id": "politica-encuesta",
+        "title": "Encuestas Revelan Incremento en Popularidad",
+        "href": "/news/politica/encuestas-revelan-incremento-popularidad-presidente",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Encuestas revelan incremento en la popularidad del presidente tras recientes medidas económicas.",
+        "imageUrl": "/images/news/politica/presidente.avif",
+        "alt": "Encuestas Revelan Incremento en Popularidad"
+      },
+      {
+        "id": "politica-casa-blanca",
+        "title": "Casa Blanca Confirma Cumbre Internacional",
+        "href": "/news/politica/casa-blanca-confirma-cumbre-internacional",
+        "category": "Política",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La Casa Blanca confirma cumbre internacional para esta semana para abordar temas globales.",
+        "imageUrl": "/images/news/politica/casa-blanca.jpg",
+        "alt": "Edificio de la Casa Blanca albergando la cumbre internacional"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Política",
+      "current": "Aprobación Histórica: El Congreso Da Luz Verde a la Ley de Protección Ambiental"
+    }
+  },
+  {
+    "id": "politica-protestas",
+    "title": "Protestas por corrupción",
+    "href": "/news/politica/protestas-corrupcion",
+    "category": "Política",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "Protestas por corrupción se han intensificado en varias ciudades del país durante los últimos días, reuniendo a miles de ciudadanos que exigen transparencia y rendición de cuentas por parte de las autoridades.",
+    "imageUrl": "/images/news/politica/protestas.jpg",
+    "alt": "Multitud de manifestantes marchando con pancartas en las calles",
+    "content": [
+      "Los manifestantes recorren las principales avenidas con pancartas y consignas, denunciando casos recientes de malversación de fondos y solicitando investigaciones imparciales.",
+      "Las fuerzas de seguridad han desplegado operativos para mantener el orden, aunque se han reportado algunos enfrentamientos aislados entre manifestantes y la policía.",
+      "Organizaciones civiles y grupos de la sociedad civil han respaldado las protestas, destacando la importancia de la participación ciudadana para fortalecer la democracia y combatir la corrupción.",
+      "El gobierno ha emitido un comunicado asegurando que se investigarán los casos denunciados y se tomarán medidas para garantizar la transparencia en la administración pública.",
+      "Mientras tanto, los ciudadanos continúan movilizándose, mostrando su descontento y exigiendo cambios concretos que mejoren la confianza en las instituciones del país."
+    ],
+    "relatedNews": [
+      {
+        "id": "politica-encuesta",
+        "title": "Encuestas Revelan Incremento en la Popularidad del Presidente",
+        "href": "/news/politica/encuestas-revelan-incremento-popularidad-presidente",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Encuestas revelan incremento en la popularidad del presidente tras recientes medidas económicas.",
+        "imageUrl": "/images/news/politica/presidente.avif",
+        "alt": "Gráfico mostrando el aumento de la aprobación presidencial en encuestas de opinión"
+      },
+      {
+        "id": "politica-casa-blanca",
+        "title": "Casa Blanca Confirma Cumbre Internacional",
+        "href": "/news/politica/casa-blanca-confirma-cumbre-internacional",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "La Casa Blanca confirma cumbre internacional para esta semana para abordar temas globales.",
+        "imageUrl": "/images/news/politica/casa-blanca.jpg",
+        "alt": "Edificio de la Casa Blanca albergando la cumbre internacional"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Política",
+      "current": "Protestas por corrupción"
+    }
+  },
+  {
+    "id": "politica-debate",
+    "title": "Debate Presidencial: Candidatos Confrontan sus Propuestas Frente al País",
+    "href": "/news/politica/debate-presidencial-candidatos-confrontan-propuestas",
+    "category": "Política",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "El esperado debate presidencial se llevó a cabo anoche, reuniendo a los principales candidatos que aspiran a ocupar la primera magistratura del país. El evento, transmitido en cadena nacional, permitió a los aspirantes exponer y confrontar sus propuestas frente a millones de ciudadanos.",
+    "imageUrl": "/images/news/politica/debate.jpg",
+    "alt": "Candidatos presidenciales debatiendo en el escenario durante el evento televisado",
+    "content": [
+      "Desde el inicio, el debate estuvo marcado por un tono enérgico y momentos de tensión, especialmente en los temas económicos y sociales. Los candidatos intercambiaron críticas, pero también aprovecharon para presentar soluciones concretas a los desafíos actuales del país.",
+      "En materia económica, las posturas fueron diversas. Mientras algunos candidatos propusieron reducir impuestos para fomentar la inversión y el empleo, otros enfatizaron la necesidad de fortalecer los programas sociales y aumentar la recaudación fiscal de los sectores con mayores ingresos.",
+      "El tema de la seguridad ciudadana también generó intensos intercambios. Se discutieron estrategias para enfrentar la delincuencia, el narcotráfico y la corrupción en las instituciones. Cada candidato defendió su visión sobre cómo garantizar la paz y la confianza en las fuerzas del orden.",
+      "La educación y la salud fueron otros ejes centrales del encuentro. Algunos aspirantes propusieron una reforma integral del sistema educativo, con mayor inversión en tecnología y capacitación docente, mientras que otros plantearon mejorar la cobertura y calidad de los servicios de salud pública.",
+      "Durante el bloque ambiental, los candidatos debatieron sobre el cambio climático, la deforestación y el uso de energías renovables. Las diferencias fueron evidentes, aunque todos coincidieron en la importancia de adoptar políticas sostenibles que protejan los recursos naturales.",
+      "El debate también abordó temas de género, derechos humanos y transparencia gubernamental. Varios candidatos hicieron énfasis en la igualdad de oportunidades, la lucha contra la violencia y la necesidad de modernizar las instituciones del Estado.",
+      "La ciudadanía siguió atentamente cada intervención a través de la televisión, la radio y las redes sociales, donde el evento generó millones de interacciones y comentarios. Los analistas destacan que el desempeño de los candidatos podría influir significativamente en las próximas encuestas.",
+      "Al cierre del debate, los moderadores agradecieron la participación de todos los aspirantes e invitaron a la población a reflexionar sobre las propuestas presentadas. El próximo encuentro presidencial se celebrará dentro de dos semanas y abordará temas relacionados con política exterior y desarrollo regional.",
+      "El debate de anoche dejó en claro que la contienda electoral se encuentra en su punto más intenso, con candidatos decididos a convencer al electorado y con un país atento al rumbo que tomará su futuro político."
+    ],
+    "relatedNews": [
+      {
+        "id": "politica-encuesta",
+        "title": "Encuestas Revelan Incremento en la Popularidad del Presidente",
+        "href": "/news/politica/encuestas-revelan-incremento-popularidad-presidente",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Encuestas revelan incremento en la popularidad del presidente tras recientes medidas económicas.",
+        "imageUrl": "/images/news/politica/presidente.avif",
+        "alt": "Gráfico mostrando el aumento de la aprobación presidencial en encuestas de opinión"
+      },
+      {
+        "id": "politica-ley-ambiental",
+        "title": "Aprobación Histórica: El Congreso Da Luz Verde a la Ley de Protección Ambiental",
+        "href": "/news/politica/aprobacion-historica-ley-proteccion-ambiental",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "El Congreso da luz verde a la Ley de Protección Ambiental marcando un hito legislativo.",
+        "imageUrl": "/images/news/politica/congreso.avif",
+        "alt": "Miembros del Congreso votando la ley de protección ambiental"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Política",
+      "current": "Debate Presidencial: Candidatos Confrontan sus Propuestas Frente al País"
+    }
+  },
+  {
+    "id": "politica-senado",
+    "title": "El Senado Debate Nueva Propuesta de Reforma Constitucional",
+    "href": "/news/politica/senado-debate-nueva-propuesta-reforma-constitucional",
+    "category": "Política",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "El Senado de la República inició esta semana el debate sobre una nueva propuesta de reforma constitucional que busca introducir cambios significativos en la estructura política del país.",
+    "imageUrl": "/images/news/politica/senado.avif",
+    "alt": "Cámara del Senado durante el debate de la reforma constitucional",
+    "content": [
+      "La iniciativa, presentada por un grupo de legisladores de diferentes partidos, plantea ajustes en temas clave como la distribución del poder, la transparencia en la gestión pública y el fortalecimiento de los mecanismos de participación ciudadana.",
+      "Durante la sesión plenaria, varios senadores expresaron sus posiciones respecto a los alcances de la reforma. Algunos destacaron la importancia de modernizar la Constitución para adaptarla a las demandas actuales de la sociedad, mientras que otros advirtieron sobre el riesgo de alterar artículos fundamentales sin el debido consenso político.",
+      "El presidente del Senado afirmó que el proceso se llevará a cabo de manera transparente y con la participación de expertos constitucionalistas, con el objetivo de garantizar un debate técnico y plural.",
+      "Entre los puntos más discutidos se encuentran la posible reducción del número de legisladores, la implementación de nuevos mecanismos de control institucional y la ampliación de derechos ciudadanos en materia electoral y de justicia social.",
+      "Organizaciones civiles han manifestado su interés en participar en las audiencias públicas que acompañarán el proceso de análisis, subrayando la necesidad de que cualquier cambio constitucional responda a los intereses de la población y no a agendas partidistas.",
+      "Por su parte, el Ejecutivo ha señalado que seguirá de cerca el desarrollo del debate, sin intervenir directamente, pero dispuesto a apoyar las iniciativas que fortalezcan la gobernabilidad democrática.",
+      "Analistas políticos coinciden en que esta reforma podría marcar un punto de inflexión en la historia institucional del país, dependiendo del nivel de consenso que logren alcanzar las diferentes fuerzas políticas representadas en el Congreso.",
+      "El debate continuará en las próximas semanas y se espera que, una vez concluido, la propuesta sea sometida a votación en el pleno del Senado antes de pasar a la Cámara de Diputados para su revisión final.",
+      "De ser aprobada, la reforma constitucional entraría en vigor el próximo año, modificando varios artículos clave de la Carta Magna y dando paso a una nueva etapa en el marco político y jurídico nacional."
+    ],
+    "relatedNews": [
+      {
+        "id": "politica-encuesta",
+        "title": "Encuestas Revelan Incremento en la Popularidad del Presidente",
+        "href": "/news/politica/encuestas-revelan-incremento-popularidad-presidente",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Encuestas revelan incremento en la popularidad del presidente tras recientes medidas económicas.",
+        "imageUrl": "/images/news/politica/presidente.avif",
+        "alt": "Gráfico mostrando el aumento de la aprobación presidencial en encuestas de opinión"
+      },
+      {
+        "id": "politica-casa-blanca",
+        "title": "Casa Blanca Confirma Cumbre Internacional",
+        "href": "/news/politica/casa-blanca-confirma-cumbre-internacional",
+        "category": "Política",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "La Casa Blanca confirma cumbre internacional para esta semana para abordar temas globales.",
+        "imageUrl": "/images/news/politica/casa-blanca.jpg",
+        "alt": "Edificio de la Casa Blanca albergando la cumbre internacional"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Política",
+      "current": "El Senado Debate Nueva Propuesta de Reforma Constitucional"
+    }
+  },
+  {
+    "id": "deporte-nba",
+    "title": "Los Lakers vencen a los Celtics 112-107 en un emocionante partido de la NBA",
+    "href": "/news/deporte/lakers-vencen-celtics-nba",
+    "category": "Deporte",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "Los Lakers de Los Ángeles derrotaron a los Boston Celtics 112-107 en un partido lleno de emoción y jugadas espectaculares que mantuvo a los fanáticos al borde de sus asientos.",
+    "imageUrl": "/images/news/deporte/nba.jpg",
+    "alt": "LeBron James de los Lakers lanzando contra la defensa de los Celtics",
+    "content": [
+      "El partido comenzó con una intensidad inusual desde el primer cuarto, con ambos equipos intercambiando jugadas y mostrando por qué son considerados dos de los mejores franchises de la historia de la NBA.",
+      "LeBron James fue la figura destacada para los Lakers, contribuyendo con 28 puntos, 8 rebotes y 7 asistencias en una actuación que demuestra que todavía está en la cima de su carrera.",
+      "Por su parte, Jayson Tatum lideró a los Celtics con 25 puntos y 10 rebotes, pero no fue suficiente para evitar la derrota en un partido que se definió en los últimos minutos.",
+      "El tercer cuarto fue decisivo para el resultado final, con los Lakers imponiendo su ritmo defensivo y logrando una parcial de 32-24 que les dio una ventaja cómoda para el último periodo.",
+      "Los Celtics intentaron una remontada épica en los últimos minutos, llegando a estar a solo dos puntos de diferencia a falta de 30 segundos, pero las decisiones clave de los Lakers en los posesiones finales sellaron la victoria.",
+      "El entrenador de los Lakers, Darvin Ham, destacó la importancia de esta victoria para la confianza del equipo: \"Este tipo de partidos nos preparan para los momentos decisivos de la postemporada\".",
+      "Con este resultado, los Lakers mejoran su récord a 3-1 en la temporada, mientras que los Celtics sufren su segunda derrota y quedan con un balance de 2-2.",
+      "El próximo partido para los Lakers será contra los Warriors de Golden State, en otro enfrentamiento que promete ser un clásico más de la temporada regular."
+    ],
+    "relatedNews": [
+      {
+        "id": "deporte-atletas",
+        "title": "Atletas Rompen Récords Mundiales",
+        "href": "/news/deporte/atletas-rompen-records-mundiales",
+        "category": "Deporte",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "Atletas establecen nuevas plusmarcas mundiales en competencias internacionales.",
+        "imageUrl": "/images/news/deporte/atletas.jpg",
+        "alt": "Atletas Rompen Récords Mundiales"
+      },
+      {
+        "id": "deporte-baseball",
+        "title": "Serie Mundial de Baseball Comienza",
+        "href": "/news/deporte/serie-mundial-baseball-comienza",
+        "category": "Deporte",
+        "date": "2 de octubre de 2025",
+        "datetime": "2025-10-02",
+        "summary": "Los mejores equipos de baseball se enfrentan en la Serie Mundial.",
+        "imageUrl": "/images/news/deporte/baseball.jpg",
+        "alt": "Serie Mundial de Baseball Comienza"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Deporte",
+      "current": "Los Lakers vencen a los Celtics 112-107 en un emocionante partido de la NBA"
+    }
+  },
+  {
+    "id": "deporte-atletas",
+    "title": "Atletas Rompen Récords Mundiales en Campeonato Internacional",
+    "href": "/news/deporte/atletas-rompen-records-mundiales",
+    "category": "Deporte",
+    "date": "3 de octubre de 2025",
+    "datetime": "2025-10-03",
+    "summary": "Atletas de diferentes países establecieron nuevas plusmarcas mundiales en el campeonato internacional de atletismo, superando marcas que llevaban años vigentes.",
+    "imageUrl": "/images/news/deporte/atletas.jpg",
+    "alt": "Atletas rompiendo récords mundiales en el campeonato internacional",
+    "content": [
+      "El estadio olímpico fue testigo de momentos históricos cuando tres atletas lograron superar récords mundiales que parecían imbatibles, marcando un hito en la historia del atletismo moderno.",
+      "En la prueba de 100 metros planos, el velocista jamaicano Devon Allen corrió en 9.58 segundos, igualando la marca mundial y demostrando una velocidad extraordinaria.",
+      "La lanzadora de martillo polaca Anita Włodarczyk superó su propia marca mundial con un lanzamiento de 82.98 metros, extendiendo su dominio en esta disciplina.",
+      "El salto de altura también tuvo su momento glorioso con el sueco Armand Duplantis, quien saltó 6.23 metros para establecer una nueva plusmarca mundial y dejar a todos presentes asombrados.",
+      "Expertos deportivos atribuyen estos resultados a la evolución de los métodos de entrenamiento, la nutrición avanzada y el uso de tecnología de punta en la preparación de los atletas.",
+      "Los organizadores del campeonato destacaron que estos récords demuestran que el límite humano sigue expandiéndose y que el atletismo vive una era dorada en términos de rendimiento.",
+      "Los atletas que rompieron récords serán reconocidos en una ceremonia especial, y sus marcas serán sometidas a los procesos de verificación oficiales de la Federación Internacional de Atletismo.",
+      "Este campeonato será recordado como uno de los más importantes en la historia reciente del deporte, inspirando a nuevas generaciones de atletas a superar los límites establecidos."
+    ],
+    "relatedNews": [
+      {
+        "id": "deporte-nba",
+        "title": "Los Lakers vencen a los Celtics 112-107",
+        "href": "/news/deporte/lakers-vencen-celtics-nba",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los Lakers derrotan a los Celtics en un partido emocionante de la NBA.",
+        "imageUrl": "/images/news/deporte/nba.jpg",
+        "alt": "Los Lakers vencen a los Celtics 112-107"
+      },
+      {
+        "id": "deporte-natacion",
+        "title": "Nadadora Impone Nuevo Récord",
+        "href": "/news/deporte/nadadora-impone-nuevo-record",
+        "category": "Deporte",
+        "date": "1 de octubre de 2025",
+        "datetime": "2025-10-01",
+        "summary": "Nadadora establece nueva marca mundial en 200 metros mariposa.",
+        "imageUrl": "/images/news/deporte/natacion.jpg",
+        "alt": "Nadadora Impone Nuevo Récord"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Deporte",
+      "current": "Atletas Rompen Récords Mundiales en Campeonato Internacional"
+    }
+  },
+  {
+    "id": "deporte-mlb",
+    "title": "Los Mets vencen a los Braves en un partido decisivo de la MLB",
+    "href": "/news/deporte/mets-vencen-braves-partido-decisivo-mlb",
+    "category": "Deporte",
+    "date": "7 de octubre de 2025",
+    "datetime": "2025-10-07",
+    "summary": "Los Mets lograron una victoria impresionante sobre los Braves en un partido decisivo de la MLB, que mantuvo a los fanáticos al borde de sus asientos hasta el último out.",
+    "imageUrl": "/images/news/deporte/baseball.jpg",
+    "alt": "Lanzador de los Mets tirando la pelota en un estadio de béisbol lleno",
+    "content": [
+      "El partido comenzó con ambos equipos mostrando un juego sólido en la ofensiva y defensiva, pero fueron los Mets quienes lograron abrir el marcador en la tercera entrada gracias a un home run de su estrella principal.",
+      "Los Braves intentaron reaccionar, conectando hits importantes en la quinta y sexta entrada, pero la excelente actuación del pitcher abridor de los Mets mantuvo a raya a los bateadores rivales.",
+      "En la séptima entrada, los Mets ampliaron su ventaja con una jugada estratégica de doble robo y un sencillo oportuno, asegurando un margen cómodo antes del cierre del juego.",
+      "El bullpen de los Mets demostró solidez, cerrando el partido sin permitir carreras adicionales y asegurando la victoria con un marcador final de 5-3.",
+      "Con este triunfo, los Mets fortalecen sus aspiraciones de llegar a la postemporada y colocan presión sobre los Braves en la clasificación de la división.",
+      "Los fanáticos celebraron con entusiasmo, mientras los jugadores de los Mets destacaron el esfuerzo colectivo y la concentración que mantuvieron durante todo el partido.",
+      "Los Braves, aunque decepcionados, prometieron recuperarse en los próximos encuentros y luchar hasta el final por mantener sus opciones en la temporada.",
+      "Este partido quedará como uno de los momentos más memorables de la temporada regular, mostrando el talento y la determinación de ambos equipos en la MLB."
+    ],
+    "relatedNews": [
+      {
+        "id": "deporte-nba",
+        "title": "Los Lakers vencen a los Celtics 112-107 en un emocionante partido de la NBA",
+        "href": "/news/deporte/lakers-vencen-celtics-nba",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los Lakers lograron una victoria impresionante sobre los Celtics en un partido decisivo de la NBA.",
+        "imageUrl": "/images/news/deporte/nba.jpg",
+        "alt": "LeBron James de los Lakers lanzando contra la defensa de los Celtics"
+      },
+      {
+        "id": "deporte-equipo-local",
+        "title": "Gran victoria del equipo local en un emocionante partido de fútbol",
+        "href": "/news/deporte/gran-victoria-equipo-local-futbol",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "El equipo local logró una impresionante victoria frente a su principal rival, consolidando su posición.",
+        "imageUrl": "/images/news/deporte/futbol.jpg",
+        "alt": "Gran victoria del equipo local en un emocionante partido de fútbol"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Deporte",
+      "current": "Los Mets vencen a los Braves en un partido decisivo de la MLB"
+    }
+  },
+  {
+    "id": "deporte-natacion",
+    "title": "La selección estadounidense domina el relevo 4x100 metros en el Mundial de Natación",
+    "href": "/news/deporte/seleccion-estadounidense-dominia-relevo-4x100-metros-mundial-natacion",
+    "category": "Deporte",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "La selección estadounidense se consagró como la gran protagonista en el relevo 4x100 metros del Mundial de Natación, dominando la competencia de principio a fin y llevándose la medalla de oro con un tiempo impresionante.",
+    "imageUrl": "/images/news/deporte/natacion.jpg",
+    "alt": "Equipo de relevos estadounidense celebrando la medalla de oro en la piscina",
+    "content": [
+      "El equipo, compuesto por cuatro nadadores de élite, mostró una coordinación perfecta y relevos precisos, dejando claro su superioridad frente a rivales de todo el mundo.",
+      "Desde la salida hasta el último tramo, los estadounidenses mantuvieron el liderazgo, con cada nadador realizando una performance destacada que contribuyó al récord personal del equipo y a su victoria contundente.",
+      "El público presente en la piscina y los millones de espectadores alrededor del mundo celebraron la actuación impecable del equipo, que reafirma la fortaleza histórica de Estados Unidos en pruebas de relevos.",
+      "Los nadadores expresaron su emoción tras la competencia, destacando la importancia del trabajo en equipo, la disciplina y la preparación física y mental que los llevó al triunfo.",
+      "La competencia fue seguida de cerca por las selecciones de Australia, Reino Unido y China, quienes también ofrecieron un alto nivel de desempeño, aunque no pudieron superar la ventaja de Estados Unidos.",
+      "Con este resultado, la selección estadounidense se consolida como favorita en futuras competencias internacionales y aumenta sus posibilidades de seguir batiendo récords en el ámbito mundial.",
+      "El triunfo en el relevo 4x100 metros no solo representa una medalla más para el país, sino también un ejemplo de estrategia, sincronización y talento que inspira a las nuevas generaciones de nadadores.",
+      "El Mundial de Natación continúa con otras pruebas emocionantes, donde los atletas de distintas naciones lucharán por medallas y por dejar su huella en esta prestigiosa competencia internacional.",
+      "Sin duda, la actuación de Estados Unidos en el relevo 4x100 metros será recordada como uno de los momentos más destacados del Mundial, demostrando el poderío y la dedicación de su selección de natación."
+    ],
+    "relatedNews": [
+      {
+        "id": "deporte-nba",
+        "title": "Los Lakers vencen a los Celtics 112-107 en un emocionante partido de la NBA",
+        "href": "/news/deporte/lakers-vencen-celtics-nba",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los Lakers lograron una victoria impresionante sobre los Celtics en un partido decisivo de la NBA.",
+        "imageUrl": "/images/news/deporte/nba.jpg",
+        "alt": "LeBron James de los Lakers lanzando contra la defensa de los Celtics"
+      },
+      {
+        "id": "deporte-atletas",
+        "title": "Atletas Rompen Récords Mundiales en Campeonato Internacional",
+        "href": "/news/deporte/atletas-rompen-records-mundiales",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Atletas de diferentes países establecen nuevas marcas mundiales en varias disciplinas.",
+        "imageUrl": "/images/news/deporte/atletas.jpg",
+        "alt": "Atletas rompiendo récords mundiales en el campeonato internacional"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Deporte",
+      "current": "La selección estadounidense domina el relevo 4x100 metros en el Mundial de Natación"
+    }
+  },
+  {
+    "id": "deporte-equipo-local",
+    "title": "Gran victoria del equipo local en un emocionante partido de fútbol",
+    "href": "/news/deporte/gran-victoria-equipo-local-futbol",
+    "category": "Deporte",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "En una noche llena de emoción, el equipo local logró una impresionante victoria frente a su principal rival, consolidando su posición como uno de los favoritos del campeonato nacional.",
+    "imageUrl": "/images/news/deporte/futbol.jpg",
+    "alt": "Jugadores del equipo local celebrando una victoria",
+    "content": [
+      "Con un marcador final de 3-1, el conjunto demostró un excelente desempeño ofensivo y una defensa sólida que impidió cualquier intento de remontada del adversario. El técnico del equipo destacó la unión y el compromiso del plantel como claves del éxito.",
+      "Los fanáticos celebraron durante horas en las calles, mientras las redes sociales se llenaron de mensajes de apoyo y orgullo. Los analistas deportivos coincidieron en que esta victoria podría marcar un punto de inflexión en la temporada, fortaleciendo la moral del equipo y la confianza de los seguidores, ya era hora que el equipo obtuviera una victoria.",
+      "Tras el partido, el entrenador declaró en rueda de prensa: \"El equipo mostró carácter, disciplina y pasión. Cada jugador entendió su rol y lo cumplió a la perfección. Estoy orgulloso de lo que hemos logrado hoy y confiado en que podemos seguir mejorando\". Los próximos encuentros serán cruciales para determinar la clasificación hacia la fase final del campeonato.",
+      "Por último, la comunidad local ha comenzado a organizar celebraciones y homenajes para los jugadores, reconociendo su esfuerzo y dedicación. Se espera que la ciudad viva una semana llena de entusiasmo deportivo, consolidando aún más la pasión por el fútbol en la región."
+    ],
+    "relatedNews": [
+      {
+        "id": "deporte-nba",
+        "title": "Los Lakers vencen a los Celtics 112-107 en un emocionante partido de la NBA",
+        "href": "/news/deporte/lakers-vencen-celtics-nba",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los Lakers lograron una victoria impresionante sobre los Celtics en un partido decisivo de la NBA.",
+        "imageUrl": "/images/news/deporte/nba.jpg",
+        "alt": "LeBron James de los Lakers lanzando contra la defensa de los Celtics"
+      },
+      {
+        "id": "deporte-espana-alemania",
+        "title": "España se clasifica para la final del Mundial de Fútbol",
+        "href": "/news/deporte/espana-clasifica-final-mundial-futbol",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "España se clasificó para la final del Mundial de Fútbol tras vencer a Alemania en un emocionante partido.",
+        "imageUrl": "/images/news/deporte/spain-germany.jpg",
+        "alt": "España se clasifica para la final del Mundial de Fútbol"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Deporte",
+      "current": "Gran victoria del equipo local en un emocionante partido de fútbol"
+    }
+  },
+  {
+    "id": "deporte-espana-alemania",
+    "title": "España se clasifica para la final del Mundial de Fútbol tras vencer a Alemania",
+    "href": "/news/deporte/espana-clasifica-final-mundial-futbol",
+    "category": "Deporte",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "España se clasificó para la final del Mundial de Fútbol tras vencer a Alemania en un emocionante partido lleno de intensidad y momentos memorables. Desde el inicio, ambos equipos mostraron un alto nivel de juego, manteniendo a los aficionados al borde de sus asientos.",
+    "imageUrl": "/images/news/deporte/spain-germany.jpg",
+    "alt": "Selección española de fútbol celebrando la clasificación a la final del Mundial",
+    "content": [
+      "El primer tiempo estuvo marcado por la presión ofensiva de Alemania, que generó varias oportunidades de gol, pero la defensa española se mantuvo firme, con destacadas intervenciones del portero y una coordinación impecable en la línea defensiva.",
+      "En la segunda mitad, España logró imponer su ritmo de juego. El gol decisivo llegó gracias a una jugada colectiva que culminó con un remate preciso de un jugador destacado, desatando la euforia en la grada y marcando la diferencia en el marcador.",
+      "Además de la anotación clave, otros jugadores españoles se destacaron por su desempeño, mostrando gran visión de juego y contribuyendo a mantener la posesión del balón en momentos cruciales del encuentro.",
+      "El equipo alemán no bajó los brazos y buscó el empate hasta los últimos minutos, generando ocasiones peligrosas, pero la solidez de la defensa española y la rapidez en los contraataques permitieron mantener la ventaja y asegurar la clasificación.",
+      "Con esta victoria, España asegura su lugar en la final del Mundial, donde se enfrentará a su rival en un partido que promete ser histórico y que atraerá la atención de millones de aficionados alrededor del mundo.",
+      "El entrenador del equipo español destacó la disciplina, el trabajo en equipo y la concentración de sus jugadores, resaltando que el triunfo es fruto del esfuerzo colectivo y de la preparación estratégica que realizaron durante el torneo. España se prepara para disputar la final con el objetivo de coronarse campeón del mundo."
+    ],
+    "relatedNews": [
+      {
+        "id": "deporte-nba",
+        "title": "Los Lakers vencen a los Celtics 112-107 en un emocionante partido de la NBA",
+        "href": "/news/deporte/lakers-vencen-celtics-nba",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los Lakers lograron una victoria impresionante sobre los Celtics en un partido decisivo de la NBA.",
+        "imageUrl": "/images/news/deporte/nba.jpg",
+        "alt": "LeBron James de los Lakers lanzando contra la defensa de los Celtics"
+      },
+      {
+        "id": "deporte-equipo-local",
+        "title": "Gran victoria del equipo local en un emocionante partido de fútbol",
+        "href": "/news/deporte/gran-victoria-equipo-local-futbol",
+        "category": "Deporte",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "El equipo local logró una impresionante victoria frente a su principal rival, consolidando su posición.",
+        "imageUrl": "/images/news/deporte/futbol.jpg",
+        "alt": "Gran victoria del equipo local en un emocionante partido de fútbol"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Deporte",
+      "current": "España se clasifica para la final del Mundial de Fútbol tras vencer a Alemania"
+    }
+  },
+  {
+    "id": "economia-bolsa",
+    "title": "La bolsa de valores cierra en alza tras jornada de optimismo inversor",
+    "href": "/news/economia/bolsa-valores-cierra-alza-optimismo-inversor",
+    "category": "Economía",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "La bolsa de valores cerró en alza este jueves, impulsada por un renovado optimismo entre los inversores y la publicación de resultados financieros positivos de varias empresas líderes.",
+    "imageUrl": "/images/news/economia/bolsa-de-valores.avif",
+    "alt": "Pantalla de la bolsa mostrando números positivos del S&P 500 y Nasdaq",
+    "content": [
+      "El índice S&P 500 subió un 1,2%, mientras que el Dow Jones y el Nasdaq registraron incrementos del 1% y 1,5% respectivamente. Este comportamiento refleja la confianza de los inversores en la estabilidad económica y en las perspectivas de ganancias corporativas a corto plazo.",
+      "Los analistas señalan que la combinación de estímulos monetarios, el avance en acuerdos comerciales y la reducción de incertidumbres políticas ha contribuido a la recuperación del mercado. Además, el sector tecnológico lideró las ganancias, con varias compañías superando las expectativas de los analistas.",
+      "Por su parte, los inversores extranjeros también mostraron interés en los mercados estadounidenses, incrementando la demanda de acciones y fortaleciendo la tendencia alcista. Esta dinámica ha reforzado la percepción de que la economía se mantiene resiliente frente a desafíos globales.",
+      "En conclusión, la jornada positiva en la bolsa refleja un entorno de confianza y expectativas favorables. No obstante, los expertos advierten que la volatilidad podría regresar si se presentan cambios inesperados en la política económica o en los indicadores financieros clave."
+    ],
+    "relatedNews": [
+      {
+        "id": "economia-inflacion",
+        "title": "Inflación sigue en aumento y preocupa a expertos",
+        "href": "/news/economia/incremento-inflacion-impacta-mercados",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los indicadores económicos muestran que la inflación continúa su tendencia alcista, afectando el poder adquisitivo.",
+        "imageUrl": "/images/news/economia/inflacion.jpg",
+        "alt": "Inflación sigue en aumento y preocupa a expertos"
+      },
+      {
+        "id": "economia-dolar",
+        "title": "Dólar alcanza máximo del año frente a otras monedas",
+        "href": "/news/economia/dolar-alcanza-maximo-ano-frente-monedas",
+        "category": "Economía",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La moneda estadounidense se fortalece significativamente ante la incertidumbre global y la política monetaria.",
+        "imageUrl": "/images/news/economia/dolar.avif",
+        "alt": "Billetes de dólar estadounidense y gráficos de tipo de cambio global"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Economía",
+      "current": "La bolsa de valores cierra en alza tras jornada de optimismo inversor"
+    }
+  },
+  {
+    "id": "economia-inflacion",
+    "title": "Incremento de la inflación impacta a los mercados",
+    "href": "/news/economia/incremento-inflacion-impacta-mercados",
+    "category": "Economía",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "El aumento sostenido de la inflación genera incertidumbre en los mercados financieros y afecta el poder adquisitivo de los ciudadanos. Los precios de productos básicos y servicios esenciales continúan incrementándose, obligando a empresas y familias a ajustar presupuestos. Analistas advierten que, de no implementarse políticas económicas efectivas, esta tendencia podría persistir, impactando la inversión, el empleo y la estabilidad económica del país a mediano plazo.",
+    "imageUrl": "/images/news/economia/inflacion.jpg",
+    "alt": "Pantallas financieras mostrando gráficos de inflación y datos de mercado",
+    "content": [
+      "Según los informes más recientes, la inflación anual en las principales economías ha superado las expectativas de los analistas, impulsada por el aumento en los costos de la energía, los alimentos y el transporte. En varios países europeos, los precios registraron su mayor alza en más de un año, mientras que en Estados Unidos la tasa inflacionaria se mantiene por encima del objetivo del 2% establecido por la Reserva Federal.",
+      "Las bolsas internacionales reaccionaron con volatilidad. El índice S&P 500 cayó más de un 1%, mientras que el Euro Stoxx 50 y el Nikkei japonés registraron descensos similares. Los inversores temen que los bancos centrales puedan retrasar los recortes de tasas de interés o incluso aplicar nuevas medidas restrictivas para contener el alza de precios.",
+      "El economista principal del Fondo Monetario Internacional, Jonathan Reeves, señaló que la persistencia de la inflación \"refleja desequilibrios estructurales que van más allá del ciclo económico\". También advirtió que \"si las expectativas inflacionarias no se estabilizan pronto, los mercados podrían enfrentar un periodo prolongado de incertidumbre\".",
+      "En América Latina, los efectos también se hacen sentir. Países con economías dependientes de importaciones han visto cómo el costo de los bienes básicos se eleva, afectando directamente el poder adquisitivo de las familias. En algunos casos, los bancos centrales de la región han tenido que subir sus tasas para evitar una depreciación acelerada de sus monedas.",
+      "Por su parte, los precios del petróleo y del gas natural se mantienen en niveles elevados, lo que añade presión a las cadenas de suministro y a los costos de producción. Las empresas manufactureras y de transporte reportan márgenes de ganancia más ajustados, mientras intentan trasladar parte de los aumentos al consumidor final.",
+      "Los analistas coinciden en que, si bien la inflación podría moderarse en los próximos meses, los mercados seguirán expuestos a la incertidumbre. Factores como la inestabilidad geopolítica, los conflictos comerciales y la transición energética global seguirán influyendo en el comportamiento de los precios.",
+      "En conclusión, el incremento de la inflación no solo está afectando a las economías domésticas, sino que también está redefiniendo la estrategia de los inversores y de los bancos centrales. La clave, según los expertos, será encontrar un equilibrio entre controlar los precios y evitar una desaceleración económica más profunda."
+    ],
+    "relatedNews": [
+      {
+        "id": "economia-bolsa",
+        "title": "La bolsa de valores cierra en alza",
+        "href": "/news/economia/bolsa-valores-cierra-alza-optimismo-inversor",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los principales índices bursátiles cierran con ganancias significativas impulsados por buenos resultados empresariales.",
+        "imageUrl": "/images/news/economia/bolsa-de-valores.avif",
+        "alt": "La bolsa de valores cierra en alza"
+      },
+      {
+        "id": "economia-dolar",
+        "title": "Dólar alcanza máximo del año frente a otras monedas",
+        "href": "/news/economia/dolar-alcanza-maximo-ano-frente-monedas",
+        "category": "Economía",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La moneda estadounidense se fortalece significativamente ante la incertidumbre global y la política monetaria.",
+        "imageUrl": "/images/news/economia/dolar.avif",
+        "alt": "Billetes de dólar estadounidense y gráficos de tipo de cambio global"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Economía",
+      "current": "Incremento de la inflación impacta a los mercados"
+    }
+  },
+  {
+    "id": "economia-dolar",
+    "title": "Dólar alcanza máximo del año frente a otras monedas",
+    "href": "/news/economia/dolar-alcanza-maximo-ano-frente-monedas",
+    "category": "Economía",
+    "date": "3 de octubre de 2025",
+    "datetime": "2025-10-03",
+    "summary": "El dólar estadounidense ha alcanzado su máximo nivel del año frente a las principales divisas mundiales, impulsado por la incertidumbre global y las expectativas de política monetaria.",
+    "imageUrl": "/images/news/economia/dolar.avif",
+    "alt": "Billetes de dólar estadounidense y gráficos de tipo de cambio global",
+    "content": [
+      "El índice del dólar, que mide el rendimiento de la moneda estadounidense frente a una cesta de seis divisas importantes, ha subido un 2.3% en la última semana, posicionándose en su nivel más alto desde enero.",
+      "Los analistas atribuyen este fortalecimiento a múltiples factores, incluyendo la persistente inflación que podría llevar a la Reserva Federal a mantener las tasas de interés altas por más tiempo de lo esperado.",
+      "El euro ha sido una de las monedas más afectadas, cayendo por debajo de 1.05 dólares por primera vez en varios meses. La libra esterlina y el yen japonés también han registrado pérdidas significativas frente al billete verde.",
+      "Los mercados emergentes están sintiendo particularmente el impacto, con varias monedas de América Latina y Asia alcanzando mínimos históricos frente al dólar, lo que aumenta la preocupación sobre la deuda externa y la inflación importada.",
+      "Los expertos financieros advierten que esta tendencia podría continuar si los datos económicos de Estados Unidos siguen mostrando resiliencia, mientras que otras economías enfrentan desaceleraciones más pronunciadas.",
+      "Las corporaciones multinacionales están ajustando sus proyecciones de ganancias ante la volatilidad cambiaria, mientras que los inversores buscan refugio en activos denominados en dólares."
+    ],
+    "relatedNews": [
+      {
+        "id": "economia-bolsa",
+        "title": "La bolsa de valores cierra en alza",
+        "href": "/news/economia/bolsa-valores-cierra-alza-optimismo-inversor",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los principales índices bursátiles cierran con ganancias significativas impulsados por buenos resultados empresariales.",
+        "imageUrl": "/images/news/economia/bolsa-de-valores.avif",
+        "alt": "La bolsa de valores cierra en alza"
+      },
+      {
+        "id": "economia-inflacion",
+        "title": "Incremento de la inflación impacta a los mercados",
+        "href": "/news/economia/incremento-inflacion-impacta-mercados",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "La inflación vuelve a ocupar el centro de atención con nuevos datos que muestran incremento sostenido de precios.",
+        "imageUrl": "/images/news/economia/inflacion.jpg",
+        "alt": "Pantallas financieras mostrando gráficos de inflación y datos de mercado"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Economía",
+      "current": "Dólar alcanza máximo del año frente a otras monedas"
+    }
+  },
+  {
+    "id": "economia-euro",
+    "title": "El euro alcanza su valor más alto frente al dólar en seis meses",
+    "href": "/news/economia/euro-alcanza-valor-mas-alto-frente-dolar-seis-meses",
+    "category": "Economía",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "El euro alcanzó este jueves su valor más alto frente al dólar en los últimos seis meses, superando la barrera de los 1,12 dólares por primera vez desde abril. Este fortalecimiento de la moneda europea refleja un cambio en la dinámica económica global y un aumento de la confianza de los mercados en la estabilidad de la zona euro.",
+    "imageUrl": "/images/news/economia/euro.jpg",
+    "alt": "Monedas y billetes de euro con gráfico de tipo de cambio frente al dólar",
+    "content": [
+      "Los analistas atribuyen este repunte a una combinación de factores, entre ellos las señales de una posible pausa en las subidas de tasas de interés por parte de la Reserva Federal de Estados Unidos. La desaceleración económica en el país norteamericano ha reducido la demanda del dólar como activo refugio, lo que ha favorecido la recuperación del euro en los mercados internacionales.",
+      "Al mismo tiempo, los datos recientes de la economía europea han mostrado una ligera mejora en la actividad industrial y en los índices de confianza empresarial. Países como Alemania, Francia y España han presentado indicadores más sólidos de lo esperado, lo que ha impulsado el optimismo sobre el crecimiento en la eurozona durante los próximos meses.",
+      "Expertos del sector financiero destacan que el aumento del valor del euro también responde a una menor presión inflacionaria en Europa. El Banco Central Europeo (BCE) ha señalado que mantendrá una política monetaria prudente, aunque no descarta realizar ajustes si los precios vuelven a acelerarse. Esta postura ha sido interpretada por los mercados como una señal de estabilidad y control.",
+      "Por su parte, el dólar estadounidense ha mostrado debilidad ante los temores de una recesión leve y la posibilidad de que la Reserva Federal reduzca las tasas antes de lo previsto. El diferencial de políticas monetarias entre ambas regiones ha sido determinante para el fortalecimiento del euro.",
+      "En los mercados financieros, el movimiento ha sido bien recibido. Los inversores ven en el euro una oportunidad atractiva frente al dólar, especialmente en un contexto de volatilidad global. Algunas entidades financieras prevén que, si las condiciones actuales se mantienen, la moneda europea podría alcanzar los 1,15 dólares antes de que termine el año.",
+      "El repunte del euro tiene implicaciones directas para el comercio internacional, ya que encarece las exportaciones europeas pero abarata las importaciones. Esto podría beneficiar a los consumidores de la eurozona, aunque representa un desafío para las empresas exportadoras, que podrían ver reducida su competitividad en los mercados externos.",
+      "En conclusión, el fortalecimiento del euro frente al dólar refleja un reequilibrio en la economía global, donde la confianza en la estabilidad europea y la cautela de la Reserva Federal están marcando el rumbo de las principales divisas. Los próximos meses serán clave para determinar si esta tendencia alcista se consolida o si el dólar logra recuperar terreno."
+    ],
+    "relatedNews": [
+      {
+        "id": "economia-inflacion",
+        "title": "Incremento de la inflación impacta a los mercados",
+        "href": "/news/economia/incremento-inflacion-impacta-mercados",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los indicadores económicos muestran que la inflación continúa su tendencia alcista, afectando el poder adquisitivo.",
+        "imageUrl": "/images/news/economia/inflacion.jpg",
+        "alt": "Pantallas financieras mostrando gráficos de inflación y datos de mercado"
+      },
+      {
+        "id": "economia-dolar",
+        "title": "Dólar alcanza máximo del año frente a otras monedas",
+        "href": "/news/economia/dolar-alcanza-maximo-ano-frente-monedas",
+        "category": "Economía",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La moneda estadounidense se fortalece significativamente ante la incertidumbre global y la política monetaria.",
+        "imageUrl": "/images/news/economia/dolar.avif",
+        "alt": "Billetes de dólar estadounidense y gráficos de tipo de cambio global"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Economía",
+      "current": "El euro alcanza su valor más alto frente al dólar en seis meses"
+    }
+  },
+  {
+    "id": "economia-petroleo",
+    "title": "Petróleo registra fuerte repunte y preocupa a consumidores y empresas",
+    "href": "/news/economia/petroleo-registra-fuerte-repunte-preocupa-consumidores-empresas",
+    "category": "Economía",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "El precio del petróleo registró un fuerte repunte este jueves, alcanzando niveles no vistos en los últimos meses y generando preocupación tanto entre los consumidores como entre las empresas a nivel global. Este aumento se atribuye a una combinación de factores, incluyendo tensiones geopolíticas en regiones productoras y restricciones en la oferta por parte de algunos países miembros de la OPEP.",
+    "imageUrl": "/images/news/economia/petroleo.avif",
+    "alt": "Barriles de petróleo y gráfico de precios en alza en una pantalla financiera",
+    "content": [
+      "Los analistas indican que la subida del crudo podría tener un impacto significativo en los costos de transporte y en los precios de bienes y servicios, afectando directamente el presupuesto de las familias. Los combustibles, que representan un gasto esencial en muchas economías, podrían registrar incrementos en el corto plazo, aumentando la presión sobre el poder adquisitivo de los ciudadanos.",
+      "Por el lado empresarial, las compañías de transporte, logística y producción enfrentan un aumento en sus costos operativos. Varias empresas han comenzado a ajustar precios y revisar contratos de suministro para mitigar los efectos del incremento del petróleo en sus márgenes de ganancia.",
+      "Los expertos advierten que, si el precio del crudo se mantiene en niveles elevados, podrían surgir presiones inflacionarias adicionales a nivel global. Esto también podría influir en las decisiones de los bancos centrales respecto a las tasas de interés y políticas monetarias, generando un escenario de incertidumbre en los mercados financieros.",
+      "En el plano internacional, el repunte del petróleo ha sido impulsado principalmente por la reducción de inventarios en Estados Unidos y la tensión política en Oriente Medio. Además, algunos países exportadores han optado por limitar temporalmente la producción para sostener los precios, lo que ha intensificado la preocupación de los mercados.",
+      "En conclusión, el alza del petróleo representa un desafío económico tanto para consumidores como para empresas. La evolución de los precios dependerá de factores geopolíticos, decisiones de los países productores y la capacidad de adaptación de los mercados ante la volatilidad de los costos energéticos."
+    ],
+    "relatedNews": [
+      {
+        "id": "economia-inflacion",
+        "title": "Incremento de la inflación impacta a los mercados",
+        "href": "/news/economia/incremento-inflacion-impacta-mercados",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los indicadores económicos muestran que la inflación continúa su tendencia alcista, afectando el poder adquisitivo.",
+        "imageUrl": "/images/news/economia/inflacion.jpg",
+        "alt": "Pantallas financieras mostrando gráficos de inflación y datos de mercado"
+      },
+      {
+        "id": "economia-dolar",
+        "title": "Dólar alcanza máximo del año frente a otras monedas",
+        "href": "/news/economia/dolar-alcanza-maximo-ano-frente-monedas",
+        "category": "Economía",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La moneda estadounidense se fortalece significativamente ante la incertidumbre global y la política monetaria.",
+        "imageUrl": "/images/news/economia/dolar.avif",
+        "alt": "Billetes de dólar estadounidense y gráficos de tipo de cambio global"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Economía",
+      "current": "Petróleo registra fuerte repunte y preocupa a consumidores y empresas"
+    }
+  },
+  {
+    "id": "economia-pib",
+    "title": "El PIB crece un 3,5% en el último trimestre impulsado por el consumo y la inversión",
+    "href": "/news/economia/pib-crece-35-ultimo-trimestre-impulsado-consumo-inversion",
+    "category": "Economía",
+    "date": "9 de octubre de 2025",
+    "datetime": "2025-10-09",
+    "summary": "El Producto Interno Bruto (PIB) creció un 3,5% en el último trimestre, según los datos publicados por el gobierno, impulsado principalmente por un aumento en el consumo interno y en la inversión privada.",
+    "imageUrl": "/images/news/economia/pib.jpg",
+    "alt": "Gráfico de barras del PIB mostrando un incremento del 3,5%",
+    "content": [
+      "El gasto de los hogares mostró un comportamiento positivo, con un incremento en la demanda de bienes duraderos y servicios, lo que refleja la confianza de los consumidores en la economía. Este crecimiento del consumo contribuyó significativamente al avance general del PIB.",
+      "Por su parte, la inversión empresarial también experimentó un aumento notable. Las empresas han incrementado sus gastos en infraestructura, tecnología y expansión de operaciones, lo que ha generado un efecto multiplicador sobre el empleo y la producción.",
+      "Los analistas destacan que la combinación de consumo sólido e inversión creciente ha permitido a la economía mantenerse en una senda de crecimiento estable, a pesar de la incertidumbre internacional y la volatilidad de los mercados financieros.",
+      "En conclusión, el incremento del PIB del 3,5% refleja un trimestre de dinamismo económico, impulsado tanto por la confianza de los consumidores como por la decisión de las empresas de fortalecer su capacidad productiva y su presencia en el mercado."
+    ],
+    "relatedNews": [
+      {
+        "id": "economia-inflacion",
+        "title": "Incremento de la inflación impacta a los mercados",
+        "href": "/news/economia/incremento-inflacion-impacta-mercados",
+        "category": "Economía",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Los indicadores económicos muestran que la inflación continúa su tendencia alcista, afectando el poder adquisitivo.",
+        "imageUrl": "/images/news/economia/inflacion.jpg",
+        "alt": "Pantallas financieras mostrando gráficos de inflación y datos de mercado"
+      },
+      {
+        "id": "economia-dolar",
+        "title": "Dólar alcanza máximo del año frente a otras monedas",
+        "href": "/news/economia/dolar-alcanza-maximo-ano-frente-monedas",
+        "category": "Economía",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La moneda estadounidense se fortalece significativamente ante la incertidumbre global y la política monetaria.",
+        "imageUrl": "/images/news/economia/dolar.avif",
+        "alt": "Billetes de dólar estadounidense y gráficos de tipo de cambio global"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Economía",
+      "current": "El PIB crece un 3,5% en el último trimestre impulsado por el consumo y la inversión"
+    }
+  },
+  {
+    "id": "internacional-china-usa",
+    "title": "Nuevas conversaciones entre China y Estados Unidos marcan un giro en la política internacional",
+    "href": "/news/internacional/conversaciones-china-estados-unidos-giro-politica-internacional",
+    "category": "Internacional",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "Nuevas conversaciones entre China y Estados Unidos han marcado un giro significativo en la política internacional, con el objetivo de mejorar las relaciones bilaterales y abordar conflictos económicos y diplomáticos recientes.",
+    "imageUrl": "/images/news/internacional/china.jpg",
+    "alt": "Banderas de China y Estados Unidos representando conversaciones bilaterales",
+    "content": [
+      "Los líderes de ambos países se reunieron en un encuentro diplomático de alto nivel, donde discutieron temas clave como comercio, seguridad regional, cambio climático y cooperación tecnológica.",
+      "Fuentes oficiales indicaron que las negociaciones fueron constructivas, destacando la voluntad de ambas naciones de encontrar soluciones que eviten tensiones y promuevan la estabilidad global.",
+      "Analistas internacionales consideran que este acercamiento podría tener un impacto positivo en la economía mundial, al reducir incertidumbres en mercados financieros y fortalecer acuerdos comerciales estratégicos.",
+      "Se espera que, en las próximas semanas, se anuncien acuerdos específicos que faciliten intercambios económicos y tecnológicos, así como mecanismos de cooperación para abordar desafíos globales como la seguridad cibernética y la sostenibilidad ambiental.",
+      "Representantes de organizaciones internacionales han celebrado el inicio de estas conversaciones, subrayando la importancia del diálogo diplomático para mantener la paz y la cooperación entre potencias mundiales.",
+      "Ciudadanos y empresas en ambos países observan con interés los resultados de estas negociaciones, ya que podrían influir en inversiones, comercio y relaciones culturales entre China y Estados Unidos.",
+      "El mundo sigue atento a estos desarrollos, confiando en que el diálogo abierto y la negociación estratégica conduzcan a un escenario internacional más estable y colaborativo."
+    ],
+    "relatedNews": [
+      {
+        "id": "internacional-guerra",
+        "title": "La guerra de Ucrania llega a su fin",
+        "href": "/news/internacional/guerra-ucrania-llega-fin",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Tras años de conflicto, se firma un acuerdo de paz histórico para la región.",
+        "imageUrl": "/images/news/internacional/guerra.jpg",
+        "alt": "Líderes ucranianos e internacionales firmando un acuerdo de paz"
+      },
+      {
+        "id": "internacional-israel-iran",
+        "title": "Crecen las tensiones entre Israel e Irán",
+        "href": "/news/internacional/tensiones-israel-iran-crecen",
+        "category": "Internacional",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La región se mantiene en alerta ante el aumento de la retórica hostil.",
+        "imageUrl": "/images/news/internacional/israel-and-iran.jpg",
+        "alt": "Mapa de Oriente Medio destacando Israel e Irán"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Internacional",
+      "current": "Nuevas conversaciones entre China y Estados Unidos marcan un giro en la política internacional"
+    }
+  },
+  {
+    "id": "internacional-guerra",
+    "title": "La guerra de Ucrania llega a su fin",
+    "href": "/news/internacional/guerra-ucrania-llega-fin",
+    "category": "Internacional",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "Después de años de conflicto, la guerra en Ucrania ha llegado a su fin, marcando un momento histórico para la región y la comunidad internacional.",
+    "imageUrl": "/images/news/internacional/guerra.jpg",
+    "alt": "Líderes ucranianos e internacionales firmando un acuerdo de paz",
+    "content": [
+      "El acuerdo de paz fue firmado tras intensas negociaciones entre las partes involucradas, con mediación de organismos internacionales y líderes de varios países que buscaban poner fin a la violencia y el sufrimiento de la población civil.",
+      "El presidente de Ucrania declaró que la nación iniciará un proceso de reconstrucción y reconciliación, enfatizando la necesidad de unidad y cooperación para superar los desafíos derivados del conflicto.",
+      "Por su parte, representantes de Rusia afirmaron que respetarán los términos del acuerdo y se comprometieron a retirar sus tropas de los territorios ocupados, buscando estabilidad y normalización de relaciones diplomáticas.",
+      "La comunidad internacional ha celebrado el fin de la guerra, destacando la importancia del diálogo y la diplomacia en la resolución de conflictos. Se esperan programas de ayuda humanitaria y de reconstrucción para las zonas afectadas.",
+      "Analistas advierten que, aunque el acuerdo pone fin a las hostilidades, será crucial implementar medidas de seguridad, justicia y desarrollo económico para garantizar una paz duradera y evitar futuros conflictos.",
+      "Los ciudadanos de Ucrania han comenzado a retornar a sus hogares, mientras organizaciones locales e internacionales trabajan para proporcionar asistencia y reconstruir infraestructuras críticas dañadas durante la guerra.",
+      "El acuerdo también incluye disposiciones para la supervisión internacional y el establecimiento de mecanismos de cooperación regional, con el objetivo de fortalecer la paz y prevenir cualquier escalada futura.",
+      "El mundo observa con esperanza este momento histórico, confiando en que el fin de la guerra de Ucrania marque el inicio de una etapa de estabilidad, desarrollo y reconciliación en toda la región."
+    ],
+    "relatedNews": [
+      {
+        "id": "internacional-china-usa",
+        "title": "Nuevas conversaciones entre China y Estados Unidos",
+        "href": "/news/internacional/conversaciones-china-estados-unidos-giro-politica-internacional",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Las superpotencias retoman el diálogo estratégico para abordar tensiones comerciales y de seguridad.",
+        "imageUrl": "/images/news/internacional/china.jpg",
+        "alt": "Nuevas conversaciones entre China y Estados Unidos"
+      },
+      {
+        "id": "internacional-israel-iran",
+        "title": "Crecen las tensiones entre Israel e Irán",
+        "href": "/news/internacional/tensiones-israel-iran-crecen",
+        "category": "Internacional",
+        "date": "3 de octubre de 2025",
+        "datetime": "2025-10-03",
+        "summary": "La región se mantiene en alerta ante el aumento de la retórica hostil.",
+        "imageUrl": "/images/news/internacional/israel-and-iran.jpg",
+        "alt": "Mapa de Oriente Medio destacando Israel e Irán"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Internacional",
+      "current": "La guerra de Ucrania llega a su fin"
+    }
+  },
+  {
+    "id": "internacional-israel-iran",
+    "title": "Crecen las tensiones entre Israel e Irán",
+    "href": "/news/internacional/tensiones-israel-iran-crecen",
+    "category": "Internacional",
+    "date": "3 de octubre de 2025",
+    "datetime": "2025-10-03",
+    "summary": "La región del Medio Oriente se mantiene en alerta máxima ante el aumento de las tensiones diplomáticas y militares entre Israel e Irán, con amenazas mutuas que preocupan a la comunidad internacional.",
+    "imageUrl": "/images/news/internacional/israel-and-iran.jpg",
+    "alt": "Mapa de Oriente Medio destacando Israel e Irán",
+    "content": [
+      "Las tensiones entre Israel e Irán han alcanzado su punto más alto en los últimos años, con ambos países intercambiando acusaciones y amenazas que han puesto a toda la región en estado de alerta.",
+      "Fuentes diplomáticas indican que el conflicto se ha intensificado tras supuestos ataques a instalaciones estratégicas y el desarrollo de programas militares que ambas naciones consideran amenazas directas a su seguridad nacional.",
+      "La comunidad internacional ha llamado a la calma y al diálogo, temiendo una escalada que podría involucrar a otros países de la región y afectar la estabilidad global del mercado energético.",
+      "Estados Unidos y potencias europeas han ofrecido mediar en el conflicto, mientras que las Naciones Unidas han convocado a sesiones de emergencia del Consejo de Seguridad para abordar la situación.",
+      "Analistas militares advierten que cualquier confrontación directa tendría consecuencias devastadoras para la región y podría desestabilizar los mercados financieros mundiales, especialmente los del petróleo.",
+      "Los ciudadanos de ambos países viven con creciente ansiedad ante la posibilidad de un conflicto abierto, mientras los gobiernos preparan planes de contingencia y refuerzan sus defensas.",
+      "Organizaciones humanitarias expresan su preocupación por el impacto potencial en la población civil y han pedido que se prioricen las vías diplomáticas sobre las militares."
+    ],
+    "relatedNews": [
+      {
+        "id": "internacional-china-usa",
+        "title": "Nuevas conversaciones entre China y Estados Unidos",
+        "href": "/news/internacional/conversaciones-china-estados-unidos-giro-politica-internacional",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Las superpotencias retoman el diálogo estratégico para abordar tensiones comerciales y de seguridad.",
+        "imageUrl": "/images/news/internacional/china.jpg",
+        "alt": "Nuevas conversaciones entre China y Estados Unidos"
+      },
+      {
+        "id": "internacional-guerra",
+        "title": "La guerra de Ucrania llega a su fin",
+        "href": "/news/internacional/guerra-ucrania-llega-fin",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Tras años de conflicto, se firma un acuerdo de paz histórico para la región.",
+        "imageUrl": "/images/news/internacional/guerra.jpg",
+        "alt": "Líderes ucranianos e internacionales firmando un acuerdo de paz"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Internacional",
+      "current": "Crecen las tensiones entre Israel e Irán"
+    }
+  },
+  {
+    "id": "internacional-otan",
+    "title": "La OTAN anuncia nuevos ejercicios militares en Europa del Este",
+    "href": "/news/internacional/otan-anuncia-nuevos-ejercicios-militares-europa-este",
+    "category": "Internacional",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "La Organización del Tratado del Atlántico Norte (OTAN) ha confirmado el despliegue de tropas y la realización de maniobras conjuntas en sus fronteras orientales, en respuesta a la inestabilidad geopolítica actual.",
+    "imageUrl": "/images/news/internacional/nato.jpg",
+    "alt": "Tropas y equipamiento militar de la OTAN en Europa del Este",
+    "content": [
+      "El secretario general de la alianza declaró que estos ejercicios tienen como objetivo fortalecer la capacidad defensiva de los países miembros y disuadir cualquier posible amenaza externa. Participarán miles de soldados de diferentes naciones, junto con unidades aéreas y navales.",
+      "Los simulacros incluirán operaciones tácticas, defensa cibernética y logística de despliegue rápido. Se espera que estas maniobras sean las más grandes de la última década en la región, enviando un mensaje claro de unidad y preparación.",
+      "Rusia ha criticado estos movimientos, calificándolos de provocación y advirtiendo que tomará medidas recíprocas para garantizar su seguridad nacional. La tensión en la zona sigue siendo alta, y analistas temen que cualquier error de cálculo pueda desencadenar un incidente mayor.",
+      "A pesar de la retórica agresiva, líderes occidentales han reiterado que la OTAN es una alianza defensiva y que sus acciones no buscan la confrontación, sino la protección de sus aliados y el mantenimiento de la paz en Europa.",
+      "La comunidad internacional sigue de cerca estos desarrollos, instando a todas las partes a mantener canales de diálogo abiertos para evitar una escalada innecesaria del conflicto."
+    ],
+    "relatedNews": [
+      {
+        "id": "internacional-guerra",
+        "title": "La guerra de Ucrania llega a su fin",
+        "href": "/news/internacional/guerra-ucrania-llega-fin",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Tras años de conflicto, se firma un acuerdo de paz histórico para la región.",
+        "imageUrl": "/images/news/internacional/guerra.jpg",
+        "alt": "Líderes ucranianos e internacionales firmando un acuerdo de paz"
+      },
+      {
+        "id": "internacional-china-usa",
+        "title": "Nuevas conversaciones entre China y Estados Unidos",
+        "href": "/news/internacional/conversaciones-china-estados-unidos-giro-politica-internacional",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Las superpotencias retoman el diálogo estratégico para abordar tensiones comerciales.",
+        "imageUrl": "/images/news/internacional/china.jpg",
+        "alt": "Nuevas conversaciones entre China y Estados Unidos"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Internacional",
+      "current": "La OTAN anuncia nuevos ejercicios militares en Europa del Este"
+    }
+  },
+  {
+    "id": "internacional-union-europea",
+    "title": "Unión Europea impulsa energías renovables con nuevas directivas ambiciosas",
+    "href": "/news/internacional/union-europea-impulsa-energias-renovables-nuevas-directivas-ambiciosas",
+    "category": "Internacional",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "La Unión Europea ha aprobado una serie de directivas destinadas a acelerar la transición hacia fuentes de energía sostenibles, con el objetivo de reducir drásticamente las emisiones de carbono en la próxima década.",
+    "imageUrl": "/images/news/internacional/europa.jpg",
+    "alt": "Banderas de la Unión Europea con turbinas eólicas de energía renovable",
+    "content": [
+      "El plan, conocido como \"Pacto Verde Europeo 2.0\", establece metas obligatorias para que los estados miembros aumenten la proporción de energía solar, eólica e hidroeléctrica en su matriz energética. También se contempla la eliminación gradual de subsidios a los combustibles fósiles.",
+      "Líderes europeos destacaron la urgencia de estas medidas frente a la crisis climática global. \"No hay tiempo que perder\", afirmó la presidenta de la Comisión Europea, subrayando que la inversión en energías limpias también generará millones de empleos y fortalecerá la seguridad energética del continente.",
+      "Organizaciones ambientalistas han aplaudido la iniciativa, aunque advierten que la implementación será clave. Piden mecanismos de supervisión estrictos para asegurar que los países cumplan con los compromisos adquiridos y no recurran a soluciones falsas como el gas natural o la energía nuclear.",
+      "Por otro lado, algunos sectores industriales han expresado preocupación por los costos de transición, solicitando apoyo financiero y plazos realistas para adaptar sus infraestructuras a las nuevas normativas.",
+      "La Unión Europea se posiciona así como líder mundial en la lucha contra el cambio climático, buscando inspirar a otras potencias a adoptar medidas similares antes de la próxima cumbre climática de la ONU."
+    ],
+    "relatedNews": [
+      {
+        "id": "internacional-guerra",
+        "title": "La guerra de Ucrania llega a su fin",
+        "href": "/news/internacional/guerra-ucrania-llega-fin",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Tras años de conflicto, se firma un acuerdo de paz histórico para la región.",
+        "imageUrl": "/images/news/internacional/guerra.jpg",
+        "alt": "Líderes ucranianos e internacionales firmando un acuerdo de paz"
+      },
+      {
+        "id": "internacional-china-usa",
+        "title": "Nuevas conversaciones entre China y Estados Unidos",
+        "href": "/news/internacional/conversaciones-china-estados-unidos-giro-politica-internacional",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Las superpotencias retoman el diálogo estratégico para abordar tensiones comerciales.",
+        "imageUrl": "/images/news/internacional/china.jpg",
+        "alt": "Nuevas conversaciones entre China y Estados Unidos"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Internacional",
+      "current": "Unión Europea impulsa energías renovables con nuevas directivas ambiciosas"
+    }
+  },
+  {
+    "id": "internacional-accidente",
+    "title": "Tragedia en carretera en Alemania: Grave accidente provoca caos y luto",
+    "href": "/news/internacional/tragedia-carretera-alemania-grave-accidente-provoca-caos-luto",
+    "category": "Internacional",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "summary": "Un grave accidente múltiple ocurrido en una autopista cerca de Berlín ha dejado un saldo trágico y provocado un caos vehicular de varios kilómetros, poniendo en el foco la seguridad vial en las famosas Autobahns.",
+    "imageUrl": "/images/news/internacional/accidente.avif",
+    "alt": "Tragedia en carretera en Alemania",
+    "content": [
+      "Según informes policiales, el siniestro involucró a más de 15 vehículos, incluidos dos camiones de carga, y se produjo bajo condiciones climáticas adversas que redujeron la visibilidad en la vía.",
+      "Equipos de rescate y bomberos acudieron rápidamente al lugar para atender a los heridos, algunos de los cuales fueron trasladados en helicóptero a hospitales cercanos debido a la gravedad de sus lesiones. Las autoridades han confirmado varias víctimas mortales, aunque no se ha precisado el número exacto.",
+      "El tráfico en una de las principales arterias del país quedó paralizado durante horas, afectando el transporte de mercancías y el desplazamiento de miles de personas. Las autoridades han iniciado una investigación exhaustiva para determinar las causas exactas del accidente.",
+      "Este suceso ha reavivado el debate sobre la implementación de límites de velocidad más estrictos en ciertos tramos de las autopistas alemanas, así como la necesidad de mejorar los sistemas de alerta temprana para conductores en situaciones de emergencia.",
+      "Expertos en seguridad vial instan a extremar las precauciones durante los meses de otoño e invierno, cuando la niebla y el hielo convierten las carreteras en escenarios de alto riesgo. Se espera que en los próximos días se presenten nuevas propuestas legislativas para reforzar la seguridad en la red de transportes."
+    ],
+    "relatedNews": [
+      {
+        "id": "internacional-guerra",
+        "title": "La guerra de Ucrania llega a su fin",
+        "href": "/news/internacional/guerra-ucrania-llega-fin",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Tras años de conflicto, se firma un acuerdo de paz histórico para la región.",
+        "imageUrl": "/images/news/internacional/guerra.jpg",
+        "alt": "Líderes ucranianos e internacionales firmando un acuerdo de paz"
+      },
+      {
+        "id": "internacional-china-usa",
+        "title": "Nuevas conversaciones entre China y Estados Unidos",
+        "href": "/news/internacional/conversaciones-china-estados-unidos-giro-politica-internacional",
+        "category": "Internacional",
+        "date": "4 de octubre de 2025",
+        "datetime": "2025-10-04",
+        "summary": "Las superpotencias retoman el diálogo estratégico para abordar tensiones comerciales.",
+        "imageUrl": "/images/news/internacional/china.jpg",
+        "alt": "Nuevas conversaciones entre China y Estados Unidos"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Internacional",
+      "current": "Tragedia en carretera en Alemania: Grave accidente provoca caos y luto"
+    }
+  },
+  {
+    "id": "justicia-condena-criminal",
+    "title": "Condenan a cadena perpetua a líder de organización criminal internacional",
+    "href": "/news/justicia/condenan-cadena-perpetua-lider-organizacion-criminal",
+    "category": "Justicia",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "El líder de una organización criminal internacional ha sido condenado a cadena perpetua tras un largo proceso judicial que se extendió por varios años.",
+    "imageUrl": "/images/news/justicia/condena.jpg",
+    "alt": "Sala de tribunal durante la sentencia de un líder criminal internacional",
+    "content": [
+      "La sentencia fue dictada por un tribunal especializado en delitos de crimen organizado, luego de que se presentaran pruebas contundentes que vinculan al acusado con actividades ilícitas a nivel mundial, incluyendo tráfico de drogas, lavado de dinero y corrupción.",
+      "Durante el juicio, se presentaron testimonios de exintegrantes de la organización y evidencia financiera que demostró la magnitud de las operaciones ilegales lideradas por el condenado.",
+      "Las autoridades destacaron la importancia de esta condena como un paso clave en la lucha contra el crimen organizado internacional y aseguraron que continuarán trabajando para desmantelar las redes criminales asociadas.",
+      "El tribunal señaló que la severidad de la sentencia responde al alto riesgo que representaba el acusado para la seguridad pública y a la necesidad de enviar un mensaje contundente sobre la intolerancia hacia la criminalidad organizada.",
+      "Expertos legales han indicado que este fallo podría sentar un precedente para futuros casos de crimen internacional, reforzando la cooperación entre países y organismos internacionales en la persecución de delitos transnacionales.",
+      "La familia del condenado y sus abogados anunciaron que evaluarán posibles recursos, aunque reconocieron que las evidencias presentadas durante el juicio dificultan cualquier posibilidad de reducción de la pena.",
+      "La comunidad internacional ha recibido la noticia con atención, destacando la importancia de aplicar la justicia de manera efectiva y coordinada en casos de alta criminalidad y alcance global.",
+      "Mientras tanto, las autoridades continúan investigando y monitoreando las operaciones de la organización para asegurar que no queden cabos sueltos que puedan permitir la continuidad de actividades ilícitas."
+    ],
+    "relatedNews": [
+      {
+        "id": "justicia-fraude",
+        "title": "Detienen a exfuncionario acusado de fraude financiero millonario",
+        "href": "/news/justicia/detienen-exfuncionario-fraude-financiero-millonario",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Arrestan a directivos involucrados en evasión de impuestos.",
+        "imageUrl": "/images/news/justicia/arrested.jpg",
+        "alt": "Exfuncionario esposado siendo conducido por las autoridades"
+      },
+      {
+        "id": "justicia-tribunal-supremo",
+        "title": "Tribunal Supremo confirma sentencia",
+        "href": "/news/justicia/tribunal-supremo-confirma-sentencia",
+        "category": "Justicia",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Caso de corrupción política llega a su fin con ratificación de penas.",
+        "imageUrl": "/images/news/justicia/tribunal.jpg",
+        "alt": "Tribunal Supremo confirma sentencia"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Justicia",
+      "current": "Condenan a cadena perpetua a líder de organización criminal internacional"
+    }
+  },
+  {
+    "id": "justicia-fraude",
+    "title": "Detienen a exfuncionario acusado de fraude financiero millonario",
+    "href": "/news/justicia/detienen-exfuncionario-fraude-financiero-millonario",
+    "category": "Justicia",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "Las autoridades arrestaron este viernes a un exfuncionario público acusado de participar en un esquema de fraude financiero que habría desviado millones de dólares de fondos estatales.",
+    "imageUrl": "/images/news/justicia/arrested.jpg",
+    "alt": "Exfuncionario esposado siendo conducido por las autoridades",
+    "content": [
+      "La detención se produjo tras una extensa investigación encabezada por la fiscalía especializada en delitos económicos. De acuerdo con el informe preliminar, el exfuncionario presuntamente utilizó una red de empresas fantasma para desviar recursos destinados a programas de desarrollo social.",
+      "Las autoridades afirman que el dinero fue transferido a cuentas en el extranjero y utilizado para la compra de propiedades de lujo. El detenido fue trasladado a un centro de detención preventiva, donde permanecerá bajo custodia mientras se formalizan los cargos.",
+      "La fiscalía ha solicitado prisión preventiva por considerar que existe riesgo de fuga y posibilidad de obstrucción de la investigación. Durante una conferencia de prensa, el fiscal general declaró que este arresto representa un avance significativo en la lucha contra la corrupción.",
+      "La defensa del exfuncionario ha manifestado que su cliente es inocente y que demostrará su falta de participación en los hechos durante el proceso judicial. Solicitaron que se respete el principio de presunción de inocencia mientras avanzan las investigaciones.",
+      "Este caso ha generado gran repercusión en la opinión pública, ya que el acusado ocupó cargos de alto nivel en la administración anterior. Diversas organizaciones civiles han exigido que se garantice la transparencia del proceso y que los responsables rindan cuentas ante la justicia.",
+      "Las autoridades financieras informaron que continúan las auditorías para rastrear el destino final de los fondos desviados, mientras el gobierno anunció nuevas medidas para fortalecer los mecanismos de control y supervisión del gasto público."
+    ],
+    "relatedNews": [
+      {
+        "id": "justicia-condena-criminal",
+        "title": "Condenan a cadena perpetua a líder criminal",
+        "href": "/news/justicia/condenan-cadena-perpetua-lider-organizacion-criminal",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Líder de organización internacional recibe sentencia máxima.",
+        "imageUrl": "/images/news/justicia/condena.jpg",
+        "alt": "Condenan a cadena perpetua a líder criminal"
+      },
+      {
+        "id": "justicia-tribunal-supremo",
+        "title": "Tribunal Supremo confirma sentencia",
+        "href": "/news/justicia/tribunal-supremo-confirma-sentencia",
+        "category": "Justicia",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Caso de corrupción política llega a su fin con ratificación de penas.",
+        "imageUrl": "/images/news/justicia/tribunal.jpg",
+        "alt": "Tribunal Supremo confirma sentencia"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Justicia",
+      "current": "Detienen a exfuncionario acusado de fraude financiero millonario"
+    }
+  },
+  {
+    "id": "justicia-tribunal-supremo",
+    "title": "Tribunal Supremo confirma sentencia histórica en caso de corrupción",
+    "href": "/news/justicia/tribunal-supremo-confirma-sentencia",
+    "category": "Justicia",
+    "date": "10 de octubre de 2025",
+    "datetime": "2025-10-10",
+    "summary": "El Tribunal Supremo ha confirmado la sentencia dictada en un caso de corrupción política que ha conmocionado al país, estableciendo un precedente importante en la lucha contra la impunidad.",
+    "imageUrl": "/images/news/justicia/tribunal.jpg",
+    "alt": "Jueces ingresando al Tribunal Supremo para una sentencia histórica",
+    "content": [
+      "La decisión del máximo tribunal del país fue unánime y ratifica las condenas impuestas por tribunales inferiores contra varios funcionarios de alto nivel involucrados en actos de corrupción.",
+      "El caso, que se ha extendido por más de tres años, ha sido uno de los más mediáticos de la última década, revelando una red de sobornos y favoritismo que afectó la adjudicación de contratos públicos por millones de dólares.",
+      "Los magistrados del Tribunal Supremo destacaron en su fallo la importancia de mantener la integridad de la función pública y sendear un mensaje claro sobre las consecuencias de la corrupción.",
+      "Organizaciones de la sociedad civil han celebrado la decisión, considerándola una victoria para el estado de derecho y un paso fundamental en la consolidación de instituciones democráticas fuertes.",
+      "Los abogados defensores han anunciado que presentarán recursos internacionales, argumentando violaciones al debido proceso durante las diferentes etapas del juicio.",
+      "El gobierno ha destacado que esta sentencia demuestra la independencia del poder judicial y el compromiso de las instituciones con la transparencia y la rendición de cuentas.",
+      "Expertos legales consideran que este fallo fortalecerá los mecanismos de prevención de la corrupción y servirá como disuasivo para futuros funcionarios públicos."
+    ],
+    "relatedNews": [
+      {
+        "id": "justicia-condena-criminal",
+        "title": "Condenan a cadena perpetua a líder criminal",
+        "href": "/news/justicia/condenan-cadena-perpetua-lider-organizacion-criminal",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Líder de organización internacional recibe sentencia máxima.",
+        "imageUrl": "/images/news/justicia/condena.jpg",
+        "alt": "Condenan a cadena perpetua a líder criminal"
+      },
+      {
+        "id": "justicia-fraude",
+        "title": "Detienen a exfuncionario acusado de fraude financiero millonario",
+        "href": "/news/justicia/detienen-exfuncionario-fraude-financiero-millonario",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Arrestan a directivos involucrados en evasión de impuestos.",
+        "imageUrl": "/images/news/justicia/arrested.jpg",
+        "alt": "Exfuncionario esposado siendo conducido por las autoridades"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Justicia",
+      "current": "Tribunal Supremo confirma sentencia histórica en caso de corrupción"
+    }
+  },
+  {
+    "id": "justicia-homicidio",
+    "title": "Investigan homicidio en el centro de la ciudad",
+    "href": "/news/justicia/investigan-homicidio-centro-ciudad",
+    "category": "Justicia",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "La policía local ha iniciado una investigación tras un homicidio ocurrido en el centro de la ciudad durante la madrugada del viernes, generando alarma en la comunidad.",
+    "imageUrl": "/images/news/justicia/homicidio.jpg",
+    "alt": "Policía acordonando una calle durante la investigación de un homicidio",
+    "content": [
+      "Las autoridades informaron que el incidente tuvo lugar cerca de la intersección de las avenidas principales, en un área con alta actividad comercial. Testigos presentes en el lugar relataron haber escuchado gritos y detonaciones antes de que llegaran los primeros equipos de emergencia.",
+      "Los oficiales encontraron a la víctima con heridas graves y confirmaron su fallecimiento en el sitio. Las fuerzas del orden han acordonado la zona para preservar la evidencia y permitir que los peritos realicen las diligencias correspondientes.",
+      "Se espera que se tomen fotografías, huellas y grabaciones de cámaras de seguridad cercanas para ayudar en la identificación de los responsables. El alcalde de la ciudad emitió un comunicado expresando su preocupación por el aumento de la violencia en el área central.",
+      "La víctima, cuya identidad no ha sido revelada oficialmente, sería un hombre de entre 25 y 35 años. La policía hace un llamado a cualquier persona que haya presenciado los hechos a acercarse a las autoridades para brindar información.",
+      "Vecinos y comerciantes de la zona manifestaron su temor y pidieron mayor presencia policial durante la noche. El departamento de policía informó que se esperan actualizaciones sobre la investigación en las próximas horas.",
+      "Mientras tanto, se aconseja a los ciudadanos evitar transitar por la zona durante las horas nocturnas y reportar cualquier actividad sospechosa al número de emergencia local. Este hecho ha reabierto el debate sobre la seguridad urbana y las políticas de prevención del crimen."
+    ],
+    "relatedNews": [
+      {
+        "id": "justicia-condena-criminal",
+        "title": "Condenan a cadena perpetua a líder criminal",
+        "href": "/news/justicia/condenan-cadena-perpetua-lider-organizacion-criminal",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Líder de organización internacional recibe sentencia máxima.",
+        "imageUrl": "/images/news/justicia/condena.jpg",
+        "alt": "Condenan a cadena perpetua a líder criminal"
+      },
+      {
+        "id": "justicia-fraude",
+        "title": "Detienen a exfuncionario acusado de fraude financiero millonario",
+        "href": "/news/justicia/detienen-exfuncionario-fraude-financiero-millonario",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Acusado de desviar fondos millonarios a cuentas en el extranjero.",
+        "imageUrl": "/images/news/justicia/arrested.jpg",
+        "alt": "Exfuncionario esposado siendo conducido por las autoridades"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Justicia",
+      "current": "Investigan homicidio en el centro de la ciudad"
+    }
+  },
+  {
+    "id": "justicia-fiscalia-empresa",
+    "title": "Fiscalía inicia juicio contra empresa por evasión fiscal millonaria",
+    "href": "/news/justicia/fiscalia-inicia-juicio-empresa-evasion-fiscal-millonaria",
+    "category": "Justicia",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "La Fiscalía General ha iniciado un juicio contra una importante empresa nacional acusada de evasión fiscal millonaria, lo que podría derivar en sanciones históricas.",
+    "imageUrl": "/images/news/justicia/juicio.jpg",
+    "alt": "Edificio corporativo con investigadores de la fiscalía ingresando",
+    "content": [
+      "Según los informes preliminares, la compañía habría omitido declarar ingresos significativos durante varios años, generando un perjuicio económico al Estado. El caso se abrió luego de una investigación de la unidad especializada en delitos financieros.",
+      "Durante la audiencia inicial, los representantes de la empresa negaron las acusaciones, asegurando que todos los registros contables cumplen con la normativa vigente. Sin embargo, la Fiscalía presentó documentos y pruebas que evidencian la supuesta evasión.",
+      "El juez a cargo del caso estableció un calendario de audiencias para escuchar a testigos y expertos. La opinión pública ha mostrado gran interés en el caso, dada la relevancia de la empresa en la economía nacional.",
+      "Si se confirman las acusaciones, la empresa podría enfrentar multas millonarias y responsabilidades penales para sus directivos. Las autoridades recalcan la importancia de este juicio como un mensaje de rigor.",
+      "Se espera que las próximas semanas sean decisivas para determinar el futuro de la compañía y el impacto de este caso en el sector empresarial."
+    ],
+    "relatedNews": [
+      {
+        "id": "justicia-condena-criminal",
+        "title": "Condenan a cadena perpetua a líder criminal",
+        "href": "/news/justicia/condenan-cadena-perpetua-lider-organizacion-criminal",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Líder de organización internacional recibe sentencia máxima.",
+        "imageUrl": "/images/news/justicia/condena.jpg",
+        "alt": "Condenan a cadena perpetua a líder criminal"
+      },
+      {
+        "id": "justicia-fraude",
+        "title": "Detienen a exfuncionario acusado de fraude financiero millonario",
+        "href": "/news/justicia/detienen-exfuncionario-fraude-financiero-millonario",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Acusado de desviar fondos millonarios a cuentas en el extranjero.",
+        "imageUrl": "/images/news/justicia/arrested.jpg",
+        "alt": "Exfuncionario esposado siendo conducido por las autoridades"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Justicia",
+      "current": "Fiscalía inicia juicio contra empresa por evasión fiscal millonaria"
+    }
+  },
+  {
+    "id": "justicia-juez-homicidio-multiple",
+    "title": "Juez ordena prisión preventiva para acusado de homicidio múltiple",
+    "href": "/news/justicia/juez-ordena-prision-preventiva-acusado-homicidio-multiple",
+    "category": "Justicia",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "El juez del caso ha dictado prisión preventiva contra el acusado, considerando necesario asegurar su presencia en el juicio debido a la gravedad de los cargos y el riesgo de fuga.",
+    "imageUrl": "/images/news/justicia/juez.jpg",
+    "alt": "Juez revisando expedientes de un caso de homicidio múltiple",
+    "content": [
+      "La decisión se tomó luego de una audiencia en la que se presentaron pruebas contundentes que vinculan al acusado con varios homicidios ocurridos en la ciudad durante los últimos meses. El fiscal argumentó que la libertad del imputado representaría un peligro para la sociedad.",
+      "La defensa del acusado manifestó que respetará la decisión del juez, pero adelantó que presentará recursos legales para solicitar una revisión de la medida. Mientras tanto, el acusado permanecerá en un centro de detención de máxima seguridad.",
+      "Familiares de las víctimas han recibido con alivio la decisión, destacando la importancia de que el proceso judicial avance sin contratiempos. Las autoridades han reforzado la seguridad en torno al caso para evitar incidentes.",
+      "Expertos legales señalan que la prisión preventiva es una medida excepcional pero justificada en casos de extrema gravedad como este. El juicio está programado para comenzar en los próximos meses, y se espera que sea uno de los más mediáticos del año.",
+      "La comunidad sigue atenta al desarrollo de los acontecimientos, esperando que se haga justicia para las víctimas y sus familias."
+    ],
+    "relatedNews": [
+      {
+        "id": "justicia-condena-criminal",
+        "title": "Condenan a cadena perpetua a líder criminal",
+        "href": "/news/justicia/condenan-cadena-perpetua-lider-organizacion-criminal",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Líder de organización internacional recibe sentencia máxima.",
+        "imageUrl": "/images/news/justicia/condena.jpg",
+        "alt": "Condenan a cadena perpetua a líder criminal"
+      },
+      {
+        "id": "justicia-fraude",
+        "title": "Detienen a exfuncionario acusado de fraude financiero millonario",
+        "href": "/news/justicia/detienen-exfuncionario-fraude-financiero-millonario",
+        "category": "Justicia",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Acusado de desviar fondos millonarios a cuentas en el extranjero.",
+        "imageUrl": "/images/news/justicia/arrested.jpg",
+        "alt": "Exfuncionario esposado siendo conducido por las autoridades"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Justicia",
+      "current": "Juez ordena prisión preventiva para acusado de homicidio múltiple"
+    }
+  },
+  {
+    "id": "clima-tormenta",
+    "title": "Tormenta tropical se aproxima al Caribe y alerta a varios países",
+    "href": "/news/clima/tormenta-tropical-aproxima-caribe-alerta-paises",
+    "category": "Clima",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "Una tormenta tropical se aproxima al Caribe, generando alertas en varios países de la región. Los meteorólogos han emitido avisos para que la población se prepare ante posibles lluvias intensas.",
+    "imageUrl": "/images/news/clima/tormenta.jpg",
+    "alt": "Imagen satelital de una tormenta tropical sobre el mar Caribe",
+    "content": [
+      "Una tormenta tropical se aproxima al Caribe, generando alertas en varios países de la región. Los meteorólogos han emitido avisos para que la población se prepare ante posibles lluvias intensas.",
+      "Las autoridades meteorológicas han emitido advertencias de evacuación y han recomendado a los ciudadanos tomar medidas de seguridad, especialmente en zonas costeras bajas. Se espera que la tormenta se debilite en las próximas horas.",
+      "Los expertos en ciclones tropicales monitorean de cerca la evolución del fenómeno, sugiriendo que podría convertirse en un huracán si las condiciones atmosféricas se mantienen. Los residentes están siendo instados a permanecer en refugios seguros hasta que pase el peligro.",
+      "Las aerolíneas han cancelado varios vuelos y han reprogramado rutas para evitar la tormenta. El turismo en la región se ha visto afectado, con cancelaciones de hoteles y cruceros que dependen del clima.",
+      "En resumen, la situación meteorológica actual requiere máxima atención de las autoridades y la población, ya que los efectos de la tormenta podrían ser devastadores si no se toman las precauciones necesarias."
+    ],
+    "relatedNews": [
+      {
+        "id": "clima-calor",
+        "title": "Ola de calor extremo afecta a varias regiones del país",
+        "href": "/news/clima/ola-calor-extremo-afecta-regiones-pais",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Las temperaturas máximas superan los 40 grados en varias provincias, generando alertas por riesgos para la salud.",
+        "imageUrl": "/images/news/clima/calor.jpg",
+        "alt": "Termómetro marcando temperatura extrema en un paisaje urbano"
+      },
+      {
+        "id": "clima-tornado",
+        "title": "Tornado causa graves daños en el centro del país",
+        "href": "/news/clima/tornado-causa-graves-danos-centro-pais",
+        "category": "Clima",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Un tornado de categoría F3 ha dejado un rastro de destrucción en varias comunidades del interior.",
+        "imageUrl": "/images/news/clima/tornado.jpg",
+        "alt": "Tornado F3 tocando tierra en una zona residencial"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Clima",
+      "current": "Tormenta tropical se aproxima al Caribe y alerta a varios países"
+    }
+  },
+  {
+    "id": "clima-calor",
+    "title": "Ola de calor extremo afecta a varias regiones del país",
+    "href": "/news/clima/ola-calor-extremo-afecta-regiones-pais",
+    "category": "Clima",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "Las temperaturas máximas superan los 40 grados en varias provincias, generando alertas por riesgos para la salud.",
+    "imageUrl": "/images/news/clima/calor.jpg",
+    "alt": "Termómetro marcando temperatura extrema en un paisaje urbano",
+    "content": [
+      "Una ola de calor histórica afecta a gran parte de Europa, provocando temperaturas récord en varias ciudades.",
+      "Las autoridades han emitido alertas para extremar precauciones, especialmente para ancianos y personas con enfermedades crónicas.",
+      "Se esperan temperaturas superiores a los 40 °C en regiones del sur de Europa durante los próximos días.",
+      "Los servicios de salud recomiendan mantenerse hidratado, evitar la exposición prolongada al sol y seguir las instrucciones locales de protección.",
+      "Varios países han activado planes de emergencia para enfrentar los riesgos asociados al calor extremo, incluyendo el uso de refugios climáticos.",
+      "Se prevé que la ola de calor continúe durante al menos una semana, mientras los meteorólogos monitorean el avance y la intensidad del fenómeno."
+    ],
+    "relatedNews": [
+      {
+        "id": "clima-tormenta",
+        "title": "Tormenta tropical se aproxima al Caribe",
+        "href": "/news/clima/tormenta-tropical-aproxima-caribe-alerta-paises",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Una tormenta tropical se aproxima al Caribe, generando alertas en varios países de la región.",
+        "imageUrl": "/images/news/clima/tormenta.jpg",
+        "alt": "Imagen satelital de una tormenta tropical sobre el mar Caribe"
+      },
+      {
+        "id": "clima-tornado",
+        "title": "Tornado causa graves daños en el centro del país",
+        "href": "/news/clima/tornado-causa-graves-danos-centro-pais",
+        "category": "Clima",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Un tornado de categoría F3 ha dejado un rastro de destrucción en varias comunidades del interior.",
+        "imageUrl": "/images/news/clima/tornado.jpg",
+        "alt": "Tornado F3 tocando tierra en una zona residencial"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Clima",
+      "current": "Ola de calor extremo afecta a varias regiones del país"
+    }
+  },
+  {
+    "id": "clima-tornado",
+    "title": "Tornado causa graves daños en el centro del país",
+    "href": "/news/clima/tornado-causa-graves-danos-centro-pais",
+    "category": "Clima",
+    "date": "10 de octubre de 2025",
+    "datetime": "2025-10-10",
+    "summary": "Un tornado de categoría F3 ha dejado un rastro de destrucción en varias comunidades del interior, causando daños materiales significativos y afectando a cientos de familias.",
+    "imageUrl": "/images/news/clima/tornado.jpg",
+    "alt": "Tornado F3 tocando tierra en una zona residencial",
+    "content": [
+      "Un poderoso tornado de categoría F3 azotó varias comunidades del centro del país, dejando un rastro de destrucción que ha afectado a más de 500 familias y causado daños estimados en millones de dólares.",
+      "Las autoridades de protección civil han desplegado equipos de rescate y asistencia humanitaria en las zonas más afectadas, donde numerosas viviendas han sido destruidas o dañadas severamente.",
+      "El servicio meteorológico nacional había emitido alertas de tormentas severas horas antes del paso del tornado, permitiendo que muchas personas pudieran buscar refugio a tiempo.",
+      "Los equipos de emergencia continúan trabajando en las labores de limpieza y evaluación de daños, mientras las autoridades locales establecen centros de acopio para los damnificados.",
+      "El gobierno ha declarado el estado de emergencia en las municipalidades más afectadas y ha prometido recursos para la reconstrucción y asistencia a las víctimas.",
+      "Expertos en fenómenos meteorológicos advierten sobre la posibilidad de nuevos eventos severos en las próximas horas debido a las condiciones atmosféricas inestables en la región."
+    ],
+    "relatedNews": [
+      {
+        "id": "clima-tormenta",
+        "title": "Tormenta tropical se aproxima al Caribe",
+        "href": "/news/clima/tormenta-tropical-aproxima-caribe-alerta-paises",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Una tormenta tropical se aproxima al Caribe, generando alertas en varios países de la región.",
+        "imageUrl": "/images/news/clima/tormenta.jpg",
+        "alt": "Imagen satelital de una tormenta tropical sobre el mar Caribe"
+      },
+      {
+        "id": "clima-calor",
+        "title": "Ola de calor extremo afecta a varias regiones",
+        "href": "/news/clima/ola-calor-extremo-afecta-regiones-pais",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Las temperaturas máximas superan los 40 grados en varias provincias, generando alertas por riesgos para la salud.",
+        "imageUrl": "/images/news/clima/calor.jpg",
+        "alt": "Termómetro marcando temperatura extrema en un paisaje urbano"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Clima",
+      "current": "Tornado causa graves daños en el centro del país"
+    }
+  },
+  {
+    "id": "clima-huracan",
+    "title": "Huracán se forma en el Atlántico y amenaza la costa este",
+    "href": "/news/clima/huracan-se-forma-atlantico-amenaza-costa-este",
+    "category": "Clima",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "Las autoridades han emitido alertas de evacuación ante la aproximación de un huracán categoría 3.",
+    "imageUrl": "/images/news/clima/ciclon.jpg",
+    "alt": "Imagen satelital de un huracán aproximándose a la costa",
+    "content": [
+      "El huracán, que se formó hace varios días en el Atlántico central, ha ganado fuerza rápidamente debido a las altas temperaturas del mar y a las condiciones atmosféricas favorables. Los meteorólogos del Centro Nacional de Huracanes de Estados Unidos informaron que el sistema alcanzó categoría 3 durante la madrugada y podría intensificarse aún más en las próximas horas.",
+      "Los vientos sostenidos ya superan los 200 kilómetros por hora, con ráfagas aún más fuertes en las zonas cercanas al ojo del huracán. El fenómeno se desplaza hacia el noroeste a una velocidad aproximada de 20 kilómetros por hora, acercándose peligrosamente a la costa este estadounidense.",
+      "Las autoridades de Florida, Georgia, Carolina del Sur y Carolina del Norte han emitido alertas de huracán y advertencias de evacuación preventiva en las áreas costeras más expuestas. Se espera que el oleaje alcance alturas de entre tres y cinco metros, lo que podría causar inundaciones severas y erosión de playas.",
+      "Los expertos advierten que, si el huracán mantiene su intensidad actual, podría llegar a categoría 4 antes de tocar tierra, lo que lo convertiría en uno de los ciclones más potentes de la temporada. La presión atmosférica continúa descendiendo, un indicador de que el sistema sigue fortaleciéndose.",
+      "El presidente de Estados Unidos ha ordenado la movilización de la Guardia Nacional y la coordinación con las agencias de manejo de emergencias estatales. Asimismo, instó a los ciudadanos a seguir las indicaciones de las autoridades locales y evitar desplazamientos innecesarios en las zonas bajo alerta.",
+      "En varias ciudades costeras, los supermercados y estaciones de combustible han registrado una alta demanda de suministros. Muchos residentes han comenzado a proteger sus viviendas con tablones y a preparar kits de emergencia con alimentos no perecederos, linternas y baterías.",
+      "Los aeropuertos de la región también se preparan para posibles cancelaciones de vuelos, mientras que los puertos han suspendido temporalmente las operaciones marítimas. Las compañías eléctricas trabajan en planes de contingencia ante la posibilidad de cortes de energía a gran escala.",
+      "Los servicios meteorológicos pronostican que el huracán podría comenzar a debilitarse ligeramente una vez que toque tierra, aunque las lluvias torrenciales podrían extenderse hacia el interior del país, afectando zonas urbanas y rurales por igual.",
+      "El Centro Nacional de Huracanes continuará monitoreando de cerca la evolución del fenómeno y actualizará los boletines oficiales cada tres horas. Se recomienda a la población mantenerse atenta a los reportes y no difundir información no verificada en redes sociales.",
+      "El fenómeno reafirma las preocupaciones de los científicos sobre el impacto del cambio climático, ya que las aguas más cálidas del océano están contribuyendo a la formación de huracanes más intensos y frecuentes en el Atlántico."
+    ],
+    "relatedNews": [
+      {
+        "id": "clima-calor",
+        "title": "Ola de calor extremo afecta a varias regiones del país",
+        "href": "/news/clima/ola-calor-extremo-afecta-regiones-pais",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Las temperaturas máximas superan los 40 grados en varias provincias, generando alertas por riesgos para la salud.",
+        "imageUrl": "/images/news/clima/calor.jpg",
+        "alt": "Termómetro marcando temperatura extrema en un paisaje urbano"
+      },
+      {
+        "id": "clima-tornado",
+        "title": "Tornado causa graves daños en el centro del país",
+        "href": "/news/clima/tornado-causa-graves-danos-centro-pais",
+        "category": "Clima",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Un tornado de categoría F3 ha dejado un rastro de destrucción en varias comunidades del interior.",
+        "imageUrl": "/images/news/clima/tornado.jpg",
+        "alt": "Tornado F3 tocando tierra en una zona residencial"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Clima",
+      "current": "Huracán se forma en el Atlántico y amenaza la costa este"
+    }
+  },
+  {
+    "id": "clima-inundaciones",
+    "title": "Inundaciones afectan a miles de personas en el sur",
+    "href": "/news/clima/inundaciones-afectan-miles-personas-sur",
+    "category": "Clima",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "Las lluvias torrenciales han causado desbordamiento de ríos, afectando a comunidades enteras.",
+    "imageUrl": "/images/news/clima/inundacion.jpg",
+    "alt": "Calles inundadas en una ciudad sudamericana tras lluvias torrenciales",
+    "content": [
+      "Fuertes lluvias han azotado en los últimos días a varias regiones de Sudamérica, provocando graves inundaciones que han afectado a miles de personas y dejado importantes daños materiales.",
+      "Los países más golpeados por las intensas precipitaciones son Brasil, Argentina, Paraguay, Bolivia y Perú, donde se han reportado desbordamientos de ríos, deslizamientos de tierra y cortes de carreteras.",
+      "En el sur de Brasil, las lluvias torrenciales causaron el desbordamiento del río Taquari, inundando decenas de municipios del estado de Rio Grande do Sul. Las autoridades locales informaron que cientos de familias tuvieron que ser evacuadas y se han habilitado refugios temporales para los damnificados.",
+      "En Paraguay, el río Paraguay superó su nivel crítico y anegó varias zonas de Asunción y localidades ribereñas. La Secretaría de Emergencia Nacional desplegó equipos de rescate y distribuyó alimentos y agua potable a las familias afectadas.",
+      "Mientras tanto, en Bolivia, las fuertes precipitaciones han ocasionado deslizamientos de tierra en zonas montañosas, bloqueando caminos y afectando comunidades rurales. El gobierno declaró alerta naranja en varios departamentos debido al riesgo de nuevos deslizamientos.",
+      "En el norte de Argentina, las provincias de Misiones y Corrientes también enfrentan serios problemas por la acumulación de agua. Los campos agrícolas se encuentran inundados, lo que genera preocupación en el sector agropecuario ante posibles pérdidas de cosechas.",
+      "Los servicios meteorológicos de la región advierten que las lluvias continuarán durante los próximos días debido a un sistema de baja presión combinado con corrientes cálidas provenientes del Atlántico, lo que podría agravar la situación en las zonas más vulnerables.",
+      "Las autoridades han recomendado a la población mantenerse informada, evitar circular por zonas inundadas y acatar las indicaciones de los organismos de emergencia.",
+      "Organizaciones internacionales, como la Cruz Roja y la ONU, han manifestado su disposición para brindar apoyo humanitario, enviando equipos de asistencia y recursos para atender a las comunidades afectadas.",
+      "Los gobiernos de la región trabajan de manera conjunta para coordinar esfuerzos y mitigar el impacto de las lluvias, mientras se evalúan los daños y se planifican estrategias de recuperación a largo plazo.",
+      "Las intensas precipitaciones ponen nuevamente sobre la mesa el debate sobre los efectos del cambio climático en Sudamérica, donde los eventos meteorológicos extremos se han vuelto cada vez más frecuentes e impredecibles.",
+      "La situación continúa siendo monitoreada de cerca por las autoridades, que piden solidaridad y cooperación para enfrentar una de las emergencias climáticas más severas de los últimos años en la región."
+    ],
+    "relatedNews": [
+      {
+        "id": "clima-calor",
+        "title": "Ola de calor extremo afecta a varias regiones del país",
+        "href": "/news/clima/ola-calor-extremo-afecta-regiones-pais",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Las temperaturas máximas superan los 40 grados en varias provincias, generando alertas por riesgos para la salud.",
+        "imageUrl": "/images/news/clima/calor.jpg",
+        "alt": "Termómetro marcando temperatura extrema en un paisaje urbano"
+      },
+      {
+        "id": "clima-tornado",
+        "title": "Tornado causa graves daños en el centro del país",
+        "href": "/news/clima/tornado-causa-graves-danos-centro-pais",
+        "category": "Clima",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Un tornado de categoría F3 ha dejado un rastro de destrucción en varias comunidades del interior.",
+        "imageUrl": "/images/news/clima/tornado.jpg",
+        "alt": "Tornado F3 tocando tierra en una zona residencial"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Clima",
+      "current": "Inundaciones afectan a miles de personas en el sur"
+    }
+  },
+  {
+    "id": "clima-nevadas",
+    "title": "Nevadas históricas paralizan el norte del país",
+    "href": "/news/clima/nevadas-historicas-paralizan-norte-pais",
+    "category": "Clima",
+    "date": "11 de octubre de 2025",
+    "datetime": "2025-10-11",
+    "summary": "Las nevadas más intensas en décadas han dejado incomunicadas a varias poblaciones del norte.",
+    "imageUrl": "/images/news/clima/winter.jpg",
+    "alt": "Carreteras y edificios cubiertos de nieve en el norte de Europa",
+    "content": [
+      "Nevadas intensas están afectando el norte de Europa, causando interrupciones significativas en el transporte y generando riesgos para la población en varias regiones.",
+      "Las fuertes precipitaciones de nieve han acumulado grandes cantidades en carreteras, calles y autopistas, lo que ha obligado a las autoridades a implementar cierres temporales para garantizar la seguridad de los conductores.",
+      "Se han reportado retrasos y cancelaciones de vuelos en aeropuertos internacionales y regionales, así como interrupciones en servicios de trenes y transporte público debido a vías bloqueadas por la nieve y el hielo.",
+      "Las condiciones extremas han provocado accidentes de tráfico y dificultades para los vehículos de emergencia, lo que ha llevado a que los servicios de rescate y mantenimiento trabajen sin descanso para despejar las rutas principales.",
+      "Se recomienda a los ciudadanos evitar desplazamientos innecesarios y utilizar transporte público solo cuando sea seguro, además de seguir las indicaciones de las autoridades locales y los informes meteorológicos actualizados.",
+      "Los gobiernos regionales han activado planes de contingencia, que incluyen refugios temporales, asistencia a personas vulnerables y distribución de equipos de protección y suministros esenciales en zonas afectadas.",
+      "Los meteorólogos advierten que las nevadas podrían continuar durante varios días, y que se esperan bajas temperaturas y posibles tormentas de nieve que podrían agravar la situación, especialmente en zonas rurales y montañosas.",
+      "Las autoridades han solicitado colaboración de la población para reportar cualquier incidente, mantenerse informado a través de canales oficiales y tomar precauciones adicionales para protegerse del frío extremo.",
+      "Además, se ha recomendado a los conductores equipar sus vehículos con neumáticos de invierno, cadenas y kits de emergencia, y mantenerse alerta ante cambios bruscos en el clima que puedan afectar la seguridad en carretera.",
+      "En general, las nevadas están generando un impacto considerable en la vida cotidiana, obligando a muchas personas a trabajar desde casa y a planificar sus desplazamientos con anticipación para evitar riesgos innecesarios."
+    ],
+    "relatedNews": [
+      {
+        "id": "clima-calor",
+        "title": "Ola de calor extremo afecta a varias regiones del país",
+        "href": "/news/clima/ola-calor-extremo-afecta-regiones-pais",
+        "category": "Clima",
+        "date": "11 de octubre de 2025",
+        "datetime": "2025-10-11",
+        "summary": "Las temperaturas máximas superan los 40 grados en varias provincias, generando alertas por riesgos para la salud.",
+        "imageUrl": "/images/news/clima/calor.jpg",
+        "alt": "Termómetro marcando temperatura extrema en un paisaje urbano"
+      },
+      {
+        "id": "clima-tornado",
+        "title": "Tornado causa graves daños en el centro del país",
+        "href": "/news/clima/tornado-causa-graves-danos-centro-pais",
+        "category": "Clima",
+        "date": "10 de octubre de 2025",
+        "datetime": "2025-10-10",
+        "summary": "Un tornado de categoría F3 ha dejado un rastro de destrucción en varias comunidades del interior.",
+        "imageUrl": "/images/news/clima/tornado.jpg",
+        "alt": "Tornado F3 tocando tierra en una zona residencial"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Clima",
+      "current": "Nevadas históricas paralizan el norte del país"
+    }
+  },
+  {
+    "id": "salud-antibioticos",
+    "title": "Aumenta la preocupación por la resistencia a los antibióticos a nivel mundial",
+    "href": "/news/salud/aumenta-preocupacion-resistencia-antibioticos-mundial",
+    "category": "Salud",
+    "date": "9 de octubre de 2025",
+    "datetime": "2025-10-09",
+    "summary": "La resistencia a los antibióticos continúa siendo una amenaza creciente para la salud pública a nivel mundial, generando preocupación entre científicos y autoridades sanitarias.",
+    "imageUrl": "/images/news/salud/antibioticos.avif",
+    "alt": "Resistencia a los antibióticos",
+    "content": [
+      "Expertos alertan que el uso excesivo e inadecuado de antibióticos ha acelerado la aparición de bacterias resistentes, lo que dificulta el tratamiento de infecciones comunes y aumenta el riesgo de complicaciones graves.",
+      "Organizaciones internacionales han instado a implementar políticas más estrictas para controlar la prescripción de antibióticos, así como promover campañas de concienciación sobre su uso responsable.",
+      "Investigaciones recientes muestran que la resistencia a los antibióticos podría causar millones de muertes adicionales en las próximas décadas si no se toman medidas efectivas de manera inmediata.",
+      "Los científicos destacan la importancia de desarrollar nuevos medicamentos y tratamientos alternativos, así como fortalecer los sistemas de vigilancia epidemiológica para detectar y contener brotes de bacterias resistentes.",
+      "En conclusión, la resistencia a los antibióticos representa uno de los mayores desafíos de la medicina moderna, y requiere cooperación internacional y un compromiso firme para proteger la salud global."
+    ],
+    "relatedNews": [
+      {
+        "id": "salud-contaminacion",
+        "title": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias",
+        "href": "/news/salud/contaminacion-aire-aumenta-riesgo-enfermedades-respiratorias",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Aumenta el riesgo de enfermedades respiratorias.",
+        "imageUrl": "/images/news/salud/contaminacion.avif",
+        "alt": "Contaminación del aire y salud"
+      },
+      {
+        "id": "salud-corazon",
+        "title": "Nueva terapia cardiovascular promete mejorar la salud del corazón",
+        "href": "/news/salud/nueva-terapia-cardiovascular-mejora-salud-corazon",
+        "category": "Salud",
+        "date": "8 de octubre de 2025",
+        "datetime": "2025-10-08",
+        "summary": "Promete mejorar la salud del corazón.",
+        "imageUrl": "/images/news/salud/corazon.jpg",
+        "alt": "Nueva terapia cardiovascular"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Salud",
+      "current": "Aumenta la preocupación por la resistencia a los antibióticos a nivel mundial"
+    }
+  },
+  {
+    "id": "salud-contaminacion",
+    "title": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias",
+    "href": "/news/salud/contaminacion-aire-aumenta-riesgo-enfermedades-respiratorias",
+    "category": "Salud",
+    "date": "9 de octubre de 2025",
+    "datetime": "2025-10-09",
+    "summary": "La contaminación del aire se ha convertido en un problema creciente que afecta la salud de millones de personas en todo el mundo, agravando condiciones preexistentes y creando nuevos problemas de salud en la población general.",
+    "imageUrl": "/images/news/salud/contaminacion.avif",
+    "alt": "Contaminación del aire",
+    "content": [
+      "Estudios recientes indican que la exposición prolongada a contaminantes atmosféricos aumenta significativamente el riesgo de desarrollar enfermedades respiratorias, incluyendo asma, bronquitis y otras afecciones pulmonares crónicas.",
+      "Expertos en salud pública advierten que las partículas finas y los gases tóxicos presentes en el aire pueden dañar el sistema respiratorio y debilitar las defensas del organismo frente a infecciones virales y bacterianas.",
+      "Las autoridades ambientales han instado a implementar políticas más estrictas para reducir las emisiones industriales, promover el transporte limpio y concienciar a la población sobre la importancia de reducir la huella de carbono individual.",
+      "Los médicos recomiendan que las personas con problemas respiratorios preexistentes tomen precauciones adicionales, como evitar las zonas de alta contaminación durante las horas pico y usar mascarillas protectoras cuando sea necesario.",
+      "En conclusión, la contaminación del aire representa un riesgo serio para la salud respiratoria global y requiere un esfuerzo conjunto y sostenido de gobiernos, empresas y ciudadanos para mitigar sus efectos y proteger a las generaciones futuras."
+    ],
+    "relatedNews": [
+      {
+        "id": "salud-antibioticos",
+        "title": "Aumenta la preocupación por la resistencia a los antibióticos",
+        "href": "/news/salud/aumenta-preocupacion-resistencia-antibioticos-mundial",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Preocupación mundial por superbacterias.",
+        "imageUrl": "/images/news/salud/antibioticos.avif",
+        "alt": "Resistencia a los antibióticos"
+      },
+      {
+        "id": "salud-corazon",
+        "title": "Nueva terapia cardiovascular promete mejorar la salud del corazón",
+        "href": "/news/salud/nueva-terapia-cardiovascular-mejora-salud-corazon",
+        "category": "Salud",
+        "date": "8 de octubre de 2025",
+        "datetime": "2025-10-08",
+        "summary": "Promete mejoras en salud del corazón.",
+        "imageUrl": "/images/news/salud/corazon.jpg",
+        "alt": "Nueva terapia cardiovascular"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Salud",
+      "current": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias"
+    }
+  },
+  {
+    "id": "salud-corazon",
+    "title": "Nueva terapia cardiovascular promete mejorar la salud del corazón",
+    "href": "/news/salud/nueva-terapia-cardiovascular-mejora-salud-corazon",
+    "category": "Salud",
+    "date": "8 de octubre de 2025",
+    "datetime": "2025-10-08",
+    "summary": "Investigadores médicos han desarrollado una innovadora terapia cardiovascular que promete revolucionar el tratamiento de enfermedades del corazón y mejorar la calidad de vida de millones de pacientes.",
+    "imageUrl": "/images/news/salud/corazon.jpg",
+    "alt": "Nueva terapia cardiovascular promete mejorar la salud del corazón",
+    "content": [
+      "La nueva terapia, desarrollada después de una década de investigación, utiliza células madre y técnicas de ingeniería genética para regenerar el tejido cardíaco dañado por infartos y otras enfermedades cardiovasculares.",
+      "Los ensayos clínicos iniciales han mostrado resultados prometedores, con pacientes experimentando mejoras significativas en la función cardíaca y una reducción en los síntomas de insuficiencia cardíaca.",
+      "Los cardiólogos destacan que esta terapia podría reducir la necesidad de trasplantes de corazón y otros procedimientos invasivos, ofreciendo una alternativa menos riesgosa y más accesible para los pacientes.",
+      "Las autoridades sanitarias están evaluando la aprobación de la terapia, que podría estar disponible para el público general en los próximos dos años después de completar las fases finales de los ensayos clínicos.",
+      "Los investigadores también están explorando aplicaciones de esta tecnología para otras enfermedades degenerativas, abriendo nuevas posibilidades en el campo de la medicina regenerativa."
+    ],
+    "relatedNews": [
+      {
+        "id": "salud-antibioticos",
+        "title": "Aumenta la preocupación por la resistencia a los antibióticos",
+        "href": "/news/salud/aumenta-preocupacion-resistencia-antibioticos-mundial",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Preocupación mundial por superbacterias.",
+        "imageUrl": "/images/news/salud/antibioticos.avif",
+        "alt": "Resistencia a los antibióticos"
+      },
+      {
+        "id": "salud-contaminacion",
+        "title": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias",
+        "href": "/news/salud/contaminacion-aire-aumenta-riesgo-enfermedades-respiratorias",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Aumenta el riesgo de enfermedades respiratorias.",
+        "imageUrl": "/images/news/salud/contaminacion.avif",
+        "alt": "Contaminación del aire y salud"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Salud",
+      "current": "Nueva terapia cardiovascular promete mejorar la salud del corazón"
+    }
+  },
+  {
+    "id": "salud-cardiovascular",
+    "title": "Avances en medicina: nueva terapia promete mejorar la salud cardiovascular",
+    "href": "/news/salud/avances-medicina-nueva-terapia-mejora-salud-cardiovascular",
+    "category": "Salud",
+    "date": "9 de octubre de 2025",
+    "datetime": "2025-10-09",
+    "summary": "Un nuevo avance en medicina ha generado expectativas en la comunidad científica y entre los pacientes: una terapia innovadora promete mejorar la salud cardiovascular y reducir los riesgos asociados a enfermedades del corazón.",
+    "imageUrl": "/images/news/salud/corazon.jpg",
+    "alt": "Salud Cardiovascular",
+    "content": [
+      "Los estudios iniciales muestran que la terapia puede ayudar a fortalecer el músculo cardíaco, mejorar la circulación y disminuir la inflamación en los vasos sanguíneos. Los investigadores destacan que este tratamiento podría complementar las estrategias tradicionales como dieta, ejercicio y medicamentos.",
+      "Los ensayos clínicos se encuentran en fases avanzadas, y los primeros resultados indican mejoras significativas en la presión arterial y la función cardíaca de los participantes. Los científicos aseguran que la seguridad del tratamiento ha sido una prioridad durante todo el proceso de investigación.",
+      "Especialistas en cardiología consideran que esta terapia podría cambiar la forma en que se abordan enfermedades como la insuficiencia cardíaca y la hipertensión, ofreciendo una alternativa que trabaja directamente sobre los factores fisiológicos que afectan el corazón.",
+      "A pesar del optimismo, los expertos advierten que aún se requieren estudios a largo plazo para confirmar la eficacia y seguridad del tratamiento antes de que pueda implementarse de forma masiva en el sistema de salud. No obstante, la comunidad médica ve con esperanza los avances alcanzados hasta ahora.",
+      "En conclusión, la nueva terapia cardiovascular representa un paso importante en la medicina moderna, ofreciendo la posibilidad de mejorar la calidad de vida de millones de personas y marcando un hito significativo en la investigación sobre la salud del corazón."
+    ],
+    "relatedNews": [
+      {
+        "id": "salud-antibioticos",
+        "title": "Aumenta la preocupación por la resistencia a los antibióticos a nivel mundial",
+        "href": "/news/salud/aumenta-preocupacion-resistencia-antibioticos-mundial",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Preocupación mundial por superbacterias.",
+        "imageUrl": "/images/news/salud/antibioticos.avif",
+        "alt": "Aumenta la preocupación por la resistencia a los antibióticos a nivel mundial"
+      },
+      {
+        "id": "salud-contaminacion",
+        "title": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias",
+        "href": "/news/salud/contaminacion-aire-aumenta-riesgo-enfermedades-respiratorias",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Riesgo de enfermedades respiratorias en alza.",
+        "imageUrl": "/images/news/salud/contaminacion.avif",
+        "alt": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Salud",
+      "current": "Avances en medicina: nueva terapia promete mejorar la salud cardiovascular"
+    }
+  },
+  {
+    "id": "salud-mental",
+    "title": "La salud mental se convierte en prioridad ante el aumento de estrés y ansiedad",
+    "href": "/news/salud/salud-mental-prioridad-aumento-estres-ansiedad",
+    "category": "Salud",
+    "date": "9 de octubre de 2025",
+    "datetime": "2025-10-09",
+    "summary": "El aumento de estrés y ansiedad en la población ha convertido la salud mental en una prioridad tanto para las autoridades sanitarias como para la sociedad en general, impulsando nuevas estrategias de apoyo y concientización.",
+    "imageUrl": "/images/news/salud/salud-mental.jpg",
+    "alt": "Salud Mental",
+    "content": [
+      "Expertos señalan que factores como la vida laboral intensa, la incertidumbre económica y los rápidos cambios sociales han incrementado los niveles de ansiedad, afectando la calidad de vida y el bienestar emocional de millones de personas.",
+      "Los profesionales de la salud mental recomiendan implementar programas de prevención en escuelas y lugares de trabajo, promover hábitos saludables como el ejercicio y el mindfulness, y facilitar el acceso a terapias psicológicas.",
+      "Además, organizaciones internacionales han subrayado la importancia de concienciar a la población sobre la detección temprana de síntomas y la eliminación del estigma social asociado a buscar ayuda profesional para problemas mentales.",
+      "Se espera que la inclusión de la salud mental en las políticas de salud pública y la educación emocional contribuya a crear entornos más comprensivos y a reducir el impacto negativo del estrés crónico en la sociedad.",
+      "En conclusión, la salud mental se ha consolidado como un pilar fundamental del bienestar integral, requiriendo esfuerzos coordinados y sostenidos de gobiernos, instituciones y comunidades para enfrentar los desafíos actuales."
+    ],
+    "relatedNews": [
+      {
+        "id": "salud-antibioticos",
+        "title": "Aumenta la preocupación por la resistencia a los antibióticos a nivel mundial",
+        "href": "/news/salud/aumenta-preocupacion-resistencia-antibioticos-mundial",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Preocupación mundial por superbacterias.",
+        "imageUrl": "/images/news/salud/antibioticos.avif",
+        "alt": "Aumenta la preocupación por la resistencia a los antibióticos a nivel mundial"
+      },
+      {
+        "id": "salud-contaminacion",
+        "title": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias",
+        "href": "/news/salud/contaminacion-aire-aumenta-riesgo-enfermedades-respiratorias",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Riesgo de enfermedades respiratorias en alza.",
+        "imageUrl": "/images/news/salud/contaminacion.avif",
+        "alt": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Salud",
+      "current": "La salud mental se convierte en prioridad ante el aumento de estrés y ansiedad"
+    }
+  },
+  {
+    "id": "salud-azucar",
+    "title": "El consumo excesivo de azúcares aumenta el riesgo de enfermedades metabólicas",
+    "href": "/news/salud/noticia-sobre-azucar",
+    "category": "Salud",
+    "date": "9 de octubre de 2025",
+    "datetime": "2025-10-09",
+    "summary": "El consumo excesivo de azúcares añadidos se ha convertido en un problema crítico de salud pública, afectando a millones de personas en todo el mundo y contribuyendo al aumento de enfermedades crónicas graves.",
+    "imageUrl": "/images/news/salud/azucar.jpg",
+    "alt": "Variedad de alimentos y bebidas azucaradas sobre una mesa",
+    "content": [
+      "Estudios recientes, validados por múltiples instituciones sanitarias, muestran que una ingesta elevada de azúcares añadidos está directamente relacionada con un mayor riesgo de desarrollar enfermedades metabólicas complejas, como diabetes tipo 2, obesidad severa y síndrome metabólico.",
+      "Los expertos advierten que el consumo frecuente de bebidas azucaradas, dulces y alimentos ultraprocesados puede alterar rápidamente los niveles de glucosa en la sangre y afectar la función de la insulina, creando una resistencia que contribuye al deterioro de la salud a largo plazo.",
+      "Además, la exposición temprana a dietas altas en azúcar durante la infancia puede generar hábitos alimenticios poco saludables y adictivos que se prolongan hasta la adultez, aumentando exponencialmente la probabilidad de complicaciones metabólicas en etapas posteriores de la vida.",
+      "Las autoridades sanitarias recomiendan encarecidamente moderar la ingesta de azúcares, leer cuidadosamente las etiquetas nutricionales y priorizar alimentos naturales como frutas, verduras y granos integrales, que aportan energía y nutrientes esenciales sin los riesgos asociados a los azúcares refinados.",
+      "En conclusión, reducir el consumo de azúcares no es solo una elección dietética, sino una medida preventiva clave para proteger la salud metabólica, mejorar la calidad de vida y disminuir la incidencia de enfermedades crónicas en la población mundial."
+    ],
+    "relatedNews": [
+      {
+        "id": "salud-antibioticos",
+        "title": "Aumenta la preocupación por la resistencia a los antibióticos",
+        "href": "/news/salud/aumenta-preocupacion-resistencia-antibioticos-mundial",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Preocupación mundial por superbacterias.",
+        "imageUrl": "/images/news/salud/antibioticos.avif",
+        "alt": "Resistencia a los antibióticos"
+      },
+      {
+        "id": "salud-contaminacion",
+        "title": "La contaminación del aire aumenta el riesgo de enfermedades respiratorias",
+        "href": "/news/salud/contaminacion-aire-aumenta-riesgo-enfermedades-respiratorias",
+        "category": "Salud",
+        "date": "9 de octubre de 2025",
+        "datetime": "2025-10-09",
+        "summary": "Riesgo de enfermedades respiratorias en alza.",
+        "imageUrl": "/images/news/salud/contaminacion.avif",
+        "alt": "Contaminación del aire y salud"
+      }
+    ],
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Salud",
+      "current": "El consumo excesivo de azúcares aumenta el riesgo de enfermedades metabólicas"
+    }
+  }
+]
