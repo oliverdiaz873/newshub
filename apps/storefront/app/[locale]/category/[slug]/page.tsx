@@ -1,8 +1,17 @@
 import type { Metadata } from 'next';
 import { categoryContent } from '@/data/categories';
+import type { CategoryPageContent, NewsArticle } from '@/data/newsModels';
 import { Category } from '../../_components/CategoryPageClient';
 import { SITE_URL, SITE_NAME, getLocalePrefix, getOgLocale } from '@/shared/config/site';
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
+import {
+  apiGetNoStoreOutcome,
+  buildCategoryContent,
+  type ApiArticleListItem,
+  type ApiCategoryDetail,
+  type ApiList,
+  type ApiOpinionListItem,
+} from '@/lib/api';
 
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -13,15 +22,66 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const t = await getTranslations({ locale, namespace: 'data.categories' });
   const tMeta = await getTranslations({ locale, namespace: 'metadata.category' });
+  const baseUrl = SITE_URL;
+  const path = getLocalePrefix(locale);
+  const canonicalUrl = `${baseUrl}${path}/category/${slug}`;
+
+  // F2.1 metadata API-first: label/description/canonical/hreflang/OG come
+  // from GET /categories/:slug. Overlay data.categories.* applies only
+  // when a local key exists. description:null falls back to the generic
+  // category description (never empty, never local content for missing).
+  const outcome = await apiGetNoStoreOutcome<ApiCategoryDetail>(`/categories/${slug}`, locale);
+  if (outcome.reason === 'ok') {
+    const detail = outcome.data;
+    const t = await getTranslations({ locale, namespace: 'data.categories' });
+    const label = t.has(`${detail.slug}.label`) ? t(`${detail.slug}.label`) : detail.label;
+    const description = t.has(`${detail.slug}.description`)
+      ? t(`${detail.slug}.description`)
+      : (detail.description ?? tMeta('description'));
+    const languages = detail.fallback
+      ? { es: `${baseUrl}/category/${slug}`, 'x-default': `${baseUrl}/category/${slug}` }
+      : {
+          es: `${baseUrl}/category/${slug}`,
+          en: `${baseUrl}/en/category/${slug}`,
+          'x-default': `${baseUrl}/category/${slug}`,
+        };
+    return {
+      title: label,
+      description,
+      keywords: [label, 'noticias', 'información'],
+      alternates: { canonical: canonicalUrl, languages },
+      openGraph: {
+        title: label,
+        description,
+        url: canonicalUrl,
+        type: 'website',
+        siteName: SITE_NAME,
+        locale: getOgLocale(locale),
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: label,
+        description,
+      },
+    };
+  }
+  if (outcome.reason === 'error') {
+    throw new Error(`Newshub API unavailable while generating metadata for /category/${slug}`);
+  }
+
+  // Development fallback only (NEXT_PUBLIC_API_URL unset).
+  if (outcome.reason !== 'unconfigured') {
+    return {
+      title: tMeta('notFound'),
+      description: tMeta('notFoundDescription'),
+    };
+  }
+  const t = await getTranslations({ locale, namespace: 'data.categories' });
 
   const hasCategory = t.has(`${slug}.label`);
   const label = hasCategory ? t(`${slug}.label`) : undefined;
   const description = hasCategory ? t(`${slug}.description`) : undefined;
-  const baseUrl = SITE_URL;
-  const path = getLocalePrefix(locale);
-  const canonicalUrl = `${baseUrl}${path}/category/${slug}`;
 
   return {
     title: label ?? tMeta('notFound'),
@@ -53,7 +113,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Page({ params }: PageProps) {
   const { slug, locale } = await params;
-  const category = categoryContent[slug];
+
+  // F2.1 category API-first: detail + article list + opinions sidebar are
+  // fetched with no-store (locked rule, no ISR60 in F2 render).
+  // - ok → API composition via buildCategoryContent (deterministic, deduped).
+  // - not-found → notFound() (unknown/empty category has no fallback).
+  // - error → throw to error.tsx (never silent local in production).
+  // - unconfigured → development local fallback (categoryContent).
+  let initialContent: CategoryPageContent | null = null;
+  const detailOutcome = await apiGetNoStoreOutcome<ApiCategoryDetail>(`/categories/${slug}`, locale);
+  if (detailOutcome.reason === 'ok') {
+    const [artsOutcome, opsOutcome] = await Promise.all([
+      apiGetNoStoreOutcome<ApiList<ApiArticleListItem>>(
+        `/articles?category=${encodeURIComponent(slug)}&limit=100`,
+        locale,
+      ),
+      apiGetNoStoreOutcome<ApiList<ApiOpinionListItem>>('/opinions?limit=3', locale),
+    ]);
+    if (artsOutcome.reason === 'error' || opsOutcome.reason === 'error') {
+      throw new Error(`Newshub API unavailable while loading /category/${slug}`);
+    }
+    initialContent = buildCategoryContent(
+      detailOutcome.data,
+      artsOutcome.reason === 'ok' ? artsOutcome.data.data : [],
+      opsOutcome.reason === 'ok' ? opsOutcome.data.data : [],
+    );
+  } else if (detailOutcome.reason === 'not-found') {
+    notFound();
+  } else if (detailOutcome.reason === 'error') {
+    throw new Error(`Newshub API unavailable while loading /category/${slug}`);
+  }
+
+  const category = initialContent ?? categoryContent[slug];
 
   if (!category) {
     notFound();
@@ -73,13 +164,15 @@ export default async function Page({ params }: PageProps) {
       ])
     : null;
 
+  // F2.0: thin API pools leave tuple slots undefined; drop them before
+  // SEO so ItemList never crashes and positions stay dense.
   const items = category?.featuredSection
     ? [
         category.featuredSection.primary,
         ...category.featuredSection.secondary,
         ...category.featuredSection.grid,
         ...(category.latestNews ?? []),
-      ]
+      ].filter((article): article is NewsArticle => article != null)
     : [];
 
   const collectionJsonLd = category
@@ -122,7 +215,7 @@ export default async function Page({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
         />
       )}
-      <Category />
+      <Category initialContent={initialContent} />
     </>
   );
 }

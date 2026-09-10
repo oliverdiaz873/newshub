@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { opinionArticles, type OpinionArticle } from '../../../../data';
+import { FALLBACK_OG_IMAGE } from '@/lib/api';
 import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 import '../RecentNewsSidebar/RecentNewsSidebar.css';
 
@@ -35,7 +36,7 @@ export const OpinionSidebar = ({ title, articles: rawArticles = opinionArticles 
               <Link href={article.href} className="block text-inherit no-underline">
                 <div className="recent-news-image-wrapper relative mb-2 w-full overflow-hidden rounded-lg">
                   <Image
-                    src={article.imageUrl}
+                    src={article.imageUrl || FALLBACK_OG_IMAGE}
                     alt={article.alt}
                     fill
                     sizes="300px"

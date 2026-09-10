@@ -38,6 +38,11 @@ export interface OpinionArticle {
   alt: string;
   date: string;
   datetime: string;
+  // F2.0 API-first provenance (optional so local static data keeps compiling).
+  author?: { slug: string; name: string; bio: string | null } | null;
+  updatedAt?: string;
+  fallback?: boolean;
+  localeResolved?: string;
 }
 
 

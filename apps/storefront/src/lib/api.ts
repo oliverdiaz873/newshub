@@ -21,6 +21,7 @@
  */
 import type {
   ArticleContent,
+  CategoryPageContent,
   FullNewsArticle,
   NewsArticle,
   OpinionArticle,
@@ -56,6 +57,8 @@ export interface ApiArticleListItem {
   firstPublishedAt: string;
   updatedAt: string;
   fallback: boolean;
+  isBreaking: boolean;
+  isFeatured: boolean;
 }
 
 export interface ApiArticleDetail extends ApiArticleListItem {
@@ -262,6 +265,9 @@ export function toOpinionArticle(item: ApiOpinionListItem): OpinionArticle {
     alt: item.cover?.alt ?? item.title,
     date: datePart(item.firstPublishedAt),
     datetime: item.firstPublishedAt,
+    author: item.author,
+    updatedAt: item.updatedAt,
+    fallback: item.fallback,
   };
 }
 
@@ -293,4 +299,62 @@ export function toOpinionDetail(detail: ApiOpinionDetail): ArticleContent {
 /** F1.2: opinion sidebar comes from `detail.related` (latest, API). */
 export function toRelatedOpinions(related: ApiOpinionListItem[]): OpinionArticle[] {
   return related.map(toOpinionArticle);
+}
+
+/**
+ * F2.0 deterministic category composition (frontend, no new endpoint).
+ *
+ * Locked rule:
+ * - featured pool = articles flagged isFeatured (API order), filled with
+ *   latest non-duplicates up to 6;
+ * - featuredIds = hrefs used in featured (primary/secondary/grid);
+ * - latestNews = first 6 recents not in featuredIds;
+ * - opinionArticles = provided separately (GET /opinions?limit=3);
+ * - never duplicate an article across sections; thin pools yield fewer
+ *   items (callers must tolerate short sections, never assume 4/6/11).
+ * - sidebarNews is presentation-only here: latest non-duplicates after
+ *   featured+latest (kept for the CategoryPageContent shape; the F2
+ *   category render uses the opinions sidebar instead).
+ */
+export function buildCategoryContent(
+  detail: ApiCategoryDetail,
+  articles: ApiArticleListItem[],
+  opinions: ApiOpinionListItem[],
+): CategoryPageContent {
+  const mapped = articles.map((item) => toNewsArticle(item, item.categorySlug || detail.slug));
+  const seen = new Set<string>();
+  const takeUnique = (pool: NewsArticle[], count: number): NewsArticle[] => {
+    const out: NewsArticle[] = [];
+    for (const article of pool) {
+      if (out.length >= count) break;
+      if (seen.has(article.href)) continue;
+      seen.add(article.href);
+      out.push(article);
+    }
+    return out;
+  };
+  const curated = takeUnique(
+    mapped.filter((article, index) => articles[index]?.isFeatured === true),
+    6,
+  );
+  const featured = [...curated, ...takeUnique(mapped, 6 - curated.length)];
+  const latestNews = takeUnique(mapped, 6);
+  const sidebarNews = takeUnique(mapped, 5);
+  const [primary, ...rest] = featured;
+  return {
+    slug: detail.slug,
+    label: detail.label,
+    description: detail.description ?? '',
+    featuredSection: {
+      title: detail.label,
+      primary: primary as NewsArticle,
+      secondary: [rest[0], rest[1], rest[2]] as [NewsArticle, NewsArticle, NewsArticle],
+      grid: rest.slice(3, 5),
+    },
+    latestTitle: `Mas en ${detail.label}`,
+    latestNews,
+    sidebarTitle: 'Opinion',
+    sidebarNews,
+    opinionArticles: opinions.map(toOpinionArticle),
+  };
 }
