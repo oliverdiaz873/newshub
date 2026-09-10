@@ -21,8 +21,16 @@ export const useSearch = (overrideQuery?: string) => {
   const locale = useLocale();
   const apiBase = getApiBase();
   const [enTranslator, setEnTranslator] = useState<((key: string) => string) | null>(null);
-  const [apiResults, setApiResults] = useState<SearchResultItem[] | null>(null);
-  const [apiError, setApiError] = useState<Error | null>(null);
+  // F3 review fix: API results/errors are keyed by the query that produced
+  // them. While a new query is in flight (or after it changed), the render
+  // must not show previous-query results nor rethrow a previous error:
+  // the cleanup effect runs after render, so a bare `apiError` flag would
+  // poison every subsequent render, including recovery searches.
+  const [apiState, setApiState] = useState<{
+    query: string;
+    results: SearchResultItem[] | null;
+    error: Error | null;
+  }>({ query: '', results: null, error: null });
 
   useEffect(() => {
     if (apiBase) return;
@@ -42,27 +50,29 @@ export const useSearch = (overrideQuery?: string) => {
   useEffect(() => {
     if (!apiBase || !hasSearchQuery(query)) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional cache reset: clears API results/error when the query is cleared or API is unavailable; consumers already render []/fallback from null, so no cascading render affects output
-      setApiResults(null);
-      setApiError(null);
+      setApiState({ query, results: null, error: null });
       return;
     }
     let cancelled = false;
     searchAll(query, locale).then(
       (res) => {
         if (cancelled) return;
-        if (res.outcome === 'ok' && res.data) setApiResults(res.data.results);
-        else if (res.outcome === 'error') setApiError(new Error(`Newshub API search failed for q=${query}`));
-        else setApiResults(null);
+        if (res.outcome === 'ok' && res.data) setApiState({ query, results: res.data.results, error: null });
+        else if (res.outcome === 'error') setApiState({ query, results: null, error: new Error(`Newshub API search failed for q=${query}`) });
+        else setApiState({ query, results: null, error: null });
       },
       (err: unknown) => {
-        if (!cancelled) setApiError(err instanceof Error ? err : new Error('Newshub API search failed'));
+        if (!cancelled) setApiState({ query, results: null, error: err instanceof Error ? err : new Error('Newshub API search failed') });
       },
     );
     return () => { cancelled = true; };
   }, [query, locale, apiBase]);
 
   // Error de backend -> error.tsx (nunca datos locales en producción).
-  if (apiError) throw apiError;
+  // Solo cuando el error pertenece a la query actual: al cambiar de query,
+  // el estado obsoleto se ignora para permitir recuperación y no mostrar
+  // resultados ajenos mientras el nuevo fetch está en vuelo.
+  const settled = apiState.query === query;
 
   const localResults = useMemo(() => {
     if (!hasSearchQuery(query) || !enTranslator) return [];
@@ -95,7 +105,18 @@ export const useSearch = (overrideQuery?: string) => {
     });
   }, [query, enTranslator]);
 
-  const results = apiBase ? (apiResults ?? []) : localResults;
+  if (!settled) {
+    return {
+      query,
+      results: [],
+      count: 0,
+      isEmpty: query.length > 0,
+      hasQuery: query.length > 0,
+    };
+  }
+  if (apiState.error) throw apiState.error;
+
+  const results = apiBase ? (apiState.results ?? []) : localResults;
 
   return {
     query,
