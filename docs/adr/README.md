@@ -7,6 +7,8 @@ Decision log for Newshub. Source templates live in
 |----|-------|--------|------|---------------|
 | ADR-009 | Dashboard as separate Next.js app | Accepted | 2026-09-06 | — |
 | ADR-010 | Editorial authentication & authorization | Accepted | 2026-09-06 | — |
+| ADR-011 | Dashboard access-token storage & silent restore | Accepted | 2026-09-09 | — |
+| ADR-012 | Editorial single source of truth | Proposed | 2026-09-10 | — |
 
 ## Status Legend
 
