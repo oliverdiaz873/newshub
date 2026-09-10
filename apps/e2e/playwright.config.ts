@@ -39,6 +39,7 @@ export default defineConfig({
         JWT_SECRET: 'e2e-test-secret',
         PORT: '3211',
         DASHBOARD_URL: 'http://localhost:3212',
+        STOREFRONT_URL: 'http://localhost:3210',
         API_PUBLIC_URL: 'http://localhost:3211',
       },
     },
