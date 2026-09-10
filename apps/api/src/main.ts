@@ -12,10 +12,15 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.use(helmet());
   app.use(cookieParser());
-  // Dashboard runs on another origin in dev (different port, same site for
-  // cookies). Production allowlist stays open (hosting decision).
+  // Storefront and Dashboard are both first-party browser clients of
+  // this API (ADR-012). CORS allows exactly these two origins, each
+  // falling back to its local dev default when unset. Production must
+  // set both explicitly (see .env.example) — no wildcard origins.
+  const dashboardOrigin = (process.env.DASHBOARD_URL ?? 'http://localhost:3212').trim();
+  const storefrontOrigin = (process.env.STOREFRONT_URL ?? 'http://localhost:3000').trim();
+  const allowedOrigins = [dashboardOrigin, storefrontOrigin].filter((o) => o.length > 0);
   app.enableCors({
-    origin: process.env.DASHBOARD_URL ?? 'http://localhost:3212',
+    origin: allowedOrigins,
     credentials: true,
   });
   app.useGlobalPipes(
