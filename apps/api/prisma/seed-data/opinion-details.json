@@ -1,0 +1,68 @@
+{
+  "opinion-politica": {
+    "id": "opinion-politica",
+    "title": "La democracia y el reto de la transparencia",
+    "href": "/opiniones/opinion-politica",
+    "date": "4 de octubre de 2025",
+    "datetime": "2025-10-04",
+    "category": "Opinion",
+    "summary": "La confianza ciudadana depende cada vez mas de instituciones abiertas y responsables.",
+    "imageUrl": "/images/news/politica/congreso.avif",
+    "alt": "Ilustración de instituciones democráticas y conceptos de transparencia",
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Opinion",
+      "current": "Opinion politica"
+    },
+    "content": [
+      "En el complejo escenario politico actual, la transparencia se ha consolidado no solo como un requisito etico, sino como el pilar fundamental que sostiene la legitimidad de las democracias modernas. La confianza de los ciudadanos en sus representantes e instituciones se ha visto erosionada por anos de opacidad y falta de rendicion de cuentas, creando una brecha que solo puede cerrarse con luz y honestidad.",
+      "La verdadera transparencia va mas alla de publicar documentos en portales web; implica una voluntad real de exponer los procesos de toma de decisiones al escrutinio publico. Cuando los gobiernos ocultan las razones detras de sus politicas o los detalles de su gasto, fomentan un clima de sospecha que alimenta el populismo y la desafeccion politica.",
+      "Es imperativo que nuestras instituciones adopten tecnologias abiertas y procesos de auditoria ciudadana. Una democracia que teme a la transparencia es una democracia que duda de su propio valor. El reto es enorme, pero el costo de la opacidad es, sencillamente, inasumible para una sociedad que aspira a ser verdaderamente libre."
+    ],
+    "relatedNews": []
+  },
+  "opinion-economia": {
+    "id": "opinion-economia",
+    "title": "Hacia donde va la economia global?",
+    "href": "/opiniones/opinion-economia",
+    "date": "3 de octubre de 2025",
+    "datetime": "2025-10-03",
+    "category": "Opinion",
+    "summary": "Analizamos los factores que marcaran el rumbo economico en los proximos anos.",
+    "imageUrl": "/images/opiniones/opinion-economia.jpg",
+    "alt": "Representación visual de tendencias económicas globales y tecnología de IA",
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Opinion",
+      "current": "Opinion economica"
+    },
+    "content": [
+      "Nos encontramos en un punto de inflexion sin precedentes en la historia economica contemporanea. La globalizacion, tal como la conociamos, esta siendo redefinida por tensiones geopoliticas, la transicion energetica y la irrupcion masiva de la inteligencia artificial. Estos factores no solo estan cambiando el que producimos, sino el como y donde lo hacemos.",
+      "La inflacion, aunque parece estar bajo control en algunas regiones, ha dejado una huella profunda en la estructura de costes de las empresas y en el presupuesto de las familias. El gran reto de los bancos centrales sera navegar este nuevo entorno sin sofocar el crecimiento necesario para financiar la transicion hacia una economia verde.",
+      "A largo plazo, la sostenibilidad sera el motor principal del valor economico. Aquellos paises y empresas que no logren adaptar sus modelos de negocio a los limites del planeta se veran marginados. La economia global del futuro no sera solo digital, sera fundamentalmente regenerativa o no sera."
+    ],
+    "relatedNews": []
+  },
+  "opinion-salud": {
+    "id": "opinion-salud",
+    "title": "La importancia de la salud preventiva",
+    "href": "/opiniones/opinion-salud",
+    "date": "2 de octubre de 2025",
+    "datetime": "2025-10-02",
+    "category": "Opinion",
+    "summary": "Invertir en prevencion es fundamental para mantener una poblacion saludable y reducir gastos sanitarios.",
+    "imageUrl": "/images/news/salud/antibioticos.avif",
+    "alt": "Ilustración de cuidados médicos preventivos y chequeos de salud",
+    "breadcrumb": {
+      "home": "Inicio",
+      "category": "Opinion",
+      "current": "Opinion salud"
+    },
+    "content": [
+      "El sistema sanitario global ha estado historicamente enfocado en la cura, reaccionando ante la enfermedad una vez que esta se manifiesta. Sin embargo, la verdadera revolucion medica del siglo XXI reside en la prevencion. Invertir en salud preventiva no es solo una cuestion de bienestar individual, es una estrategia de supervivencia para los sistemas publicos de salud.",
+      "Cada euro invertido en campanas de vacunacion, deteccion temprana y promocion de habitos saludables ahorra miles de euros en tratamientos cronicos y hospitalizaciones complejas. La tecnologia hoy nos permite monitorear nuestra salud en tiempo real, ofreciendonos una oportunidad unica para intervenir antes de que el dano sea irreversible.",
+      "La salud preventiva requiere un cambio de paradigma cultural: pasar de ser pacientes pasivos a ser gestores activos de nuestro propio bienestar. Solo a traves de la educacion y el acceso equitativo a servicios preventivos podremos garantizar una longevidad que sea verdaderamente saludable y digna para todos."
+    ],
+    "relatedNews": []
+  }
+}

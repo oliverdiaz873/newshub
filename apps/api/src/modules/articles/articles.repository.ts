@@ -9,6 +9,8 @@ export interface ArticleFilters {
   authorId?: string;
   q?: string;
   sort: 'publishedAt:desc' | 'publishedAt:asc';
+  breaking?: boolean;
+  featured?: boolean;
 }
 
 export interface EditorialArticleFilters {
@@ -16,6 +18,8 @@ export interface EditorialArticleFilters {
   categoryId?: string;
   authorId?: string;
   q?: string;
+  breaking?: boolean;
+  featured?: boolean;
 }
 
 /**
@@ -30,6 +34,8 @@ export class ArticlesRepository {
     const where: Prisma.ArticleWhereInput = { status: PUBLISHED };
     if (filters.categoryId) where.categoryId = filters.categoryId;
     if (filters.authorId) where.authorId = filters.authorId;
+    if (filters.breaking !== undefined) where.isBreaking = filters.breaking;
+    if (filters.featured !== undefined) where.isFeatured = filters.featured;
     if (filters.q) {
       // F1 basic: accent-sensitive ILIKE. Accent-insensitive search (unaccent/pg_trgm)
       // is deferred to the future search evolution; the `q` param shape stays stable.
@@ -103,6 +109,8 @@ export class ArticlesRepository {
     if (filters.status) where.status = filters.status;
     if (filters.categoryId) where.categoryId = filters.categoryId;
     if (filters.authorId) where.authorId = filters.authorId;
+    if (filters.breaking !== undefined) where.isBreaking = filters.breaking;
+    if (filters.featured !== undefined) where.isFeatured = filters.featured;
     if (filters.q) {
       where.translations = {
         some: {
@@ -184,7 +192,7 @@ export class ArticlesRepository {
 
   updateFields(
     id: string,
-    input: { categoryId?: string; authorId?: string | null; coverMediaId?: string | null; status?: string; updatedById: string },
+    input: { categoryId?: string; authorId?: string | null; coverMediaId?: string | null; status?: string; isBreaking?: boolean; isFeatured?: boolean; updatedById: string },
   ) {
     return this.prisma.article.update({
       where: { id },
@@ -201,6 +209,8 @@ export class ArticlesRepository {
             : { cover: { connect: { id: input.coverMediaId } } }
           : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
+        ...(input.isBreaking !== undefined ? { isBreaking: input.isBreaking } : {}),
+        ...(input.isFeatured !== undefined ? { isFeatured: input.isFeatured } : {}),
         updatedBy: { connect: { id: input.updatedById } },
       },
     });

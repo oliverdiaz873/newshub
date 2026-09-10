@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsIn,
   IsOptional,
   IsString,
@@ -81,6 +82,14 @@ export class UpdateArticleDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isBreaking?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean;
 
   @IsOptional()
   @IsArray()

@@ -1,0 +1,41 @@
+{
+  "order": [
+    "politica",
+    "internacional",
+    "economia",
+    "salud",
+    "deporte",
+    "clima",
+    "justicia"
+  ],
+  "meta": {
+    "politica": {
+      "label": "Política",
+      "description": "Cobertura sobre gobierno, poder legislativo, partidos, transparencia y decisiones públicas con impacto nacional."
+    },
+    "internacional": {
+      "label": "Internacional",
+      "description": "Panorama global con enfoque en diplomacia, conflictos, alianzas estrategicas y movimientos geopoliticos clave."
+    },
+    "economia": {
+      "label": "Economía",
+      "description": "Mercados, inflación, empresas, empleo y decisiones financieras que marcan el ritmo económico del país y el mundo."
+    },
+    "salud": {
+      "label": "Salud",
+      "description": "Información sobre sistema sanitario, prevención, investigación médica y tendencias que impactan el bienestar colectivo."
+    },
+    "deporte": {
+      "label": "Deporte",
+      "description": "Actualidad deportiva con foco en resultados, figuras, torneos y el pulso competitivo de las principales disciplinas."
+    },
+    "clima": {
+      "label": "Clima",
+      "description": "Seguimiento meteorológico, alertas, fenómenos extremos y efectos ambientales en comunidades y sectores productivos."
+    },
+    "justicia": {
+      "label": "Justicia",
+      "description": "Procesos judiciales, investigación de delitos, reformas legales y decisiones institucionales en materia de justicia."
+    }
+  }
+}

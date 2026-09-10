@@ -45,7 +45,7 @@ export class OpinionsService {
   ) {}
 
   async list(
-    query: { page?: number; limit?: number; author?: string; q?: string },
+    query: { page?: number; limit?: number; author?: string; q?: string; sort?: 'publishedAt:desc' | 'publishedAt:asc' },
     locale: ResolvedLocale,
   ) {
     const { page, limit } = normalizePagination(query.page, query.limit);
@@ -55,7 +55,7 @@ export class OpinionsService {
       if (!author) throw new NotFoundException('Author not found.');
       authorId = author.id;
     }
-    const filters = { authorId, q: query.q?.trim() ? query.q.trim() : undefined };
+    const filters = { authorId, q: query.q?.trim() ? query.q.trim() : undefined, sort: query.sort ?? 'publishedAt:desc' };
     const total = await this.opinions.countPublished(filters);
     const rows = await this.opinions.listPublished(filters, (page - 1) * limit, limit);
     const data = await Promise.all(rows.map((row) => this.toListItem(row, locale)));

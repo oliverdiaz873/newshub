@@ -7,6 +7,7 @@ const PUBLISHED = 'published';
 export interface OpinionFilters {
   authorId?: string;
   q?: string;
+  sort: 'publishedAt:desc' | 'publishedAt:asc';
 }
 
 export interface EditorialOpinionFilters {
@@ -46,7 +47,7 @@ export class OpinionsRepository {
   listPublished(filters: OpinionFilters, skip: number, take: number) {
     return this.prisma.opinion.findMany({
       where: this.baseWhere(filters),
-      orderBy: { publishedAt: 'desc' },
+      orderBy: { publishedAt: filters.sort === 'publishedAt:asc' ? 'asc' : 'desc' },
       skip,
       take,
       include: { translations: true, cover: true },
