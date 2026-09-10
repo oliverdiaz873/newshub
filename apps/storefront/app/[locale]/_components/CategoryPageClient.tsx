@@ -2,26 +2,32 @@
 
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { useCategory, RecentNewsSidebar, FeaturedNewsSection, LatestNewsSection } from '@/features/news';
+import { useCategory, FeaturedNewsSection, LatestNewsSection, OpinionSidebar } from '@/features/news';
+import type { CategoryPageContent } from '@/data/newsModels';
 import { NewsLayout } from '@/shared/layouts';
 import { useCategoryTranslation } from '@/features/news/hooks/useCategoryTranslation';
 
 
 /**
  * Category Page - Client Component
- * 
+ *
  * Página que orquestra la visualización de una sección de noticias (Salud, Deporte, etc.).
- * Utiliza el hook useCategory para abstraer la lógica de obtención de contenidos.
- * 
+ *
+ * F2.2 category API-first: the server-resolved content (API composition)
+ * takes precedence; the local hook remains only as the development
+ * fallback when the server could not resolve from the API
+ * (NEXT_PUBLIC_API_URL unset). The sidebar shows API opinions
+ * (GET /opinions?limit=3); sidebarNews.ts is no longer a render source.
+ *
  * Componentes usados:
  * - NewsLayout: Estructura de dos columnas (Main + Sidebar).
- * - RecentNewsSidebar: Barra lateral con noticias de la sección.
+ * - OpinionSidebar: Barra lateral con opiniones del API.
  * - FeaturedNewsSection: Grid de noticias destacadas de la categoría.
  * - LatestNewsSection: Listado inferior de noticias adicionales.
  */
-export const Category = () => {
+export const Category = ({ initialContent }: { initialContent?: CategoryPageContent | null }) => {
   const { content: rawContent } = useCategory();
-  const content = useCategoryTranslation(rawContent);
+  const content = useCategoryTranslation(initialContent ?? rawContent);
   const t = useTranslations('news');
   const tCommon = useTranslations('common');
 
@@ -51,9 +57,8 @@ export const Category = () => {
       <NewsLayout
         className="category-layout"
         sidebar={
-          <RecentNewsSidebar 
-            title={t('category.recentNews')}
-            articles={content.sidebarNews} 
+          <OpinionSidebar
+            articles={content.opinionArticles}
           />
         }
       >

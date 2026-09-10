@@ -9,6 +9,12 @@ export interface NewsArticle {
   imageUrl: string;
   alt: string;
   isBreaking?: boolean;
+  // F1.1 API-first provenance (optional so local static data keeps compiling).
+  // Present when mapped from the NestJS API; absent on legacy local objects.
+  author?: { slug: string; name: string; bio: string | null } | null;
+  updatedAt?: string;
+  fallback?: boolean;
+  localeResolved?: string;
 }
 
 export interface FullNewsArticle extends NewsArticle {
@@ -32,6 +38,11 @@ export interface OpinionArticle {
   alt: string;
   date: string;
   datetime: string;
+  // F2.0 API-first provenance (optional so local static data keeps compiling).
+  author?: { slug: string; name: string; bio: string | null } | null;
+  updatedAt?: string;
+  fallback?: boolean;
+  localeResolved?: string;
 }
 
 

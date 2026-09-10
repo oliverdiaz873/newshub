@@ -10,12 +10,14 @@ import type { ArticleContent, OpinionArticle } from '@/data/newsModels';
 
 /**
  * Opinion Page - Client Component
- * 
+ *
  * Página que orquestra la visualización de una columna de opinión individual.
  * Utiliza la misma plantilla que las noticias para mantener la consistencia visual.
  *
- * F1 adapter: accepts API-sourced article + sidebar; falls back to the local
- * hooks when absent (see src/lib/api.ts).
+ * F1.2 opinions API-first: the server-resolved article + sidebar
+ * (`detail` + `detail.related`) take precedence; the local hooks remain
+ * only as the development fallback when the server could not resolve
+ * from the API (NEXT_PUBLIC_API_URL unset).
  */
 export const Opinion = ({
   initialArticle,

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { latestNews, type NewsArticle } from '../../../../data';
+import { FALLBACK_OG_IMAGE } from '@/lib/api';
 import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 
 interface LatestNewsSectionProps {
@@ -33,7 +34,7 @@ export const LatestNewsSection = ({ title, articles: rawArticles = latestNews }:
             <Link href={article.href} aria-label={tCommon('readArticle', { title: article.title })} className="block text-inherit no-underline">
               <div className="relative mb-3 overflow-hidden rounded-lg h-48 md:h-56 lg:h-48">
                 <Image
-                  src={article.imageUrl}
+                  src={article.imageUrl || FALLBACK_OG_IMAGE}
                   alt={article.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

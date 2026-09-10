@@ -11,14 +11,15 @@ import type { FullNewsArticle } from '@/data/newsModels';
 
 /**
  * Article Page - Client Component
- * 
+ *
  * Página que orquestra la visualización de una noticia individual.
  * Delega la lógica de búsqueda al hook useNewsArticle para mantener un diseño limpio.
  *
- * F1 adapter: accepts an API-sourced article as the body source. The curated
- * `relatedNews` always come from the local layer until a dedicated endpoint
- * exists (see src/lib/api.ts).
- * 
+ * F1.1 detail API-first: the server-resolved article (API-first) is the
+ * body source, including `relatedNews` from `detail.related`. The local
+ * hook remains only as the development fallback when the server could
+ * not resolve from the API (NEXT_PUBLIC_API_URL unset).
+ *
  * Componentes usados:
  * - Breadcrumb: Navegación jerárquica (Inicio > Categoría > Noticia).
  * - NewsLayout: Estructura de dos columnas.
@@ -29,10 +30,7 @@ export const Article = ({ initialArticle }: { initialArticle?: FullNewsArticle |
   const translateArticle = useArticleTranslator();
   const { article: localArticle, categoryName, categorySlug } = useNewsArticle();
   const base = initialArticle ?? localArticle ?? undefined;
-  const withRelated = base
-    ? { ...base, relatedNews: localArticle?.relatedNews ?? base.relatedNews }
-    : base;
-  const article = translateArticle(withRelated);
+  const article = translateArticle(base);
   const t = useTranslations('news');
   const tCommon = useTranslations('common');
   const tData = useTranslations('data');

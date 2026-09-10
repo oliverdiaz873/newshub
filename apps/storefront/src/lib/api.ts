@@ -13,10 +13,15 @@
  * - search results ordering (API `q` contract covered by e2e; client keeps
  *   local ordering until search UX is designed)
  * - legal pages (static, no resource)
- * - article relatedNews (editorial curation, kept local)
+ *
+ * F1.1 detail API-first: article/opinion detail body, metadata, JSON-LD and
+ * related content come from the API. `local ?? API` is replaced by
+ * `API-first`; local static data remains only as a development fallback
+ * when NEXT_PUBLIC_API_URL is unset.
  */
 import type {
   ArticleContent,
+  CategoryPageContent,
   FullNewsArticle,
   NewsArticle,
   OpinionArticle,
@@ -52,12 +57,16 @@ export interface ApiArticleListItem {
   firstPublishedAt: string;
   updatedAt: string;
   fallback: boolean;
+  isBreaking: boolean;
+  isFeatured: boolean;
 }
 
 export interface ApiArticleDetail extends ApiArticleListItem {
   content: string[];
   breadcrumb: { home: string; category: string; current: string };
   related: ApiArticleListItem[];
+  localeRequested: string;
+  localeResolved: string;
 }
 
 export interface ApiOpinionListItem {
@@ -76,6 +85,8 @@ export interface ApiOpinionDetail extends ApiOpinionListItem {
   content: string[];
   breadcrumb: { home: string; category: string; current: string };
   related: ApiOpinionListItem[];
+  localeRequested: string;
+  localeResolved: string;
 }
 
 export interface ApiCategoryDetail {
@@ -130,6 +141,58 @@ export function apiGetNoStore<T>(path: string, locale: string): Promise<T | null
   return get<T>(path, locale, undefined, true);
 }
 
+/**
+ * F1.1 detail outcome: distinguishes why a detail fetch produced no data.
+ *
+ * - `ok`: API returned the resource.
+ * - `not-found`: API answered 404 (unknown slug, unpublished, or locale miss).
+ * - `error`: API answered 5xx or the request failed (network/DNS/CORS).
+ * - `unconfigured`: NEXT_PUBLIC_API_URL is unset (development fallback).
+ *
+ * Detail pages use this to apply the production fallback policy:
+ * ok → API, not-found → notFound(), error → error boundary (throw),
+ * unconfigured → local static data (development only).
+ */
+export type ApiFetchOutcome<T> =
+  | { data: T; reason: 'ok' }
+  | { data: null; reason: 'not-found' | 'error' | 'unconfigured' };
+
+async function getOutcome<T>(path: string, locale: string): Promise<ApiFetchOutcome<T>> {
+  const base = getApiBase();
+  if (!base) return { data: null, reason: 'unconfigured' };
+  try {
+    const separator = path.includes('?') ? '&' : '?';
+    const res = await fetch(
+      `${base}${path}${separator}locale=${encodeURIComponent(locale)}`,
+      { cache: 'no-store' },
+    );
+    if (!res.ok) {
+      return { data: null, reason: res.status === 404 ? 'not-found' : 'error' };
+    }
+    return { data: (await res.json()) as T, reason: 'ok' };
+  } catch {
+    return { data: null, reason: 'error' };
+  }
+}
+
+/** Detail fetch with outcome (no-store, publishing-sensitive). */
+export function apiGetNoStoreOutcome<T>(path: string, locale: string): Promise<ApiFetchOutcome<T>> {
+  return getOutcome<T>(path, locale);
+}
+
+/** Fallback OG/JSON-LD image when an article has no cover. Never emits "". */
+export const FALLBACK_OG_IMAGE = '/images/logo/logo.jpg';
+
+/**
+ * Absolute-safe image URL: absolute API covers (http...) pass through,
+ * root-relative paths are resolved against the site base URL.
+ */
+export function resolveArticleImage(baseUrl: string, imageUrl: string): string {
+  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+  if (!imageUrl) return `${baseUrl}${FALLBACK_OG_IMAGE}`;
+  return `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
+}
+
 /** Client-side fetch (no ISR options). */
 export function apiGetClient<T>(path: string, locale: string): Promise<T | null> {
   return get<T>(path, locale, undefined);
@@ -152,6 +215,9 @@ export function toNewsArticle(item: ApiArticleListItem, categorySlug: string): N
     summary: item.summary,
     imageUrl: item.cover?.url ?? '',
     alt: item.cover?.alt ?? item.title,
+    author: item.author,
+    updatedAt: item.updatedAt,
+    fallback: item.fallback,
   };
 }
 
@@ -164,8 +230,10 @@ export function toFullArticle(
   // the next-intl overlay (data.articles.<id>.*) resolves exactly as in the
   // local path. Raw API ids (slugs) miss those keys and render raw values,
   // which is correct only for content without a messages entry.
+  // TRANSITORIO hasta F6: el overlay local se elimina con messages/data.*.
   return {
     ...toNewsArticle(detail, categorySlug),
+    localeResolved: detail.localeResolved,
     content: detail.content,
     relatedNews,
     breadcrumb: {
@@ -174,6 +242,15 @@ export function toFullArticle(
       current: detail.breadcrumb.current,
     },
   };
+}
+
+/**
+ * F1.1: related articles come from `detail.related` (same category, API).
+ * The API omits `category` on related rows, so their `categorySlug` is
+ * empty; fall back to the parent category (identical by construction).
+ */
+export function toRelatedNews(related: ApiArticleListItem[], categorySlug: string): NewsArticle[] {
+  return related.map((item) => toNewsArticle(item, item.categorySlug || categorySlug));
 }
 
 export function toOpinionArticle(item: ApiOpinionListItem): OpinionArticle {
@@ -188,6 +265,9 @@ export function toOpinionArticle(item: ApiOpinionListItem): OpinionArticle {
     alt: item.cover?.alt ?? item.title,
     date: datePart(item.firstPublishedAt),
     datetime: item.firstPublishedAt,
+    author: item.author,
+    updatedAt: item.updatedAt,
+    fallback: item.fallback,
   };
 }
 
@@ -196,18 +276,85 @@ export function toOpinionDetail(detail: ApiOpinionDetail): ArticleContent {
     id: detail.slug,
     title: detail.title,
     href: `/opiniones/${detail.slug}`,
-    category: 'Opinion',
+    category: 'Opinión',
     date: datePart(detail.firstPublishedAt),
     datetime: detail.firstPublishedAt,
     summary: detail.summary,
     imageUrl: detail.cover?.url ?? '',
     alt: detail.cover?.alt ?? detail.title,
+    author: detail.author,
+    updatedAt: detail.updatedAt,
+    fallback: detail.fallback,
+    localeResolved: detail.localeResolved,
     content: detail.content,
-    relatedNews: [],
+    relatedNews: toRelatedOpinions(detail.related),
     breadcrumb: {
       home: detail.breadcrumb.home,
       category: detail.breadcrumb.category,
       current: detail.breadcrumb.current,
     },
+  };
+}
+
+/** F1.2: opinion sidebar comes from `detail.related` (latest, API). */
+export function toRelatedOpinions(related: ApiOpinionListItem[]): OpinionArticle[] {
+  return related.map(toOpinionArticle);
+}
+
+/**
+ * F2.0 deterministic category composition (frontend, no new endpoint).
+ *
+ * Locked rule:
+ * - featured pool = articles flagged isFeatured (API order), filled with
+ *   latest non-duplicates up to 6;
+ * - featuredIds = hrefs used in featured (primary/secondary/grid);
+ * - latestNews = first 6 recents not in featuredIds;
+ * - opinionArticles = provided separately (GET /opinions?limit=3);
+ * - never duplicate an article across sections; thin pools yield fewer
+ *   items (callers must tolerate short sections, never assume 4/6/11).
+ * - sidebarNews is presentation-only here: latest non-duplicates after
+ *   featured+latest (kept for the CategoryPageContent shape; the F2
+ *   category render uses the opinions sidebar instead).
+ */
+export function buildCategoryContent(
+  detail: ApiCategoryDetail,
+  articles: ApiArticleListItem[],
+  opinions: ApiOpinionListItem[],
+): CategoryPageContent {
+  const mapped = articles.map((item) => toNewsArticle(item, item.categorySlug || detail.slug));
+  const seen = new Set<string>();
+  const takeUnique = (pool: NewsArticle[], count: number): NewsArticle[] => {
+    const out: NewsArticle[] = [];
+    for (const article of pool) {
+      if (out.length >= count) break;
+      if (seen.has(article.href)) continue;
+      seen.add(article.href);
+      out.push(article);
+    }
+    return out;
+  };
+  const curated = takeUnique(
+    mapped.filter((article, index) => articles[index]?.isFeatured === true),
+    6,
+  );
+  const featured = [...curated, ...takeUnique(mapped, 6 - curated.length)];
+  const latestNews = takeUnique(mapped, 6);
+  const sidebarNews = takeUnique(mapped, 5);
+  const [primary, ...rest] = featured;
+  return {
+    slug: detail.slug,
+    label: detail.label,
+    description: detail.description ?? '',
+    featuredSection: {
+      title: detail.label,
+      primary: primary as NewsArticle,
+      secondary: [rest[0], rest[1], rest[2]] as [NewsArticle, NewsArticle, NewsArticle],
+      grid: rest.slice(3, 5),
+    },
+    latestTitle: `Mas en ${detail.label}`,
+    latestNews,
+    sidebarTitle: 'Opinion',
+    sidebarNews,
+    opinionArticles: opinions.map(toOpinionArticle),
   };
 }

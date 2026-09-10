@@ -10,6 +10,7 @@ import {
   type FeaturedSectionContent,
   type NewsArticle,
 } from '../../../../data';
+import { FALLBACK_OG_IMAGE } from '@/lib/api';
 import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 
 /** Muestra el bloque de metadatos editoriales de una noticia: fecha y categoria. */
@@ -33,6 +34,9 @@ const CardLink = ({
   imageClassName: string;
 }) => {
   const t = useTranslations('common');
+  // F2.0: API articles without cover carry imageUrl ''; never pass it to
+  // next/image or <img> (brand fallback instead, no visual change otherwise).
+  const imgSrc = article.imageUrl || FALLBACK_OG_IMAGE;
   return (
     <Link href={article.href} aria-label={t('readArticle', { title: article.title })} className="block text-inherit no-underline">
       {/* Se mantiene <img> en lugar de next/image porque:
@@ -40,7 +44,7 @@ const CardLink = ({
           - No hay dimensiones conocidas ni aspect-ratio consistente en todos los contextos (home vs categoría)
           - Migrar requeriría introducir restricciones de tamaño que alterarían el diseño actual
           - La estabilidad visual tiene prioridad sobre alcanzar el 100% de migración */}
-      <img src={article.imageUrl} alt={article.alt} loading="lazy" className={imageClassName} />
+      <img src={imgSrc} alt={article.alt} loading="lazy" className={imageClassName} />
       <h3 className={titleClassName}>{article.title}</h3>
       <ArticleMeta article={article} />
       <p className="text-[0.98rem] leading-[1.6] text-[#292f34] dark:text-[var(--color-text-primary)]">{article.summary}</p>
@@ -72,7 +76,17 @@ export const FeaturedNewsSection = ({ content }: FeaturedNewsSectionProps) => {
     grid: rawSectionContent.grid.map(translateArticle),
   };
 
-  const [secondary1, secondary2, secondary3] = sectionContent.secondary;
+  // F2.0: thin API pools yield fewer items; never assume 1+3+2.
+  // Undefined entries are dropped, an empty section renders nothing.
+  const primary = sectionContent.primary ?? undefined;
+  const secondary = sectionContent.secondary.filter(
+    (article): article is NewsArticle => article != null,
+  );
+  const grid = sectionContent.grid.filter(
+    (article): article is NewsArticle => article != null,
+  );
+  if (!primary) return null;
+  const [secondary1, secondary2, secondary3] = secondary;
 
   return (
     <section className="rounded-lg bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[var(--color-surface-base)] font-sans">
@@ -88,7 +102,7 @@ export const FeaturedNewsSection = ({ content }: FeaturedNewsSectionProps) => {
             <div className="mb-4 xl:order-2 xl:mb-0 xl:w-[70%]">
               <div className="relative overflow-hidden rounded-lg aspect-video">
                 <Image
-                  src={sectionContent.primary.imageUrl}
+                  src={sectionContent.primary.imageUrl || FALLBACK_OG_IMAGE}
                   alt={sectionContent.primary.alt}
                   fill
                   sizes="(max-width: 1280px) 100vw, 70vw"
@@ -110,31 +124,25 @@ export const FeaturedNewsSection = ({ content }: FeaturedNewsSectionProps) => {
       </div>
 
       <div className="mb-1 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <article className="news-card-home h-full rounded-lg bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.15)] dark:bg-[var(--color-surface-base)]">
-          <CardLink
-            article={secondary1}
-            imageClassName="mb-3 w-full rounded-lg transition-transform duration-300 hover:scale-105"
-            titleClassName="mb-2 text-xl font-semibold leading-snug text-neutral-900 transition-colors duration-300 hover:text-[#dc3545] dark:text-[var(--color-text-primary)]"
-          />
-        </article>
-        <article className="news-card-home h-full rounded-lg bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.15)] dark:bg-[var(--color-surface-base)]">
-          <CardLink
-            article={secondary2}
-            imageClassName="mb-3 w-full rounded-lg transition-transform duration-300 hover:scale-105"
-            titleClassName="mb-2 text-xl font-semibold leading-snug text-neutral-900 transition-colors duration-300 hover:text-[#dc3545] dark:text-[var(--color-text-primary)]"
-          />
-        </article>
-        <article className="news-card-home h-full rounded-lg bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.15)] dark:bg-[var(--color-surface-base)]">
-          <CardLink
-            article={secondary3}
-            imageClassName="mb-3 w-full rounded-lg transition-transform duration-300 hover:scale-105"
-            titleClassName="mb-2 text-xl font-semibold leading-snug text-neutral-900 transition-colors duration-300 hover:text-[#dc3545] dark:text-[var(--color-text-primary)]"
-          />
-        </article>
+        {[secondary1, secondary2, secondary3].map(
+          (article) =>
+            article && (
+              <article
+                key={article.id}
+                className="news-card-home h-full rounded-lg bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.15)] dark:bg-[var(--color-surface-base)]"
+              >
+                <CardLink
+                  article={article}
+                  imageClassName="mb-3 w-full rounded-lg transition-transform duration-300 hover:scale-105"
+                  titleClassName="mb-2 text-xl font-semibold leading-snug text-neutral-900 transition-colors duration-300 hover:text-[#dc3545] dark:text-[var(--color-text-primary)]"
+                />
+              </article>
+            ),
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {sectionContent.grid.map((article) => (
+        {grid.map((article) => (
           <article
             key={article.id}
             className="news-card-home h-full rounded-lg bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.15)] dark:bg-[var(--color-surface-base)]"

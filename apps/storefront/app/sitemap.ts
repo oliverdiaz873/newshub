@@ -57,10 +57,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locales = routing.locales
   const baseUrl = SITE_URL
 
+  // F2.3: /search is intentionally excluded (query pages must not be
+  // indexed). Static entries are UI routes; editorial URLs come from the
+  // API-primary merge below (local branches remain as dev-build fallback).
   const staticPages = locales.flatMap((locale) =>
     [
       '',
-      '/search',
       '/legal/privacy',
       '/legal/terms',
     ].map((route) => ({
