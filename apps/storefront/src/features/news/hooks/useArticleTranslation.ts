@@ -18,8 +18,19 @@ export const useArticleTranslator = () => {
     if (!article || !article.id) return article as T;
 
     const articleId = article.id;
-    
+
+    // F1.4: when the API already resolved the requested locale
+    // (fallback === false and localeResolved === locale), use the API
+    // values directly. The data.articles.* overlay applies only as a
+    // transitory fallback when a local key exists. Local static objects
+    // carry no provenance flags, so they keep the legacy overlay path.
+    // TRANSITORIO hasta F6: el overlay desaparece con messages/data.*.
+    const apiLocalized =
+      (article as { fallback?: boolean }).fallback === false &&
+      (article as { localeResolved?: string }).localeResolved === locale;
+
     const getVal = (key: string, defaultValue: string) => {
+      if (apiLocalized) return defaultValue;
       return t.has(key) ? t(key) : defaultValue;
     };
 
@@ -64,7 +75,7 @@ export const useArticleTranslator = () => {
       
       // Intentamos obtener el contenido traducido (array)
       const contentKey = `data.articles.${articleId}.content`;
-      if (t.has(contentKey)) {
+      if (!apiLocalized && t.has(contentKey)) {
         const translatedContent = t.raw(contentKey);
         if (Array.isArray(translatedContent)) {
           fullArticle.content = translatedContent.filter((item): item is string => typeof item === 'string');
