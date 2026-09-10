@@ -301,6 +301,56 @@ export function toRelatedOpinions(related: ApiOpinionListItem[]): OpinionArticle
   return related.map(toOpinionArticle);
 }
 
+export type SearchResultItem = NewsArticle | OpinionArticle;
+
+export interface SearchOutcome {
+  results: SearchResultItem[];
+  totalArticles: number;
+  totalOpinions: number;
+}
+
+/**
+ * F3.0 unified search (frontend composition, no /search endpoint).
+ *
+ * Parallel `GET /articles?q=` + `GET /opinions?q=` with the F1/F2 outcome
+ * policy (no-store, publishing-sensitive): callers map `not-found` (no
+ * matches) to empty results, `error` to the error boundary, and
+ * `unconfigured` to the development local fallback.
+ * Merge order is `firstPublishedAt` DESC (no relevance ranking in v1).
+ * Known MVP limitation: API matching is accent-sensitive ILIKE over
+ * title/summary only; `economia` does not match `Economía`.
+ */
+export async function searchAll(
+  q: string,
+  locale: string,
+  limit = 50,
+): Promise<{ outcome: 'ok'; data: SearchOutcome } | { outcome: 'error' | 'unconfigured'; data: null }> {
+  const encoded = `q=${encodeURIComponent(q)}&limit=${limit}`;
+  const [arts, ops] = await Promise.all([
+    apiGetNoStoreOutcome<ApiList<ApiArticleListItem>>(`/articles?${encoded}`, locale),
+    apiGetNoStoreOutcome<ApiList<ApiOpinionListItem>>(`/opinions?${encoded}`, locale),
+  ]);
+  if (arts.reason === 'error' || ops.reason === 'error') {
+    return { outcome: 'error', data: null };
+  }
+  if (arts.reason === 'unconfigured' || ops.reason === 'unconfigured') {
+    return { outcome: 'unconfigured', data: null };
+  }
+  const articles = (arts.data?.data ?? []).map((item) => toNewsArticle(item, item.categorySlug));
+  const opinions = (ops.data?.data ?? []).map(toOpinionArticle);
+  const results: SearchResultItem[] = [...articles, ...opinions].sort((a, b) =>
+    b.datetime.localeCompare(a.datetime),
+  );
+  return {
+    outcome: 'ok',
+    data: {
+      results,
+      totalArticles: arts.data?.meta.total ?? 0,
+      totalOpinions: ops.data?.meta.total ?? 0,
+    },
+  };
+}
+
 /**
  * F2.0 deterministic category composition (frontend, no new endpoint).
  *

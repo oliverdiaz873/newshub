@@ -1,25 +1,31 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createTranslator } from 'next-intl';
+import { createTranslator, useLocale } from 'next-intl';
 import { newsArticles, opinionArticles } from '../../../data';
 import { hasSearchQuery, matchesSearchQuery } from '../../../shared/utils/searchUtils';
+import { getApiBase, searchAll, type SearchResultItem } from '@/lib/api';
 
 /**
  * Hook para gestionar la lógica de búsqueda global de noticias y opiniones.
- * 
- * Filtra los datos centralizados basándose en el parámetro 'q' de la URL.
- * Búsqueda bilingüe: siempre busca en AMBOS idiomas (ES + EN),
- * independientemente del idioma activo, para una experiencia profesional.
- * 
- * El diccionario EN se carga dinámicamente solo cuando hay una query activa
- * para evitar incluir ~91KB en el bundle inicial del cliente.
+ *
+ * F3.1 search API-first: con NEXT_PUBLIC_API_URL configurado, los
+ * resultados vienen de GET /articles?q= + GET /opinions?q= en paralelo
+ * (merge por publishedAt DESC). La capa local estática permanece
+ * únicamente como fallback de desarrollo (API no configurada).
+ * Limitación MVP conocida: el matching API es ILIKE sensible a tildes
+ * sobre title/summary; `economia` no encuentra `Economía`.
  */
 export const useSearch = (overrideQuery?: string) => {
   const searchParams = useSearchParams();
   const query = overrideQuery !== undefined ? overrideQuery : (searchParams.get('q') || '');
+  const locale = useLocale();
+  const apiBase = getApiBase();
   const [enTranslator, setEnTranslator] = useState<((key: string) => string) | null>(null);
+  const [apiResults, setApiResults] = useState<SearchResultItem[] | null>(null);
+  const [apiError, setApiError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (apiBase) return;
     if (hasSearchQuery(query)) {
       let cancelled = false;
       import('../../../../messages/en.json').then((mod) => {
@@ -31,9 +37,34 @@ export const useSearch = (overrideQuery?: string) => {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional cache reset: frees the EN translator when the query is cleared; results are already [] via the useMemo guard below, so no cascading render affects output
       setEnTranslator(null);
     }
-  }, [query]);
+  }, [query, apiBase]);
 
-  const results = useMemo(() => {
+  useEffect(() => {
+    if (!apiBase || !hasSearchQuery(query)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional cache reset: clears API results/error when the query is cleared or API is unavailable; consumers already render []/fallback from null, so no cascading render affects output
+      setApiResults(null);
+      setApiError(null);
+      return;
+    }
+    let cancelled = false;
+    searchAll(query, locale).then(
+      (res) => {
+        if (cancelled) return;
+        if (res.outcome === 'ok' && res.data) setApiResults(res.data.results);
+        else if (res.outcome === 'error') setApiError(new Error(`Newshub API search failed for q=${query}`));
+        else setApiResults(null);
+      },
+      (err: unknown) => {
+        if (!cancelled) setApiError(err instanceof Error ? err : new Error('Newshub API search failed'));
+      },
+    );
+    return () => { cancelled = true; };
+  }, [query, locale, apiBase]);
+
+  // Error de backend -> error.tsx (nunca datos locales en producción).
+  if (apiError) throw apiError;
+
+  const localResults = useMemo(() => {
     if (!hasSearchQuery(query) || !enTranslator) return [];
 
     const allContent = [
@@ -63,6 +94,8 @@ export const useSearch = (overrideQuery?: string) => {
       );
     });
   }, [query, enTranslator]);
+
+  const results = apiBase ? (apiResults ?? []) : localResults;
 
   return {
     query,

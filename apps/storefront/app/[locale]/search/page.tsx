@@ -19,6 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: `${baseUrl}${path}/search`,
     },
+    // F3.2: result pages (?q=) carry no stable editorial URLs.
+    robots: { index: false, follow: true },
   };
 }
 
