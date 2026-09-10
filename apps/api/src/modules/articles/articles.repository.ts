@@ -24,7 +24,10 @@ export interface EditorialArticleFilters {
 
 /**
  * Thin repository: published-only reads for the F1 public surface.
- * `q` is basic ILIKE-level filtering (contract-stable, tuning deferred).
+ * `q` is accent-insensitive ILIKE-level filtering via the `unaccent`
+ * extension (migration 20260911000000): unaccent(title/summary) is
+ * compared so `economia` matches `Economía`. Contract-stable otherwise
+ * (contains semantics, title/summary only, tuning deferred).
  */
 @Injectable()
 export class ArticlesRepository {
@@ -36,37 +39,116 @@ export class ArticlesRepository {
     if (filters.authorId) where.authorId = filters.authorId;
     if (filters.breaking !== undefined) where.isBreaking = filters.breaking;
     if (filters.featured !== undefined) where.isFeatured = filters.featured;
-    if (filters.q) {
-      // F1 basic: accent-sensitive ILIKE. Accent-insensitive search (unaccent/pg_trgm)
-      // is deferred to the future search evolution; the `q` param shape stays stable.
-      where.translations = {
-        some: {
-          OR: [
-            { title: { contains: filters.q, mode: 'insensitive' } },
-            { summary: { contains: filters.q, mode: 'insensitive' } },
-          ],
-        },
-      };
-    }
+    // NOTE: `q` is intentionally absent here. Accent-insensitive matching
+    // requires unaccent(), which Prisma cannot express fluently, so every
+    // q-filtered read goes through findQIds()/countQ() below (raw SQL with
+    // the identical predicate for page and total).
     return where;
   }
 
-  countPublished(filters: ArticleFilters) {
-    return this.prisma.article.count({ where: this.baseWhere(filters) });
+  /**
+   * Accent-insensitive q predicate over translation title/summary.
+   * Shared by the COUNT and page-id queries so total and results can
+   * never diverge.
+   */
+  private foldQExpr(expr: Prisma.Sql): Prisma.Sql {
+    // unaccent() folds ñ->n on our PostgreSQL build, but ñ is a distinct
+    // Spanish letter, so it is shielded through control chars (assumed
+    // absent from editorial content; slugs already forbid them via CHECK).
+    return Prisma.sql`replace(replace(unaccent(replace(replace(${expr}, 'ñ', chr(1)), 'Ñ', chr(2))), chr(1), 'ñ'), chr(2), 'Ñ')`;
   }
 
-  listPublished(filters: ArticleFilters, skip: number, take: number) {
-    return this.prisma.article.findMany({
-      where: this.baseWhere(filters),
-      orderBy: { publishedAt: filters.sort === 'publishedAt:asc' ? 'asc' : 'desc' },
-      skip,
-      take,
+  private qMatch(q: string): Prisma.Sql {
+    const pattern = `%${q}%`;
+    return Prisma.sql`(${this.foldQExpr(Prisma.sql`"t"."title"`)} ILIKE ${this.foldQExpr(Prisma.sql`${pattern}`)} OR ${this.foldQExpr(Prisma.sql`"t"."summary"`)} ILIKE ${this.foldQExpr(Prisma.sql`${pattern}`)})`;
+  }
+
+  private qPredicates(
+    status: Prisma.Sql,
+    filters: { categoryId?: string; authorId?: string; breaking?: boolean; featured?: boolean; q: string },
+  ): Prisma.Sql {
+    const parts: Prisma.Sql[] = [status];
+    if (filters.categoryId) parts.push(Prisma.sql`a."category_id" = ${filters.categoryId}::uuid`);
+    if (filters.authorId) parts.push(Prisma.sql`a."author_id" = ${filters.authorId}::uuid`);
+    if (filters.breaking !== undefined) parts.push(Prisma.sql`a."is_breaking" = ${filters.breaking}`);
+    if (filters.featured !== undefined) parts.push(Prisma.sql`a."is_featured" = ${filters.featured}`);
+    parts.push(
+      Prisma.sql`EXISTS (SELECT 1 FROM "article_translations" "t" WHERE "t"."article_id" = a."id" AND ${this.qMatch(filters.q)})`,
+    );
+    return Prisma.join(parts, ' AND ');
+  }
+
+  private qWherePublished(filters: ArticleFilters & { q: string }): Prisma.Sql {
+    return this.qPredicates(Prisma.sql`a."status" = ${PUBLISHED}`, filters);
+  }
+
+  private qWhereAny(filters: EditorialArticleFilters & { q: string }): Prisma.Sql {
+    const parts: Prisma.Sql[] = [];
+    if (filters.status) parts.push(Prisma.sql`a."status" = ${filters.status}`);
+    return this.qPredicates(
+      parts.length > 0 ? Prisma.join(parts, ' AND ') : Prisma.sql`TRUE`,
+      filters,
+    );
+  }
+
+  private async findQIds(
+    where: Prisma.Sql,
+    order: Prisma.Sql,
+    skip: number,
+    take: number,
+  ): Promise<string[]> {
+    const rows = await this.prisma.$queryRaw<Array<{ id: string }>>(
+      Prisma.sql`SELECT a."id" AS id FROM "articles" a WHERE ${where} ORDER BY ${order} LIMIT ${take} OFFSET ${skip}`,
+    );
+    return rows.map((r) => r.id);
+  }
+
+  private async countQ(where: Prisma.Sql): Promise<number> {
+    const rows = await this.prisma.$queryRaw<Array<{ count: bigint }>>(
+      Prisma.sql`SELECT COUNT(*) AS count FROM "articles" a WHERE ${where}`,
+    );
+    return Number(rows[0]?.count ?? 0);
+  }
+
+  private async findByQIds(ids: string[]) {
+    if (ids.length === 0) return [];
+    const rows = await this.prisma.article.findMany({
+      where: { id: { in: ids } },
       include: {
         translations: true,
         cover: true,
         category: { include: { translations: true } },
       },
     });
+    // findMany({ id: { in } }) does not preserve the raw search order.
+    const order = new Map(ids.map((id, i) => [id, i] as const));
+    rows.sort((x, y) => (order.get(x.id) ?? 0) - (order.get(y.id) ?? 0));
+    return rows;
+  }
+
+  countPublished(filters: ArticleFilters) {
+    if (!filters.q) return this.prisma.article.count({ where: this.baseWhere(filters) });
+    return this.countQ(this.qWherePublished({ ...filters, q: filters.q }));
+  }
+
+  listPublished(filters: ArticleFilters, skip: number, take: number) {
+    if (!filters.q) {
+      return this.prisma.article.findMany({
+        where: this.baseWhere(filters),
+        orderBy: { publishedAt: filters.sort === 'publishedAt:asc' ? 'asc' : 'desc' },
+        skip,
+        take,
+        include: {
+          translations: true,
+          cover: true,
+          category: { include: { translations: true } },
+        },
+      });
+    }
+    const dir = filters.sort === 'publishedAt:asc' ? Prisma.raw('ASC') : Prisma.raw('DESC');
+    return this.findQIds(this.qWherePublished({ ...filters, q: filters.q }), Prisma.sql`a."published_at" ${dir}`, skip, take).then(
+      (ids) => this.findByQIds(ids),
+    );
   }
 
   findBySlug(slug: string, locale: string) {
@@ -111,35 +193,35 @@ export class ArticlesRepository {
     if (filters.authorId) where.authorId = filters.authorId;
     if (filters.breaking !== undefined) where.isBreaking = filters.breaking;
     if (filters.featured !== undefined) where.isFeatured = filters.featured;
-    if (filters.q) {
-      where.translations = {
-        some: {
-          OR: [
-            { title: { contains: filters.q, mode: 'insensitive' } },
-            { summary: { contains: filters.q, mode: 'insensitive' } },
-          ],
-        },
-      };
-    }
+    // NOTE: `q` is intentionally absent here (see baseWhere comment).
     return where;
   }
 
   countAny(filters: EditorialArticleFilters) {
-    return this.prisma.article.count({ where: this.editorialWhere(filters) });
+    if (!filters.q) return this.prisma.article.count({ where: this.editorialWhere(filters) });
+    return this.countQ(this.qWhereAny({ ...filters, q: filters.q }));
   }
 
   listAny(filters: EditorialArticleFilters, skip: number, take: number) {
-    return this.prisma.article.findMany({
-      where: this.editorialWhere(filters),
-      orderBy: [{ publishedAt: { sort: 'desc', nulls: 'last' } }, { updatedAt: 'desc' }],
-      skip,
-      take,
-      include: {
-        translations: true,
-        cover: true,
-        category: { include: { translations: true } },
-      },
-    });
+    if (!filters.q) {
+      return this.prisma.article.findMany({
+        where: this.editorialWhere(filters),
+        orderBy: [{ publishedAt: { sort: 'desc', nulls: 'last' } }, { updatedAt: 'desc' }],
+        skip,
+        take,
+        include: {
+          translations: true,
+          cover: true,
+          category: { include: { translations: true } },
+        },
+      });
+    }
+    // Mirrors the fluent ordering exactly: publishedAt DESC NULLS LAST,
+    // then updatedAt DESC.
+    const order = Prisma.sql`a."published_at" DESC NULLS LAST, a."updated_at" DESC`;
+    return this.findQIds(this.qWhereAny({ ...filters, q: filters.q }), order, skip, take).then((ids) =>
+      this.findByQIds(ids),
+    );
   }
 
   findByIdFull(id: string) {

@@ -42,6 +42,15 @@ test('search includes opinions and EN fallback', async ({ page }) => {
   await expect(page.locator('main h3').first()).toBeVisible({ timeout: 30_000 });
 });
 
+test('search matches without accents (unaccent)', async ({ page }) => {
+  // API unaccent: `politica` finds `Política`. Documents the accent
+  // limitation closed by the backend; no exact-tilde query needed.
+  await page.goto(`${STOREFRONT}/es/search?q=politica`, { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('main h3', { hasText: /pol[ií]tica/i }).first()).toBeVisible({
+    timeout: 30_000,
+  });
+});
+
 test('short and empty queries never hit the API', async ({ page }) => {
   let apiCalls = 0;
   await page.route('**/api/v1/**', (route) => {
