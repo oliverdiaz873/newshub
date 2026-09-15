@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Sidebar } from '@/components/Sidebar';
-import { Topbar } from '@/components/Topbar';
+import { Sidebar } from '@/shared/components/Sidebar';
+import { Topbar } from '@/shared/components/Topbar';
 
 /**
  * Dashboard shell: sidebar (drawer on mobile, collapse on desktop) +

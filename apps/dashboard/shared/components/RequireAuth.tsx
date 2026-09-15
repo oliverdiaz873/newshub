@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/shared/api/auth';
 
 /**
  * Client-side route guard. Server middleware cannot see the HttpOnly

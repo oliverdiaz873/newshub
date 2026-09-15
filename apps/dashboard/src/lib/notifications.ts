@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/shared/api/auth';
 
 export interface NotificationItem {
   id: string;

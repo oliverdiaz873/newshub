@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { ConfirmDialog } from '@/components/Modal';
-import { EmptyState, ErrorState, Skeleton } from '@/components/States';
-import { Paginator, Table } from '@/components/Table';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { ConfirmDialog } from '@/shared/components/Modal';
+import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
+import { Paginator, Table } from '@/shared/components/Table';
 import { CONTENT_SLUG_PATTERN } from '@/lib/validate-content';
 
 interface AuthorRow {

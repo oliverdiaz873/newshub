@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { getApiBase } from '@/lib/config';
-import { useUiPrefs, type Density, type PreviewLanguage } from '@/lib/ui-prefs';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { useToast } from '@/components/Toasts';
+import { useAuth } from '@/shared/api/auth';
+import { getApiBase } from '@/shared/api/config';
+import { useUiPrefs, type Density, type PreviewLanguage } from '@/shared/lib/ui-prefs';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { useToast } from '@/shared/components/Toasts';
 import { NOTIFICATION_TYPES, typeLabelKey } from '@/lib/notifications';
 
 function SettingsBody() {

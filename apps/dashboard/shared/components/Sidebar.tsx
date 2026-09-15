@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useSidebarCollapsed } from '@/lib/ui-prefs';
+import { useSidebarCollapsed } from '@/shared/lib/ui-prefs';
 import { useUnreadCount } from '@/lib/notifications';
 
 const MANAGE: Array<{ href: string; key: string }> = [

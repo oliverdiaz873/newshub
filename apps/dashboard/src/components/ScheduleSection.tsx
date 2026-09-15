@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { useDashboardLocale } from '@/lib/i18n';
-import { ConfirmDialog } from '@/components/Modal';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { useDashboardLocale } from '@/shared/lib/i18n';
+import { ConfirmDialog } from '@/shared/components/Modal';
 import {
   fromLocalInputValue,
   isOverdue,

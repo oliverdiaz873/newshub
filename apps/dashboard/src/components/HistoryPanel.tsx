@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { ConfirmDialog } from '@/components/Modal';
-import { EmptyState, ErrorState, Skeleton } from '@/components/States';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { ConfirmDialog } from '@/shared/components/Modal';
+import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { diffSnapshots, type RevisionSnapshotShape } from '@/lib/revision-diff';
 
 interface RevisionRow {

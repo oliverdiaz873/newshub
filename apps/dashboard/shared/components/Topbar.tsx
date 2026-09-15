@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useTheme } from '@/lib/theme';
-import { useDashboardLocale } from '@/lib/i18n';
-import { useToast } from '@/components/Toasts';
+import { useAuth } from '@/shared/api/auth';
+import { useTheme } from '@/shared/lib/theme';
+import { useDashboardLocale } from '@/shared/lib/i18n';
+import { useToast } from '@/shared/components/Toasts';
 
 export function ThemeToggle() {
   const t = useTranslations('theme');

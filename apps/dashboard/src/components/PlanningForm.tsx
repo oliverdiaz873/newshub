@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { Modal } from '@/components/Modal';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { Modal } from '@/shared/components/Modal';
 import { fromLocalInputValue, localZoneLabel, toLocalInputValue } from '@/lib/schedule';
 import type { PlanningItem } from '@/lib/planning';
 

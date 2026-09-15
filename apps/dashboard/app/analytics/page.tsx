@@ -2,12 +2,12 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useDashboardLocale } from '@/lib/i18n';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { EmptyState, ErrorState, Skeleton } from '@/components/States';
-import { LoadingFallback } from '@/components/LoadingFallback';
+import { useAuth } from '@/shared/api/auth';
+import { useDashboardLocale } from '@/shared/lib/i18n';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
+import { LoadingFallback } from '@/shared/components/LoadingFallback';
 import { toRelativeLabel } from '@/lib/schedule';
 
 interface CategoryItem {

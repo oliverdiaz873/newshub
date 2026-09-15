@@ -3,16 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { ConfirmDialog, Modal } from '@/components/Modal';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { ConfirmDialog, Modal } from '@/shared/components/Modal';
 import { SeoChecklist } from '@/components/SeoChecklist';
 import { LocaleTabs } from '@/components/LocaleTabs';
 import { HistoryPanel } from '@/components/HistoryPanel';
 import { ScheduleSection } from '@/components/ScheduleSection';
-import { ErrorState } from '@/components/States';
+import { ErrorState } from '@/shared/components/States';
 import { MediaPicker } from '@/components/MediaPicker';
-import { useDirtyGuard } from '@/lib/dirty';
+import { useDirtyGuard } from '@/shared/lib/dirty';
 import {
   ARTICLE_FIELD_ORDER,
   buildTranslations,

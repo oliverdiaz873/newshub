@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { LoadingFallback } from '@/components/LoadingFallback';
+import { useAuth } from '@/shared/api/auth';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { LoadingFallback } from '@/shared/components/LoadingFallback';
 
 function LoginForm() {
   const t = useTranslations('login');

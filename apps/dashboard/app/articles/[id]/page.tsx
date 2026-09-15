@@ -3,10 +3,10 @@
 import { use, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { ErrorState, Skeleton } from '@/components/States';
+import { useAuth } from '@/shared/api/auth';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { ErrorState, Skeleton } from '@/shared/components/States';
 import { ArticleEditor } from '@/components/ArticleEditor';
 import type { ArticleFormValue } from '@/lib/validate-article';
 

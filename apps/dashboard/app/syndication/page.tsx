@@ -2,14 +2,14 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { ConfirmDialog, Modal } from '@/components/Modal';
-import { EmptyState, ErrorState, Skeleton } from '@/components/States';
-import { Table } from '@/components/Table';
-import { LoadingFallback } from '@/components/LoadingFallback';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { ConfirmDialog, Modal } from '@/shared/components/Modal';
+import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
+import { Table } from '@/shared/components/Table';
+import { LoadingFallback } from '@/shared/components/LoadingFallback';
 import { toLocalLabel } from '@/lib/schedule';
 
 interface Subscription {

@@ -3,14 +3,14 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { ConfirmDialog } from '@/components/Modal';
-import { EmptyState, ErrorState, Skeleton } from '@/components/States';
-import { Paginator } from '@/components/Table';
-import { LoadingFallback } from '@/components/LoadingFallback';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { ConfirmDialog } from '@/shared/components/Modal';
+import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
+import { Paginator } from '@/shared/components/Table';
+import { LoadingFallback } from '@/shared/components/LoadingFallback';
 import { MediaThumb, mediaLabel, type MediaOption } from '@/components/MediaCard';
 
 interface MediaRow extends MediaOption {

@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/components/Toasts';
-import { EmptyState, ErrorState, Skeleton } from '@/components/States';
+import { useAuth } from '@/shared/api/auth';
+import { useToast } from '@/shared/components/Toasts';
+import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { MediaThumb, mediaLabel, type MediaOption } from '@/components/MediaCard';
 
 export type { MediaOption };
