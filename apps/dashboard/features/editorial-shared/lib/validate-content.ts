@@ -5,7 +5,9 @@
  * rebaseline.
  */
 
-export const CONTENT_SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+import { CONTENT_SLUG_PATTERN } from '@/shared/lib/slug';
+
+export { CONTENT_SLUG_PATTERN };
 
 export interface TranslationForm {
   slug: string;
