@@ -1,0 +1,135 @@
+import { expect, test, type Page } from '@playwright/test';
+
+const RUN = Date.now().toString(36);
+const EDITOR = { email: 'editor@newshub.local', password: 'Editor123!' };
+const REVIEWER = { email: 'reviewer@newshub.local', password: 'Reviewer123!' };
+
+/**
+ * UI login (sets session + user via the real form). Lands on `/`
+ * (the login default). Callers use in-app navigation afterwards so the
+ * client session is preserved (no full-page reloads).
+ */
+async function uiLogin(page: Page, email: string, password: string) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(email);
+  await page.getByLabel('Contraseña').fill(password);
+  await page.getByRole('button', { name: 'Acceder' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/');
+}
+
+async function uiLogout(page: Page) {
+  await page.getByRole('button', { name: 'Salir' }).click();
+  await expect(page).toHaveURL(/\/login/);
+}
+
+async function filterReviewQueue(page: Page) {
+  await page.getByLabel('Estado').first().selectOption('review');
+  await page.locator('#articles-q').fill(RUN);
+}
+
+async function createDraftViaNew(page: Page, slug: string, title: string) {
+  await page.getByRole('link', { name: 'Artículos' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/articles');
+  await page.getByRole('link', { name: 'Nuevo artículo' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/articles/new');
+  await page.getByLabel('Categoría').selectOption({ index: 1 });
+  await page.getByLabel('Slug', { exact: true }).first().fill(slug);
+  await page.getByLabel('Título', { exact: true }).first().fill(title);
+  await page.getByLabel('Resumen', { exact: true }).first().fill('Resumen suficientemente largo para la validacion.');
+  await page.getByLabel(/Contenido/, { exact: true }).first().fill('Cuerpo de revision.');
+  await page.getByRole('button', { name: 'Crear', exact: true }).click();
+  await expect(page).toHaveURL(/\/articles\/.+/);
+}
+
+test('editor submits review, reviewer approves, content becomes published', async ({ page }) => {
+  await uiLogin(page, EDITOR.email, EDITOR.password);
+  const slug = `e2e-rev-${RUN}`;
+  const title = `E2E Revision titulo largo ${RUN}`;
+  await createDraftViaNew(page, slug, title);
+
+  // Draft direct-publish is gone from the UI (two-step approval).
+  await expect(page.getByRole('button', { name: 'Publicar' })).toHaveCount(0);
+
+  // Submit for review from the detail editor.
+  await page.getByRole('button', { name: 'Enviar a revisión' }).click();
+  await expect(page.getByText('Artículo guardado.')).toBeVisible();
+
+  // Reviewer approves.
+  await uiLogout(page);
+  await uiLogin(page, REVIEWER.email, REVIEWER.password);
+  await page.getByRole('link', { name: 'Artículos' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/articles');
+  await filterReviewQueue(page);
+  const reviewRow = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
+  await expect(reviewRow.getByRole('cell', { name: 'review' })).toBeVisible();
+  await reviewRow.getByRole('button', { name: 'Publicar' }).click();
+  // Approving leaves the review filter set, so reset it before asserting.
+  await page.getByLabel('Estado').first().selectOption('all');
+  const publishedRow = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
+  await expect(publishedRow.getByRole('cell', { name: 'published' })).toBeVisible();
+});
+
+test('reviewer rejects with reason, content returns to draft', async ({ page }) => {
+  await uiLogin(page, EDITOR.email, EDITOR.password);
+  const slug = `e2e-rej-${RUN}`;
+  const title = `E2E Rechazo titulo largo ${RUN}`;
+  await createDraftViaNew(page, slug, title);
+  await page.getByRole('button', { name: 'Enviar a revisión' }).click();
+  await expect(page.getByText('Artículo guardado.')).toBeVisible();
+
+  await uiLogout(page);
+  await uiLogin(page, REVIEWER.email, REVIEWER.password);
+  await page.getByRole('link', { name: 'Artículos' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/articles');
+  await filterReviewQueue(page);
+  const reviewRow = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
+  const editLink = reviewRow.getByRole('link', { name: 'Editar' });
+  await expect(editLink).toBeVisible();
+  await editLink.click();
+  try {
+    await expect(page).toHaveURL(/\/articles\/.+/, { timeout: 5000 });
+  } catch {
+    // List re-renders (debounced filter sync) can swallow a click; retry once.
+    await editLink.click();
+    await expect(page).toHaveURL(/\/articles\/.+/);
+  }
+  await page.getByRole('button', { name: 'Rechazar' }).click();
+  await page.getByLabel('Motivo').fill('Actualiza la fuente por favor.');
+  await page.getByRole('dialog').getByRole('button', { name: 'Rechazar' }).click();
+  await expect(page.getByText('Artículo devuelto a borrador.')).toBeVisible();
+
+  await page.getByRole('link', { name: 'Notificaciones' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/notifications');
+  await expect(page.getByRole('heading', { name: 'Notificaciones' })).toBeVisible();
+  await expect(page.getByRole('table')).toBeVisible();
+});
+
+test('notification preferences toggle persists via API', async ({ page }) => {
+  await uiLogin(page, REVIEWER.email, REVIEWER.password);
+  await page.getByRole('link', { name: 'Ajustes' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/settings');
+  const box = page.getByRole('checkbox', { name: 'Publicado', exact: true });
+  await expect(box).toBeChecked();
+  await box.uncheck();
+  await expect(page.getByText('Preferencias guardadas.').first()).toBeVisible();
+  await expect(box).not.toBeChecked();
+  await expect(page.getByText('Preferencias guardadas.')).toBeHidden({ timeout: 10000 });
+  await box.check();
+  await expect(page.getByText('Preferencias guardadas.').first()).toBeVisible();
+  await expect(box).toBeChecked();
+});
+
+test('reviewer cannot create content, inbox supports read-all', async ({ page }) => {
+  await uiLogin(page, REVIEWER.email, REVIEWER.password);
+  await page.getByRole('link', { name: 'Artículos' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/articles');
+  await expect(page.getByRole('link', { name: 'Nuevo artículo' })).toHaveCount(0);
+
+  const markAll = page.getByRole('button', { name: 'Marcar todas como leídas' });
+  await page.getByRole('link', { name: 'Notificaciones' }).click();
+  await expect(page).toHaveURL('http://localhost:3212/notifications');
+  if (await markAll.isEnabled()) {
+    await markAll.click();
+    await expect(page.getByText('Todas las notificaciones marcadas como leídas.')).toBeVisible();
+  }
+});

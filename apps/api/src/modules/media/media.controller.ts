@@ -32,7 +32,7 @@ export class MediaController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'editor')
+  @Roles('admin', 'editor', 'reviewer')
   list(@Query(new DtoPipe(ListQueryDto)) query: ListQueryDto) {
     return this.media.list(query);
   }
@@ -85,7 +85,7 @@ export class MediaController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'editor')
-  async remove(@Param('id') id: string): Promise<void> {
-    await this.media.remove(id);
+  async remove(@Param('id') id: string, @CurrentUser() user: AccessClaims): Promise<void> {
+    await this.media.remove(id, user.sub);
   }
 }

@@ -1,8 +1,9 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { getApiBase } from '@/lib/config';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
+const API_BASE = getApiBase();
 
 export interface SessionUser {
   id: string;
@@ -82,18 +83,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     booted.current = true;
     (async () => {
       try {
-        if (!loadToken()) {
-          const token = await tryRefresh();
-          if (token) {
-            try {
-              const me = await fetch(`${API_BASE}/auth/me`, {
-                headers: { Authorization: `Bearer ${token}` },
-                credentials: 'include',
-              });
-              if (me.ok) setUser(((await me.json()) as SessionUser | null) ?? null);
-            } catch {
-              // Profile is best-effort; token alone still unlocks requests.
+        let token = loadToken();
+        if (!token) {
+          token = await tryRefresh();
+        } else {
+          // A stored access token alone does not populate the session:
+          // validate it so full-page loads hydrate `user` instead of
+          // bouncing to /login. On expiry, fall back to refresh.
+          try {
+            const me = await fetch(`${API_BASE}/auth/me`, {
+              headers: { Authorization: `Bearer ${token}` },
+              credentials: 'include',
+            });
+            if (me.status === 401) {
+              saveToken(null);
+              token = await tryRefresh();
+            } else if (me.ok) {
+              setUser(((await me.json()) as SessionUser | null) ?? null);
+              return;
+            } else {
+              return;
             }
+          } catch {
+            // Profile is best-effort; fall through to refresh below.
+          }
+        }
+        if (token) {
+          try {
+            const me = await fetch(`${API_BASE}/auth/me`, {
+              headers: { Authorization: `Bearer ${token}` },
+              credentials: 'include',
+            });
+            if (me.ok) setUser(((await me.json()) as SessionUser | null) ?? null);
+          } catch {
+            // Profile is best-effort; token alone still unlocks requests.
           }
         }
       } finally {

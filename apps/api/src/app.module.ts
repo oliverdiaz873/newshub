@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from './prisma/prisma.module';
 import { HealthModule } from './health/health.module';
@@ -10,13 +11,19 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { OpinionsModule } from './modules/opinions/opinions.module';
 import { AuthorsModule } from './modules/authors/authors.module';
+import { SchedulingModule } from './modules/scheduling/scheduling.module';
+import { HistoryModule } from './modules/history/history.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PlanningModule } from './modules/planning/planning.module';
+import { SyndicationModule } from './modules/syndication/syndication.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRootAsync({
       useFactory: () => [{ name: 'default', ttl: 60000, limit: defaultThrottleLimit() }],
     }),
-    PrismaModule, HealthModule, AuthModule, EditorialModule, MediaModule, CategoriesModule, ArticlesModule, OpinionsModule, AuthorsModule,
+    PrismaModule, HealthModule, AuthModule, EditorialModule, MediaModule, CategoriesModule, ArticlesModule, OpinionsModule, AuthorsModule, SchedulingModule, HistoryModule, NotificationsModule, PlanningModule, SyndicationModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

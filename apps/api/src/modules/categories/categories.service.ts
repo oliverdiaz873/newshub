@@ -126,6 +126,13 @@ export class CategoriesService {
     return (await this.categories.findByIdWithTranslations(id)) !== null;
   }
 
+  /** Spanish slug for syndication payloads (null when unknown). */
+  async slugFor(id: string): Promise<string | null> {
+    const row = await this.categories.findByIdWithTranslations(id);
+    const t = row?.translations.find((x) => x.locale === DEFAULT_LOCALE) ?? row?.translations[0];
+    return t?.slug ?? null;
+  }
+
   async create(dto: CreateCategoryDto, userId: string, locale: ResolvedLocale) {
     this.requireSpanish(dto.translations);
     await this.assertSlugsFree(dto.translations);

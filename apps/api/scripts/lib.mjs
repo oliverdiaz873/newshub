@@ -19,6 +19,13 @@ export const TABLES = [
   'media_assets',
   'user_credentials',
   'refresh_tokens',
+  'revisions',
+  'audit_events',
+  'notifications',
+  'notification_prefs',
+  'planning_items',
+  'webhooks',
+  'webhook_deliveries',
 ];
 
 export function pgBin(name) {

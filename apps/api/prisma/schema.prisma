@@ -23,11 +23,23 @@ model User {
   updatedCategories Category[]   @relation("CategoryUpdatedBy")
   createdArticles   Article[]    @relation("ArticleCreatedBy")
   updatedArticles   Article[]    @relation("ArticleUpdatedBy")
+  scheduledArticles Article[]    @relation("ArticleScheduledBy")
   createdOpinions   Opinion[]    @relation("OpinionCreatedBy")
   updatedOpinions   Opinion[]    @relation("OpinionUpdatedBy")
+  scheduledOpinions Opinion[]    @relation("OpinionScheduledBy")
   createdMedia      MediaAsset[] @relation("MediaCreatedBy")
   credentials     UserCredential?
   refreshTokens   RefreshToken[]
+  revisions       Revision[]     @relation("RevisionActor")
+  auditEvents     AuditEvent[]   @relation("AuditActor")
+  assignedItems   PlanningItem[] @relation("PlanningAssignee")
+  reviewingItems  PlanningItem[] @relation("PlanningReviewer")
+  createdItems    PlanningItem[] @relation("PlanningCreatedBy")
+  updatedItems    PlanningItem[] @relation("PlanningUpdatedBy")
+  webhooks        Webhook[]      @relation("WebhookCreatedBy")
+  notifications   Notification[] @relation("NotificationUser")
+  notificationsSent Notification[] @relation("NotificationActor")
+  notificationPrefs NotificationPref[] @relation("NotificationPrefUser")
 
   @@map("users")
 }
@@ -67,6 +79,7 @@ model Category {
   updatedBy   User?                 @relation("CategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   translations CategoryTranslation[]
   articles    Article[]
+  planningItems PlanningItem[]
 
   @@map("categories")
 }
@@ -91,6 +104,9 @@ model Article {
   coverMediaId String?              @map("cover_media_id") @db.Uuid
   status       String               @default("draft")
   publishedAt  DateTime?            @map("published_at") @db.Timestamptz
+  scheduledAt  DateTime?            @map("scheduled_at") @db.Timestamptz
+  scheduledById String?             @map("scheduled_by") @db.Uuid
+  scheduledBy  User?                @relation("ArticleScheduledBy", fields: [scheduledById], references: [id], onDelete: SetNull)
   isBreaking   Boolean              @default(false) @map("is_breaking")
   isFeatured   Boolean              @default(false) @map("is_featured")
   createdById  String?              @map("created_by") @db.Uuid
@@ -129,6 +145,9 @@ model Opinion {
   coverMediaId String?              @map("cover_media_id") @db.Uuid
   status       String               @default("draft")
   publishedAt  DateTime?            @map("published_at") @db.Timestamptz
+  scheduledAt  DateTime?            @map("scheduled_at") @db.Timestamptz
+  scheduledById String?             @map("scheduled_by") @db.Uuid
+  scheduledBy  User?                @relation("OpinionScheduledBy", fields: [scheduledById], references: [id], onDelete: SetNull)
   createdById  String?              @map("created_by") @db.Uuid
   updatedById  String?              @map("updated_by") @db.Uuid
   createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz
@@ -193,4 +212,132 @@ model RefreshToken {
 
   @@index([userId])
   @@map("refresh_tokens")
+}
+
+model Revision {
+  id         String   @id @default(uuid()) @db.Uuid
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id") @db.Uuid
+  version    Int
+  actorId    String?  @map("actor_id") @db.Uuid
+  cause      String
+  snapshot   Json
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  actor      User?    @relation("RevisionActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@unique([entityType, entityId, version])
+  @@index([entityType, entityId, version(sort: Desc)])
+  @@map("revisions")
+}
+
+model AuditEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  at         DateTime @default(now()) @db.Timestamptz
+  actorId    String?  @map("actor_id") @db.Uuid
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id") @db.Uuid
+  metadata   Json?    @map("metadata")
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([at(sort: Desc)])
+  @@index([entityType, entityId, at(sort: Desc)])
+  @@map("audit_events")
+}
+
+model Notification {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  type       String
+  entityType String    @map("entity_type")
+  entityId   String?   @map("entity_id") @db.Uuid
+  actorId    String?   @map("actor_id") @db.Uuid
+  payload    Json?     @map("payload")
+  readAt     DateTime? @map("read_at") @db.Timestamptz
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  user       User      @relation("NotificationUser", fields: [userId], references: [id], onDelete: Cascade)
+  actor      User?     @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model NotificationPref {
+  userId     String   @id @map("user_id") @db.Uuid
+  mutedTypes String[] @map("muted_types")
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  user       User     @relation("NotificationPrefUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_prefs")
+}
+
+model PlanningItem {
+  id           String    @id @default(uuid()) @db.Uuid
+  type         String
+  title        String
+  description  String?
+  categoryId   String?   @map("category_id") @db.Uuid
+  assigneeId   String?   @map("assignee_id") @db.Uuid
+  reviewerId   String?   @map("reviewer_id") @db.Uuid
+  priority     String    @default("normal")
+  status       String    @default("pitched")
+  dueAt        DateTime? @map("due_at") @db.Timestamptz
+  entityType   String?   @map("entity_type")
+  entityId     String?   @map("entity_id") @db.Uuid
+  createdById  String?   @map("created_by") @db.Uuid
+  updatedById  String?   @map("updated_by") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  category     Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  assignee     User?     @relation("PlanningAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  reviewer     User?     @relation("PlanningReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  createdBy    User?     @relation("PlanningCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy    User?     @relation("PlanningUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([assigneeId, status, dueAt])
+  @@index([status, dueAt])
+  @@index([dueAt])
+  @@index([reviewerId])
+  @@index([categoryId])
+  @@index([type])
+  @@map("planning_items")
+}
+
+model Webhook {
+  id         String   @id @default(uuid()) @db.Uuid
+  url        String
+  secretHash String   @map("secret_hash")
+  events     String[]
+  active     Boolean  @default(true)
+  createdById String? @map("created_by") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  createdBy  User?    @relation("WebhookCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  deliveries WebhookDelivery[]
+
+  @@map("webhooks")
+}
+
+model WebhookDelivery {
+  id             String    @id @default(uuid()) @db.Uuid
+  subscriptionId String    @map("subscription_id") @db.Uuid
+  entityType     String    @map("entity_type")
+  entityId       String    @map("entity_id") @db.Uuid
+  action         String
+  status         String    @default("pending")
+  attempts       Int       @default(0)
+  nextAttemptAt  DateTime  @default(now()) @map("next_attempt_at") @db.Timestamptz
+  claimedAt      DateTime? @map("claimed_at") @db.Timestamptz
+  payload        Json?
+  responseCode   Int?      @map("response_code")
+  error          String?
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  subscription   Webhook   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriptionId, entityType, entityId, action])
+  @@index([status, nextAttemptAt])
+  @@index([subscriptionId, createdAt(sort: Desc)])
+  @@map("webhook_deliveries")
 }

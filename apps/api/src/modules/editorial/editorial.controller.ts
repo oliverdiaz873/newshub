@@ -16,7 +16,7 @@ import { EditorialArticlesQueryDto, EditorialOpinionsQueryDto } from './dto/edit
  */
 @Controller('editorial')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'editor')
+@Roles('admin', 'editor', 'reviewer')
 export class EditorialController {
   constructor(
     @Inject(ArticlesService) private readonly articles: ArticlesService,

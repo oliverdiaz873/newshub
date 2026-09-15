@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+﻿import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -14,6 +14,8 @@ export interface EditorialOpinionFilters {
   status?: string;
   authorId?: string;
   q?: string;
+  scheduled?: boolean;
+  overdue?: boolean;
 }
 
 /**
@@ -68,8 +70,16 @@ export class OpinionsRepository {
   }
 
   private qWhereAny(filters: EditorialOpinionFilters & { q: string }): Prisma.Sql {
+    const parts: Prisma.Sql[] = [];
+    if (filters.status) parts.push(Prisma.sql`o."status" = ${filters.status}`);
+    if (filters.scheduled !== undefined) {
+      parts.push(
+        filters.scheduled ? Prisma.sql`o."scheduled_at" IS NOT NULL` : Prisma.sql`o."scheduled_at" IS NULL`,
+      );
+    }
+    if (filters.overdue) parts.push(Prisma.sql`o."scheduled_at" <= NOW()`);
     return this.qPredicates(
-      filters.status ? Prisma.sql`o."status" = ${filters.status}` : Prisma.sql`TRUE`,
+      parts.length > 0 ? Prisma.join(parts, ' AND ') : Prisma.sql`TRUE`,
       filters,
     );
   }
@@ -150,6 +160,10 @@ export class OpinionsRepository {
     const where: Prisma.OpinionWhereInput = {};
     if (filters.status) where.status = filters.status;
     if (filters.authorId) where.authorId = filters.authorId;
+    if (filters.scheduled !== undefined) {
+      where.scheduledAt = filters.scheduled ? { not: null } : null;
+    }
+    if (filters.overdue) where.scheduledAt = { lte: new Date() };
     // NOTE: `q` is intentionally absent here (see baseWhere comment).
     return where;
   }
@@ -177,8 +191,8 @@ export class OpinionsRepository {
     );
   }
 
-  findByIdFull(id: string) {
-    return this.prisma.opinion.findUnique({
+  findByIdFull(id: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.findUnique({
       where: { id },
       include: { translations: true, cover: true },
     });
@@ -196,8 +210,8 @@ export class OpinionsRepository {
     coverMediaId?: string | null;
     createdById: string;
     translations: Array<{ locale: string; slug: string; title: string; summary: string; coverAlt?: string | null; content: string[] }>;
-  }) {
-    return this.prisma.opinion.create({
+  }, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.create({
       data: {
         authorId: input.authorId,
         coverMediaId: input.coverMediaId ?? null,
@@ -222,8 +236,9 @@ export class OpinionsRepository {
   updateFields(
     id: string,
     input: { authorId?: string; coverMediaId?: string | null; status?: string; updatedById: string },
+    tx?: Prisma.TransactionClient,
   ) {
-    return this.prisma.opinion.update({
+    return (tx ?? this.prisma).opinion.update({
       where: { id },
       data: {
         ...(input.authorId !== undefined ? { author: { connect: { id: input.authorId } } } : {}),
@@ -241,8 +256,9 @@ export class OpinionsRepository {
   upsertTranslation(
     opinionId: string,
     t: { locale: string; slug: string; title: string; summary: string; coverAlt?: string | null; content: string[] },
+    tx?: Prisma.TransactionClient,
   ) {
-    return this.prisma.opinionTranslation.upsert({
+    return (tx ?? this.prisma).opinionTranslation.upsert({
       where: { opinionId_locale: { opinionId, locale: t.locale } },
       update: { slug: t.slug, title: t.title, summary: t.summary, coverAlt: t.coverAlt ?? null, content: t.content },
       create: {
@@ -252,17 +268,68 @@ export class OpinionsRepository {
     });
   }
 
-  deleteById(id: string) {
-    return this.prisma.opinion.delete({ where: { id } });
+  deleteById(id: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.delete({ where: { id } });
   }
 
-  setStatus(id: string, input: { status: string; publishedAt?: Date | null; updatedById: string }) {
-    return this.prisma.opinion.update({
+  setStatus(id: string, input: { status: string; publishedAt?: Date | null; scheduledAt?: Date | null; scheduledById?: string | null; updatedById: string }, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.update({
       where: { id },
       data: {
         status: input.status,
         ...(input.publishedAt !== undefined ? { publishedAt: input.publishedAt } : {}),
+        ...(input.scheduledAt !== undefined ? { scheduledAt: input.scheduledAt } : {}),
+        ...(input.scheduledById === undefined
+          ? {}
+          : input.scheduledById === null
+            ? { scheduledBy: { disconnect: true } }
+            : { scheduledBy: { connect: { id: input.scheduledById } } }),
         updatedBy: { connect: { id: input.updatedById } },
+      },
+    });
+  }
+
+  setSchedule(id: string, input: { scheduledAt: Date; scheduledById: string; updatedById: string }, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.update({
+      where: { id },
+      data: {
+        scheduledAt: input.scheduledAt,
+        scheduledBy: { connect: { id: input.scheduledById } },
+        updatedBy: { connect: { id: input.updatedById } },
+      },
+    });
+  }
+
+  clearSchedule(id: string, updatedById: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.update({
+      where: { id },
+      data: { scheduledAt: null, scheduledBy: { disconnect: true }, updatedBy: { connect: { id: updatedById } } },
+    });
+  }
+
+  findDue(now: Date, take: number, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.findMany({
+      where: { status: 'review', scheduledAt: { lte: now } },
+      orderBy: { scheduledAt: 'asc' },
+      take,
+      include: { translations: true },
+    });
+  }
+
+  /**
+   * Guarded due-publish: flips review→published and clears the schedule
+   * only if the row is still review with the exact claimed instant
+   * (multi-instance safe; returns count 0 when raced or changed).
+   */
+  publishDue(id: string, scheduledAt: Date, publishedAt: Date, updatedById?: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).opinion.updateMany({
+      where: { id, status: 'review', scheduledAt },
+      data: {
+        status: 'published',
+        publishedAt,
+        scheduledAt: null,
+        scheduledById: null,
+        ...(updatedById ? { updatedById } : {}),
       },
     });
   }

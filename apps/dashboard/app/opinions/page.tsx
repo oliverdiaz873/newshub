@@ -1,121 +1,192 @@
-'use client';
+﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth';
+import { useUiPrefs } from '@/lib/ui-prefs';
+import { useToast } from '@/components/Toasts';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { RequireAuth } from '@/components/RequireAuth';
+import { ConfirmDialog } from '@/components/Modal';
+import { EmptyState, ErrorState, Skeleton } from '@/components/States';
+import { Paginator, Table } from '@/components/Table';
+import { LoadingFallback } from '@/components/LoadingFallback';
+import { actionsFor, type EditorialAction } from '@/lib/transitions';
+import { toLocalLabel, toUtcLabel } from '@/lib/schedule';
 
 interface ListItem {
   id: string;
   slug: string;
   title: string;
   status: string;
+  scheduledAt?: string | null;
+  updatedAt?: string;
 }
 
-interface Option {
+interface AuthorOption {
   id: string;
   label: string;
 }
 
-interface TranslationForm {
-  slug: string;
-  title: string;
-  summary: string;
-  content: string;
-}
+type RowAction = Exclude<EditorialAction, 'delete'> | 'delete';
 
-const EMPTY_TR: TranslationForm = { slug: '', title: '', summary: '', content: '' };
+const PAGE_SIZE_KEY = 'newshub-pagesize-opinions';
+const PAGE_SIZES = [10, 20, 50];
 
-function splitParas(text: string): string[] {
-  return text
-    .split(/\r?\n\s*\r?\n/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
-}
+function OpinionsBody() {
+  const t = useTranslations('opinions');
+  const ta = useTranslations('articles');
+  const ts = useTranslations('scheduling');
+  const tc = useTranslations('common');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { apiFetch, user } = useAuth();
+  const isReviewer = user?.role === 'reviewer';
+  const { previewLang } = useUiPrefs();
+  const { notify } = useToast();
 
-export default function OpinionsPage() {
-  const { apiFetch } = useAuth();
+  const editorialLocale = previewLang === 'en-first' ? 'en' : 'es';
+
+  const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') ?? 'all');
+  const [authorFilter, setAuthorFilter] = useState(() => searchParams.get('author') ?? '');
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+  const [queryInput, setQueryInput] = useState(() => searchParams.get('q') ?? '');
+  const [sort, setSort] = useState(() => searchParams.get('sort') ?? 'publishedAt:desc');
+  const [page, setPage] = useState(() => Number(searchParams.get('page') ?? 1) || 1);
+  const [limit, setLimit] = useState(() => {
+    const fromUrl = Number(searchParams.get('limit') ?? 0);
+    if (fromUrl === 10 || fromUrl === 20 || fromUrl === 50) return fromUrl;
+    if (typeof window !== 'undefined') {
+      const stored = Number(localStorage.getItem(PAGE_SIZE_KEY) ?? 0);
+      if (stored === 10 || stored === 20 || stored === 50) return stored;
+    }
+    return 20;
+  });
+
   const [items, setItems] = useState<ListItem[]>([]);
-  const [authors, setAuthors] = useState<Option[]>([]);
-  const [media, setMedia] = useState<Option[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [authors, setAuthors] = useState<AuthorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState<string | null>(null);
-  const [authorId, setAuthorId] = useState('');
-  const [coverId, setCoverId] = useState('');
-  const [initialCover, setInitialCover] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [es, setEs] = useState<TranslationForm>({ ...EMPTY_TR });
-  const [en, setEn] = useState<TranslationForm>({ ...EMPTY_TR });
+  const [confirm, setConfirm] = useState<{ action: RowAction; item: ListItem } | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
 
-  const statusQuery = statusFilter === 'all' ? '' : `&status=${statusFilter}`;
+  const paramsKey = useMemo(
+    () =>
+      JSON.stringify({ statusFilter, authorFilter, query, sort, page, limit, editorialLocale, reloadToken }),
+    [statusFilter, authorFilter, query, sort, page, limit, editorialLocale, reloadToken],
+  );
 
-  async function load() {
-    const res = await apiFetch(`/editorial/opinions?locale=es&limit=100${statusQuery}`);
-    if (res.status === 401) {
-      setError('Sesión requerida. Accede primero.');
-      setItems([]);
-      return;
-    }
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = (await res.json()) as { data: ListItem[] };
-    setItems(json.data);
-    const [auths, meds] = await Promise.all([apiFetch('/authors'), apiFetch('/media?limit=100')]);
-    if (auths.ok) {
-      const list = (await auths.json()) as Array<{
-        id: string;
-        slug: string;
-        translations: Array<{ locale: string; name: string }>;
-      }>;
-      setAuthors(
-        list.map((a) => ({
-          id: a.id,
-          label: `${a.translations.find((t) => t.locale === 'es')?.name ?? a.slug} (${a.slug})`,
-        })),
-      );
-    }
-    if (meds.ok) {
-      const medJson = (await meds.json()) as { data: Array<{ id: string; mime: string }> };
-      setMedia(medJson.data.map((m) => ({ id: m.id, label: `${m.id.slice(0, 8)} (${m.mime})` })));
-    }
+  const syncUrl = useCallback(
+    (patch: Partial<{ status: string; author: string; q: string; sort: string; page: number; limit: number }>) => {
+      const params = new URLSearchParams();
+      const next = {
+        status: patch.status ?? statusFilter,
+        author: patch.author ?? authorFilter,
+        q: patch.q ?? query,
+        sort: patch.sort ?? sort,
+        page: patch.page ?? page,
+        limit: patch.limit ?? limit,
+      };
+      if (next.status !== 'all') params.set('status', next.status);
+      if (next.author) params.set('author', next.author);
+      if (next.q) params.set('q', next.q);
+      if (next.sort !== 'publishedAt:desc') params.set('sort', next.sort);
+      if (next.page !== 1) params.set('page', String(next.page));
+      if (next.limit !== 20) params.set('limit', String(next.limit));
+      const qs = params.toString();
+      router.replace(qs ? `/opinions?${qs}` : '/opinions', { scroll: false });
+    },
+    [statusFilter, authorFilter, query, sort, page, limit, router],
+  );
+
+  function resetPage(patch: Parameters<typeof syncUrl>[0]) {
+    syncUrl({ ...patch, page: 1 });
+    setPage(1);
   }
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
+    const handle = window.setTimeout(() => {
+      if (queryInput !== query) {
+        setQuery(queryInput);
+        resetPage({ q: queryInput });
+      }
+    }, 300);
+    return () => window.clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryInput]);
+
+  useEffect(() => {
+    const onGlobal = (event: Event) => {
+      const value = (event as CustomEvent<string>).detail ?? '';
+      setQueryInput(value);
+    };
+    window.addEventListener('nh:global-search', onGlobal);
+    return () => window.removeEventListener('nh:global-search', onGlobal);
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
       try {
-        const res = await apiFetch(`/editorial/opinions?locale=es&limit=100${statusQuery}`);
+        const auths = await apiFetch('/authors');
+        if (!auths.ok) return;
+        const json = (await auths.json()) as Array<{
+          slug: string;
+          translations: Array<{ locale: string; name: string }>;
+        }>;
+        setAuthors(
+          json.map((a) => ({
+            id: a.slug,
+            label: `${a.translations.find((tr) => tr.locale === 'es')?.name ?? a.slug} (${a.slug})`,
+          })),
+        );
+      } catch {
+        // Author filter stays usable-empty.
+      }
+    })();
+  }, [apiFetch]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const state = JSON.parse(paramsKey) as {
+        statusFilter: string;
+        authorFilter: string;
+        query: string;
+        sort: string;
+        page: number;
+        limit: number;
+        editorialLocale: string;
+      };
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({
+          locale: state.editorialLocale,
+          limit: String(state.limit),
+          page: String(state.page),
+          sort: state.sort,
+        });
+        if (state.statusFilter !== 'all') params.set('status', state.statusFilter);
+        if (state.authorFilter) params.set('author', state.authorFilter);
+        if (state.query.trim()) params.set('q', state.query.trim());
+        const res = await apiFetch(`/editorial/opinions?${params.toString()}`);
         if (cancelled) return;
         if (res.status === 401) {
-          setError('Sesión requerida. Accede primero.');
+          setError(tc('sessionRequired'));
           setItems([]);
-        } else if (!res.ok) {
-          setError(`HTTP ${res.status}`);
-        } else {
-          const json = (await res.json()) as { data: ListItem[] };
-          setItems(json.data);
+          return;
         }
-        const auths = await apiFetch('/authors');
-        if (!cancelled && auths.ok) {
-          const list = (await auths.json()) as Array<{
-            id: string;
-            slug: string;
-            translations: Array<{ locale: string; name: string }>;
-          }>;
-          setAuthors(
-            list.map((a) => ({
-              id: a.id,
-              label: `${a.translations.find((t) => t.locale === 'es')?.name ?? a.slug} (${a.slug})`,
-            })),
-          );
-        }
-        const meds = await apiFetch('/media?limit=100');
-        if (!cancelled && meds.ok) {
-          const medJson = (await meds.json()) as { data: Array<{ id: string; mime: string }> };
-          setMedia(medJson.data.map((m) => ({ id: m.id, label: `${m.id.slice(0, 8)} (${m.mime})` })));
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as { data: ListItem[]; meta: { total: number; totalPages: number } };
+        setItems(json.data);
+        setTotal(json.meta.total);
+        setTotalPages(json.meta.totalPages);
       } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Error de red.');
+        if (!cancelled) setError(err instanceof Error ? err.message : tc('networkError'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -123,289 +194,244 @@ export default function OpinionsPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiFetch, statusQuery]);
+  }, [apiFetch, paramsKey, tc]);
 
-  function buildTranslations() {
-    const translations = [
-      {
-        locale: 'es',
-        slug: es.slug.trim(),
-        title: es.title.trim(),
-        summary: es.summary.trim(),
-        content: splitParas(es.content),
-      },
-    ];
-    if (en.slug.trim() && en.title.trim()) {
-      translations.push({
-        locale: 'en',
-        slug: en.slug.trim(),
-        title: en.title.trim(),
-        summary: en.summary.trim() || es.summary.trim(),
-        content: splitParas(en.content).length > 0 ? splitParas(en.content) : splitParas(es.content),
-      });
-    }
-    return translations;
-  }
-
-  function resetForm() {
-    setEditing(null);
-    setAuthorId('');
-    setCoverId('');
-    setInitialCover(null);
-    setEs({ ...EMPTY_TR });
-    setEn({ ...EMPTY_TR });
-  }
-
-  async function create(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-    if (!authorId) {
-      setError('Selecciona un autor.');
+  async function runAction(action: RowAction, item: ListItem) {
+    if (action === 'delete') {
+      const res = await apiFetch(`/opinions/${item.id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        notify(`HTTP ${res.status}`, 'err');
+        return;
+      }
+      notify(t('saved'), 'ok');
+      setReloadToken((token) => token + 1);
       return;
     }
-    const res = await apiFetch('/opinions', {
+    const res = await apiFetch(`/opinions/${item.id}/${action}`, {
       method: 'POST',
-      body: JSON.stringify({ authorId, coverMediaId: coverId || undefined, translations: buildTranslations() }),
+      ...(action === 'reject' ? { body: JSON.stringify({}) } : {}),
     });
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
-      setError(body?.code === 'slug_taken' ? 'Ese slug ya existe para el idioma.' : (body?.detail ?? `HTTP ${res.status}`));
+      const body = (await res.json().catch(() => null)) as { code?: string } | null;
+      notify(body?.code === 'invalid_transition' ? ta('invalidTransition') : `HTTP ${res.status}`, 'err');
       return;
     }
-    resetForm();
-    setLoading(true);
-    await load();
-    setLoading(false);
+    notify(action === 'reject' ? t('rejectedOk') : action === 'publish' ? t('publishedOk') : t('saved'), 'ok');
+    setReloadToken((token) => token + 1);
   }
 
-  async function startEdit(id: string) {
-    setError(null);
-    const res = await apiFetch(`/editorial/opinions/${id}`);
-    if (!res.ok) {
-      setError(`HTTP ${res.status}`);
-      return;
-    }
-    const row = (await res.json()) as {
-      authorId: string;
-      coverMediaId: string | null;
-      translations: Array<{ locale: string; slug: string; title: string; summary: string; content: string[] }>;
-    };
-    const esT = row.translations.find((t) => t.locale === 'es');
-    const enT = row.translations.find((t) => t.locale === 'en');
-    setEditing(id);
-    setAuthorId(row.authorId);
-    setCoverId(row.coverMediaId ?? '');
-    setInitialCover(row.coverMediaId ?? null);
-    setEs({
-      slug: esT?.slug ?? '',
-      title: esT?.title ?? '',
-      summary: esT?.summary ?? '',
-      content: (esT?.content ?? []).join('\n\n'),
-    });
-    setEn({
-      slug: enT?.slug ?? '',
-      title: enT?.title ?? '',
-      summary: enT?.summary ?? '',
-      content: (enT?.content ?? []).join('\n\n'),
-    });
+  function actionLabel(action: RowAction): string {
+    if (action === 'publish') return ta('actionPublish');
+    if (action === 'unpublish') return ta('actionUnpublish');
+    if (action === 'archive') return ta('actionArchive');
+    if (action === 'restore') return ta('actionRestore');
+    if (action === 'reject') return ta('actionReject');
+    return ta('actionDelete');
   }
 
-  async function saveEdit(event: React.FormEvent) {
-    event.preventDefault();
-    if (!editing) return;
-    setError(null);
-    const res = await apiFetch(`/opinions/${editing}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        authorId,
-        coverMediaId: coverId === initialCover ? undefined : coverId || null,
-        translations: buildTranslations(),
-      }),
-    });
-    if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
-      setError(body?.code === 'slug_taken' ? 'Ese slug ya existe para el idioma.' : (body?.detail ?? `HTTP ${res.status}`));
-      return;
-    }
-    resetForm();
-    setLoading(true);
-    await load();
-    setLoading(false);
-  }
-
-  async function remove(row: ListItem) {
-    if (!window.confirm(`Eliminar el borrador «${row.title}»?`)) return;
-    setError(null);
-    const res = await apiFetch(`/opinions/${row.id}`, { method: 'DELETE' });
-    if (!res.ok) {
-      setError(`HTTP ${res.status}`);
-      return;
-    }
-    setLoading(true);
-    await load();
-    setLoading(false);
-  }
-
-  async function runAction(row: ListItem, action: 'publish' | 'unpublish' | 'archive' | 'restore') {
-    const labels: Record<string, string> = {
-      publish: 'publicar',
-      unpublish: 'despublicar',
-      archive: 'archivar',
-      restore: 'restaurar',
-    };
-    if (!window.confirm(`${labels[action][0].toUpperCase()}${labels[action].slice(1)} «${row.title}»?`)) return;
-    setError(null);
-    const res = await apiFetch(`/opinions/${row.id}/${action}`, { method: 'POST' });
-    if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as { code?: string; detail?: string } | null;
-      setError(body?.code === 'invalid_transition' ? 'Transición no permitida desde su estado.' : (body?.detail ?? `HTTP ${res.status}`));
-      return;
-    }
-    setLoading(true);
-    await load();
-    setLoading(false);
-  }
-
-  function actionsFor(status: string): Array<'publish' | 'unpublish' | 'archive' | 'restore'> {
-    if (status === 'published') return ['unpublish', 'archive'];
-    if (status === 'archived') return ['restore'];
-    return ['publish', 'archive'];
+  function confirmCopy(action: RowAction, item: ListItem): { title: string; message: string } {
+    if (action === 'delete') return { title: t('deleteTitle'), message: t('deleteMessage', { title: item.title }) };
+    if (action === 'reject') return { title: t('rejectTitle'), message: t('rejectMessage', { title: item.title }) };
+    return { title: t('archiveTitle'), message: t('archiveMessage', { title: item.title }) };
   }
 
   return (
     <main>
-      <h1>Opiniones</h1>
-      <p className="nh-muted">F3 crea siempre en borrador; la publicación es F4.</p>
-      {error && (
-        <div className="nh-error">
-          {error} <Link href="/login">Acceder</Link>
+      <Breadcrumbs trail={[{ href: '/', label: 'Home' }, { label: t('title') }]} />
+      <div className="nh-row" style={{ justifyContent: 'space-between' }}>
+        <h1>{t('title')}</h1>
+        {!isReviewer && (
+          <Link className="nh-btn primary" href="/opinions/new">
+            {t('new')}
+          </Link>
+        )}
+      </div>
+
+      <section className="nh-card" aria-label={t('searchLabel')}>
+        <div className="nh-field">
+          <label htmlFor="opinions-q">{t('searchLabel')}</label>
+          <input
+            id="opinions-q"
+            type="search"
+            value={queryInput}
+            onChange={(event) => setQueryInput(event.target.value)}
+            data-f="q"
+          />
+          <span className="nh-muted">{t('searchHint')}</span>
         </div>
-      )}
-      <section className="nh-card">
-        <h2>{editing ? 'Editar opinión' : 'Nueva opinión'}</h2>
-        <form onSubmit={editing ? saveEdit : create}>
-          <div className="nh-field">
-            <label htmlFor="author">Autor (requerido)</label>
-            <select id="author" value={authorId} onChange={(e) => setAuthorId(e.target.value)} required>
-              <option value="">Seleccionar…</option>
+        <div className="nh-row">
+          <label>
+            {t('status')}{' '}
+            <select
+              value={statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                resetPage({ status: event.target.value });
+              }}
+            >
+              <option value="all">{t('allStatuses')}</option>
+              <option value="draft">{ta('statusDraft')}</option>
+              <option value="review">{ta('statusReview')}</option>
+              <option value="published">{ta('statusPublished')}</option>
+              <option value="archived">{ta('statusArchived')}</option>
+            </select>
+          </label>
+          <label>
+            {t('author')}{' '}
+            <select
+              value={authorFilter}
+              onChange={(event) => {
+                setAuthorFilter(event.target.value);
+                resetPage({ author: event.target.value });
+              }}
+            >
+              <option value="">{t('allAuthors')}</option>
               {authors.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.label}
                 </option>
               ))}
             </select>
-          </div>
-          <div className="nh-field">
-            <label htmlFor="cover">Portada (opcional, desde /media)</label>
-            <select id="cover" value={coverId} onChange={(e) => setCoverId(e.target.value)}>
-              <option value="">Sin portada</option>
-              {media.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label}
+          </label>
+          <label>
+            {t('sort')}{' '}
+            <select
+              value={sort}
+              aria-label={t('sort')}
+              onChange={(event) => {
+                setSort(event.target.value);
+                resetPage({ sort: event.target.value });
+              }}
+            >
+              <option value="publishedAt:desc">{t('sortNewest')}</option>
+              <option value="publishedAt:asc">{t('sortOldest')}</option>
+            </select>
+          </label>
+          <label>
+            {t('perPage')}{' '}
+            <select
+              value={limit}
+              onChange={(event) => {
+                const next = Number(event.target.value);
+                try {
+                  localStorage.setItem(PAGE_SIZE_KEY, String(next));
+                } catch {
+                  // ignore
+                }
+                setLimit(next);
+                resetPage({ limit: next });
+              }}
+            >
+              {PAGE_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size}
                 </option>
               ))}
             </select>
-          </div>
-          <h3>Español (requerido)</h3>
-          <div className="nh-field">
-            <label htmlFor="esSlug">Slug</label>
-            <input id="esSlug" value={es.slug} onChange={(e) => setEs({ ...es, slug: e.target.value })} required />
-          </div>
-          <div className="nh-field">
-            <label htmlFor="esTitle">Título</label>
-            <input id="esTitle" value={es.title} onChange={(e) => setEs({ ...es, title: e.target.value })} required />
-          </div>
-          <div className="nh-field">
-            <label htmlFor="esSummary">Resumen</label>
-            <textarea id="esSummary" value={es.summary} onChange={(e) => setEs({ ...es, summary: e.target.value })} rows={2} required />
-          </div>
-          <div className="nh-field">
-            <label htmlFor="esContent">Contenido (párrafos separados por línea en blanco)</label>
-            <textarea id="esContent" value={es.content} onChange={(e) => setEs({ ...es, content: e.target.value })} rows={6} required />
-          </div>
-          <h3>English (opcional)</h3>
-          <div className="nh-field">
-            <label htmlFor="enSlug">Slug</label>
-            <input id="enSlug" value={en.slug} onChange={(e) => setEn({ ...en, slug: e.target.value })} />
-          </div>
-          <div className="nh-field">
-            <label htmlFor="enTitle">Título</label>
-            <input id="enTitle" value={en.title} onChange={(e) => setEn({ ...en, title: e.target.value })} />
-          </div>
-          <div className="nh-field">
-            <label htmlFor="enSummary">Resumen</label>
-            <textarea id="enSummary" value={en.summary} onChange={(e) => setEn({ ...en, summary: e.target.value })} rows={2} />
-          </div>
-          <div className="nh-field">
-            <label htmlFor="enContent">Contenido</label>
-            <textarea id="enContent" value={en.content} onChange={(e) => setEn({ ...en, content: e.target.value })} rows={6} />
-          </div>
-          <div className="nh-row">
-            <button className="nh-btn primary" type="submit">
-              {editing ? 'Guardar' : 'Crear borrador'}
-            </button>
-            {editing && (
-              <button className="nh-btn" type="button" onClick={resetForm}>
-                Cancelar
-              </button>
-            )}
-          </div>
-        </form>
-      </section>
-      <section className="nh-card">
-        <h2>Listado</h2>
-        <div className="nh-field">
-          <label htmlFor="statusFilter">Estado</label>
-          <select id="statusFilter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="all">Todos</option>
-            <option value="draft">Borrador</option>
-            <option value="review">Revisión</option>
-            <option value="published">Publicado</option>
-            <option value="archived">Archivado</option>
-          </select>
+          </label>
         </div>
-        {loading ? (
-          <p className="nh-muted">Cargando…</p>
-        ) : items.length === 0 ? (
-          <p className="nh-muted">No hay opiniones.</p>
-        ) : (
-          <table className="nh-table">
+      </section>
+
+      {error && <ErrorState message={error} />}
+
+      {loading ? (
+        <Skeleton lines={6} />
+      ) : items.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <>
+          <Table label={t('title')}>
             <thead>
               <tr>
-                <th>Título</th>
-                <th>Estado</th>
-                <th></th>
+                <th>{t('colTitle')}</th>
+                <th>{t('colStatus')}</th>
+                <th>{t('colUpdated')}</th>
+                <th>{t('colActions')}</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((row) => (
-                <tr key={row.id}>
+              {items.map((item) => (
+                <tr key={item.id} data-row={item.id} data-status={item.status}>
                   <td>
-                    {row.title}
-                    <div className="nh-muted">{row.slug}</div>
+                    <Link href={`/opinions/${item.id}`}>{item.title}</Link>
+                    <div className="nh-muted">{item.slug}</div>
+                    {item.scheduledAt && (
+                      <div className="nh-muted" title={toUtcLabel(item.scheduledAt)}>
+                        <span aria-hidden="true">⏱</span>{' '}
+                        <span className="nh-sr-only">{ts('badge')}</span> {toLocalLabel(item.scheduledAt)}
+                      </div>
+                    )}
                   </td>
-                  <td>{row.status}</td>
+                  <td>{item.status}</td>
+                  <td className="nh-muted">{item.updatedAt ?? ''}</td>
                   <td>
                     <div className="nh-row">
-                      {actionsFor(row.status).map((action) => (
-                        <button key={action} className="nh-btn" type="button" onClick={() => void runAction(row, action)}>
-                          {action === 'publish' ? 'Publicar' : action === 'unpublish' ? 'Despublicar' : action === 'archive' ? 'Archivar' : 'Restaurar'}
-                        </button>
-                      ))}
-                      <button className="nh-btn" type="button" onClick={() => void startEdit(row.id)}>
-                        Editar
-                      </button>
-                      <button className="nh-btn danger" type="button" onClick={() => void remove(row)}>
-                        Eliminar
-                      </button>
+                      <Link className="nh-btn" href={`/opinions/${item.id}`}>
+                        {ta('actionEdit')}
+                      </Link>
+                      {(isReviewer ? actionsFor(item.status).filter((a) => a !== 'delete') : actionsFor(item.status)).map((action) =>
+                        action === 'delete' || action === 'archive' || action === 'reject' ? (
+                          <button
+                            key={action}
+                            className={action === 'delete' ? 'nh-btn danger' : 'nh-btn'}
+                            type="button"
+                            onClick={() => setConfirm({ action, item })}
+                          >
+                            {actionLabel(action)}
+                          </button>
+                        ) : (
+                          <button
+                            key={action}
+                            className="nh-btn"
+                            type="button"
+                            onClick={() => void runAction(action, item)}
+                          >
+                            {actionLabel(action)}
+                          </button>
+                        ),
+                      )}
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-        )}
-      </section>
+          </Table>
+          <Paginator
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            limit={limit}
+            onPage={(next) => {
+              setPage(next);
+              syncUrl({ page: next });
+            }}
+          />
+        </>
+      )}
+
+      {confirm && (
+        <ConfirmDialog
+          title={confirmCopy(confirm.action, confirm.item).title}
+          message={confirmCopy(confirm.action, confirm.item).message}
+          confirmLabel={confirm.action === 'delete' ? ta('actionDelete') : ta('confirm')}
+          onConfirm={() => {
+            const { action, item } = confirm;
+            setConfirm(null);
+            void runAction(action, item);
+          }}
+          onCancel={() => setConfirm(null)}
+        />
+      )}
     </main>
+  );
+}
+
+export default function OpinionsPage() {
+  return (
+    <RequireAuth>
+      <Suspense fallback={<LoadingFallback />}>
+        <OpinionsBody />
+      </Suspense>
+    </RequireAuth>
   );
 }

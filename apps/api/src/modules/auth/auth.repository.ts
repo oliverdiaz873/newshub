@@ -20,6 +20,14 @@ export class AuthRepository {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
+  /** Staff ids for notification fan-out (safe projection: id + role only). */
+  listStaffIds(roles: string[]) {
+    return this.prisma.user.findMany({
+      where: { role: { in: roles } },
+      select: { id: true },
+    });
+  }
+
   createRefreshToken(userId: string, tokenHash: string, expiresAt: Date) {
     return this.prisma.refreshToken.create({
       data: { userId, tokenHash, expiresAt },

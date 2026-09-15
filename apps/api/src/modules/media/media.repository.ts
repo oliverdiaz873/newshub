@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+﻿import { Inject, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 /** Minimal media access for cover validation (upload/selection UI is F5). */
@@ -32,12 +33,12 @@ export class MediaRepository {
     width: number | null;
     height: number | null;
     createdById: string;
-  }) {
-    return this.prisma.mediaAsset.create({ data: input });
+  }, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).mediaAsset.create({ data: input });
   }
 
-  deleteById(id: string) {
-    return this.prisma.mediaAsset.delete({ where: { id } });
+  deleteById(id: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).mediaAsset.delete({ where: { id } });
   }
 
   /** Any article/opinion cover reference blocks deletion (any status). */

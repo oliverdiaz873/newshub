@@ -3,7 +3,7 @@ import { useApiSession } from '../fixtures/auth';
 
 test('anonymous users cannot use the dashboard lists', async ({ page }) => {
   await page.goto('/categories');
-  await expect(page.getByText('Sesión requerida. Accede primero.')).toBeVisible();
+  await expect(page).toHaveURL(/\/login/);
 });
 
 test('anonymous API writes are rejected', async ({ page }) => {
@@ -16,5 +16,5 @@ test('anonymous API writes are rejected', async ({ page }) => {
 test('editor and admin share content permissions', async ({ page }) => {
   await useApiSession(page);
   await page.goto('/authors');
-  await expect(page.getByRole('heading', { name: 'Autores' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Autores', level: 1 })).toBeVisible();
 });
