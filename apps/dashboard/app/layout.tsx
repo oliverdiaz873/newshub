@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/shared/lib/theme';
 import { themeInitScript } from '@/shared/lib/theme-script';
 import { LocaleProvider } from '@/shared/lib/i18n';
 import { ToastProvider } from '@/shared/components/Toasts';
-import { Shell } from '@/shared/components/Shell';
+import { DashboardShell } from './dashboard-shell';
 import '../src/app.css';
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LocaleProvider>
             <AuthProvider>
               <ToastProvider>
-                <Shell>{children}</Shell>
+                <DashboardShell>{children}</DashboardShell>
               </ToastProvider>
             </AuthProvider>
           </LocaleProvider>

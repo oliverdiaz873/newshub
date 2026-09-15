@@ -12,7 +12,7 @@ import { Topbar } from '@/shared/components/Topbar';
  * first nav link; Escape or scrim closes and returns focus to the menu
  * button.
  */
-export function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({ children, sidebarUnreadCount = 0 }: { children: React.ReactNode; sidebarUnreadCount?: number }) {
   const [navOpen, setNavOpen] = useState(false);
   const [query, setQuery] = useState('');
   const menuRef = useRef<HTMLButtonElement | null>(null);
@@ -47,7 +47,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={navOpen ? 'nh-app nav-open' : 'nh-app'}>
-      <Sidebar onNavigate={closeWithoutRestore} />
+      <Sidebar onNavigate={closeWithoutRestore} unreadCount={sidebarUnreadCount} />
       {navOpen && <div className="nh-scrim" aria-hidden="true" onClick={() => setNavOpen(false)} />}
       <div className="nh-main">
         <Topbar

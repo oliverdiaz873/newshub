@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useSidebarCollapsed } from '@/shared/lib/ui-prefs';
-import { useUnreadCount } from '@/lib/notifications';
 
 const MANAGE: Array<{ href: string; key: string }> = [
   { href: '/', key: 'overview' },
@@ -25,12 +24,16 @@ const SYSTEM: Array<{ href: string; key: string }> = [
   { href: '/settings', key: 'settings' },
 ];
 
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+/**
+ * Shared navigation. The notifications badge count is injected by the app
+ * layer (see app/dashboard-shell.tsx) so shared never imports features.
+ */
+export function Sidebar({ onNavigate, unreadCount = 0 }: { onNavigate?: () => void; unreadCount?: number }) {
   const t = useTranslations('nav');
   const tn = useTranslations('notifications');
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useSidebarCollapsed();
-  const { unread } = useUnreadCount();
+  const unread = unreadCount;
 
   function navLink(item: { href: string; key: string }) {
     const label = t(item.key);
