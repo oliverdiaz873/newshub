@@ -1,12 +1,6 @@
 'use client';
 
-export interface MediaOption {
-  id: string;
-  url: string;
-  mime: string;
-  width: number | null;
-  height: number | null;
-}
+import type { MediaOption } from '../types';
 
 /**
  * Shared media thumbnail cell (manager grid + picker grid).

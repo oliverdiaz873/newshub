@@ -11,7 +11,7 @@ import { LocaleTabs } from '@/features/editorial-shared/components/LocaleTabs';
 import { HistoryPanel } from '@/features/editorial-shared/components/HistoryPanel';
 import { ScheduleSection } from '@/features/editorial-shared/components/ScheduleSection';
 import { ErrorState } from '@/shared/components/States';
-import { MediaPicker } from '@/components/MediaPicker';
+import { MediaPicker } from '@/features/media';
 import { useDirtyGuard } from '@/shared/lib/dirty';
 import {
   ARTICLE_FIELD_ORDER,

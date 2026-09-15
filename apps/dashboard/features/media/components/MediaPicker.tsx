@@ -5,9 +5,9 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/shared/api/auth';
 import { useToast } from '@/shared/components/Toasts';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
-import { MediaThumb, mediaLabel, type MediaOption } from '@/components/MediaCard';
-
-export type { MediaOption };
+import { MediaThumb, mediaLabel } from './MediaCard';
+import type { MediaOption } from '../types';
+import { listMediaOptions, uploadMedia } from '../services/mediaService';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
@@ -42,7 +42,7 @@ export function MediaPicker({
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/media?limit=100');
+      const res = await listMediaOptions(apiFetch);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = (await res.json()) as { data: MediaOption[] };
       setItems(json.data);
@@ -84,7 +84,7 @@ export function MediaPicker({
     try {
       const form = new FormData();
       form.append('file', file);
-      const res = await apiFetch('/media', { method: 'POST', body: form });
+      const res = await uploadMedia(apiFetch, form);
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { code?: string; message?: string } | null;
         notify(body?.message ?? `HTTP ${res.status}`, 'err');
