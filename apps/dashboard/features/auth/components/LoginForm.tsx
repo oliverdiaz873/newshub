@@ -8,8 +8,8 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 
 /**
  * Auth feature — login form only. Transversal session infrastructure
- * (AuthProvider, useAuth, ApiFetch, RequireAuth, LogoutButton) stays in
- * shared/ because every feature consumes it.
+ * (AuthProvider, useAuth, ApiFetch, RequireAuth) stays in shared/ because
+ * every feature consumes it.
  */
 export function LoginForm() {
   const t = useTranslations('login');
