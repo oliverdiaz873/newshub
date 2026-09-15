@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { RequireAuth } from '@/shared/components/RequireAuth';
-import { EMPTY_OPINION_FORM, OpinionEditor } from '@/components/OpinionEditor';
+import { EMPTY_OPINION_FORM, OpinionEditor } from '@/features/opinions/components/OpinionEditor';
 import { useAuth } from '@/shared/api/auth';
 
 export default function NewOpinionPage() {

@@ -19,8 +19,15 @@ import {
   validateOpinionForm,
   type OpinionFieldKey,
   type OpinionFormValue,
-} from '@/lib/validate-opinion';
+} from '../validate';
 import type { EditorOption } from '@/features/editorial-shared/types';
+import {
+  createOpinion,
+  getOpinionAuthors,
+  removeOpinion,
+  transitionOpinion,
+  updateOpinion,
+} from '../services/opinionService';
 
 export const EMPTY_OPINION_FORM: OpinionFormValue = {
   authorId: '',
@@ -100,7 +107,7 @@ export function OpinionEditor({
     // Author options load once per editor mount.
     void (async () => {
       try {
-        const auths = await apiFetch('/authors');
+        const auths = await getOpinionAuthors(apiFetch);
         if (!auths.ok) return;
         const json = (await auths.json()) as Array<{
           id: string;
@@ -145,13 +152,10 @@ export function OpinionEditor({
     setLoadError(null);
     try {
       if (action === 'create') {
-        const res = await apiFetch('/opinions', {
-          method: 'POST',
-          body: JSON.stringify({
-            authorId: form.authorId,
-            coverMediaId: form.coverMediaId || undefined,
-            translations: buildTranslations(form.es, form.en),
-          }),
+        const res = await createOpinion(apiFetch, {
+          authorId: form.authorId,
+          coverMediaId: form.coverMediaId || undefined,
+          translations: buildTranslations(form.es, form.en),
         });
         if (!res.ok) {
           const code = errorCode(await res.json().catch(() => null));
@@ -175,7 +179,7 @@ export function OpinionEditor({
         translations: buildTranslations(form.es, form.en),
       };
       if (action === 'review') body.status = 'review';
-      const res = await apiFetch(`/opinions/${opinionId}`, { method: 'PATCH', body: JSON.stringify(body) });
+      const res = await updateOpinion(apiFetch, opinionId, body);
       if (!res.ok) {
         const code = errorCode(await res.json().catch(() => null));
         if (code === 'slug_taken') {
@@ -199,11 +203,13 @@ export function OpinionEditor({
     if (!opinionId) return;
     setBusy(true);
     try {
-      const init: RequestInit = { method: 'POST' };
-      if (action === 'reject') {
-        init.body = JSON.stringify({ reason: reason?.trim() ? reason.trim().slice(0, 500) : undefined });
-      }
-      const res = await apiFetch(`/opinions/${opinionId}/${action}`, init);
+      const cleanReason = reason?.trim() ? reason.trim().slice(0, 500) : undefined;
+      const res = await transitionOpinion(
+        apiFetch,
+        opinionId,
+        action,
+        action === 'reject' ? { reason: cleanReason } : undefined,
+      );
       if (!res.ok) {
         const code = errorCode(await res.json().catch(() => null));
         notify(code === 'invalid_transition' && action === 'publish' && liveStatus === 'draft' ? ta('publishNeedsReview') : code === 'invalid_transition' ? ta('invalidTransition') : `HTTP ${res.status}`, 'err');
@@ -223,7 +229,7 @@ export function OpinionEditor({
     if (!opinionId) return;
     setBusy(true);
     try {
-      const res = await apiFetch(`/opinions/${opinionId}`, { method: 'DELETE' });
+      const res = await removeOpinion(apiFetch, opinionId);
       if (!res.ok) {
         notify(`HTTP ${res.status}`, 'err');
         return;
