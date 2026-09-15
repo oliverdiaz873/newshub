@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { RequireAuth } from '@/shared/components/RequireAuth';
-import { ArticleEditor, EMPTY_FORM } from '@/components/ArticleEditor';
+import { ArticleEditor, EMPTY_FORM } from '@/features/articles/components/ArticleEditor';
 import { useAuth } from '@/shared/api/auth';
 
 export default function NewArticlePage() {

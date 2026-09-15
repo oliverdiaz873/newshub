@@ -12,12 +12,14 @@ export interface SessionUser {
   role: string;
 }
 
+export type ApiFetch = (path: string, init?: RequestInit) => Promise<Response>;
+
 interface AuthState {
   user: SessionUser | null;
   ready: boolean;
   login: (email: string, password: string) => Promise<string | null>;
   logout: () => Promise<void>;
-  apiFetch: (path: string, init?: RequestInit) => Promise<Response>;
+  apiFetch: ApiFetch;
 }
 
 const AuthContext = createContext<AuthState | null>(null);

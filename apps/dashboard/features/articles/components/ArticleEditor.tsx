@@ -19,7 +19,15 @@ import {
   validateArticleForm,
   type ArticleFormValue,
   type FieldKey,
-} from '@/lib/validate-article';
+} from '../validate';
+import {
+  createArticle,
+  getArticleAuthors,
+  getArticleCategories,
+  removeArticle,
+  transitionArticle,
+  updateArticle,
+} from '../services/articleService';
 
 import type { EditorOption } from '@/features/editorial-shared/types';
 
@@ -105,10 +113,7 @@ export function ArticleEditor({
     // Reference data loads once per editor mount (not per keystroke).
     void (async () => {
       try {
-        const [cats, auths] = await Promise.all([
-          apiFetch('/editorial/categories?locale=es&limit=100'),
-          apiFetch('/authors'),
-        ]);
+        const [cats, auths] = await Promise.all([getArticleCategories(apiFetch), getArticleAuthors(apiFetch)]);
         if (cats.ok) {
           const json = (await cats.json()) as { data: Array<{ id: string; slug: string; label: string }> };
           setCategories(json.data.map((c) => ({ id: c.id, label: `${c.label} (${c.slug})` })));
@@ -158,14 +163,11 @@ export function ArticleEditor({
     setLoadError(null);
     try {
       if (action === 'create') {
-        const res = await apiFetch('/articles', {
-          method: 'POST',
-          body: JSON.stringify({
-            categoryId: form.categoryId,
-            authorId: form.authorId || undefined,
-            coverMediaId: form.coverMediaId || undefined,
-            translations: buildTranslations(form),
-          }),
+        const res = await createArticle(apiFetch, {
+          categoryId: form.categoryId,
+          authorId: form.authorId || undefined,
+          coverMediaId: form.coverMediaId || undefined,
+          translations: buildTranslations(form),
         });
         if (!res.ok) {
           const code = errorCode(await res.json().catch(() => null));
@@ -192,7 +194,7 @@ export function ArticleEditor({
         translations: buildTranslations(form),
       };
       if (action === 'review') body.status = 'review';
-      const res = await apiFetch(`/articles/${articleId}`, { method: 'PATCH', body: JSON.stringify(body) });
+      const res = await updateArticle(apiFetch, articleId, body);
       if (!res.ok) {
         const code = errorCode(await res.json().catch(() => null));
         if (code === 'slug_taken') {
@@ -216,11 +218,13 @@ export function ArticleEditor({
     if (!articleId) return;
     setBusy(true);
     try {
-      const init: RequestInit = { method: 'POST' };
-      if (action === 'reject') {
-        init.body = JSON.stringify({ reason: reason?.trim() ? reason.trim().slice(0, 500) : undefined });
-      }
-      const res = await apiFetch(`/articles/${articleId}/${action}`, init);
+      const cleanReason = reason?.trim() ? reason.trim().slice(0, 500) : undefined;
+      const res = await transitionArticle(
+        apiFetch,
+        articleId,
+        action,
+        action === 'reject' ? { reason: cleanReason } : undefined,
+      );
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         const code = errorCode(body);
@@ -246,7 +250,7 @@ export function ArticleEditor({
     if (!articleId) return;
     setBusy(true);
     try {
-      const res = await apiFetch(`/articles/${articleId}`, { method: 'DELETE' });
+      const res = await removeArticle(apiFetch, articleId);
       if (!res.ok) {
         notify(`HTTP ${res.status}`, 'err');
         return;
