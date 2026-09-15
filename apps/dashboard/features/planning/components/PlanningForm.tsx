@@ -6,7 +6,9 @@ import { useAuth } from '@/shared/api/auth';
 import { useToast } from '@/shared/components/Toasts';
 import { Modal } from '@/shared/components/Modal';
 import { fromLocalInputValue, localZoneLabel, toLocalInputValue } from '@/features/editorial-shared/lib/schedule';
-import type { PlanningItem } from '@/lib/planning';
+import { listCategories } from '@/features/categories/services/categoryService';
+import type { PlanningItem } from '../planning';
+import { createPlanning, listPlanningStaff, updatePlanning } from '../services/planningService';
 
 export interface StaffOption {
   id: string;
@@ -62,7 +64,7 @@ export function PlanningForm({
   useEffect(() => {
     void (async () => {
       try {
-        const cats = await apiFetch('/editorial/categories?locale=es&limit=100');
+        const cats = await listCategories(apiFetch, 'es');
         if (cats.ok) {
           const json = (await cats.json()) as { data: Array<{ id: string; slug: string; label: string }> };
           setCategories(json.data.map((c) => ({ id: c.id, label: `${c.label} (${c.slug})` })));
@@ -74,26 +76,10 @@ export function PlanningForm({
   }, [apiFetch]);
 
   useEffect(() => {
-    // Staff users for assignee/reviewer selects come from the audit actor
-    // surface (no dedicated users endpoint exists). Best-effort; the API
-    // validates assignee/reviewer ids server-side.
+    // Staff roster comes from the planning service (audit-derived,
+    // best-effort — see planningService.listPlanningStaff).
     void (async () => {
-      try {
-        const res = await apiFetch('/audit-log?limit=100');
-        if (!res.ok) return;
-        const json = (await res.json()) as {
-          data: Array<{ actor: { id: string; email: string; displayName: string } | null }>;
-        };
-        const seen = new Map<string, string>();
-        for (const row of json.data) {
-          if (row.actor && !seen.has(row.actor.id)) {
-            seen.set(row.actor.id, `${row.actor.displayName} (${row.actor.email})`);
-          }
-        }
-        setStaff([...seen].map(([id, label]) => ({ id, label })));
-      } catch {
-        // Manual UUID entry remains possible via the API.
-      }
+      setStaff(await listPlanningStaff(apiFetch));
     })();
   }, [apiFetch]);
 
@@ -117,8 +103,8 @@ export function PlanningForm({
         dueAt: dueInput ? (fromLocalInputValue(dueInput) ?? undefined) : undefined,
       };
       const res = initial
-        ? await apiFetch(`/planning/${initial.id}`, { method: 'PATCH', body: JSON.stringify(body) })
-        : await apiFetch('/planning', { method: 'POST', body: JSON.stringify(body) });
+        ? await updatePlanning(apiFetch, initial.id, body)
+        : await createPlanning(apiFetch, body);
       if (!res.ok) {
         const code = errorCode(await res.json().catch(() => null));
         setFormError(code === 'invalid_transition' ? t('invalidTransition') : `HTTP ${res.status}`);
