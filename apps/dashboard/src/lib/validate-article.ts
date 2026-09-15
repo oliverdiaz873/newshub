@@ -8,9 +8,9 @@ import {
   splitParas as sharedSplitParas,
   validateTranslationForm,
   type TranslationForm,
-} from '@/lib/validate-content';
+} from '@/features/editorial-shared/lib/validate-content';
 
-export { CONTENT_SLUG_PATTERN as ARTICLE_SLUG_PATTERN } from '@/lib/validate-content';
+export { CONTENT_SLUG_PATTERN as ARTICLE_SLUG_PATTERN } from '@/features/editorial-shared/lib/validate-content';
 export type { TranslationForm };
 
 export interface ArticleFormValue {

@@ -7,7 +7,7 @@ import { useAuth } from '@/shared/api/auth';
 import { useToast } from '@/shared/components/Toasts';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
-import { diffSnapshots, type RevisionSnapshotShape } from '@/lib/revision-diff';
+import { diffSnapshots, type RevisionSnapshotShape } from '@/features/editorial-shared/lib/revision-diff';
 
 interface RevisionRow {
   id: string;

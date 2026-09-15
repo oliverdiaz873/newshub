@@ -10,7 +10,7 @@ import { RequireAuth } from '@/shared/components/RequireAuth';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Paginator, Table } from '@/shared/components/Table';
-import { CONTENT_SLUG_PATTERN } from '@/lib/validate-content';
+import { CONTENT_SLUG_PATTERN } from '@/features/editorial-shared/lib/validate-content';
 
 interface CategoryRow {
   id: string;

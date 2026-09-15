@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { toLocalLabel } from '@/lib/schedule';
+import { toLocalLabel } from '@/features/editorial-shared/lib/schedule';
 
 export interface SeoSignals {
   esTitle: string;
@@ -33,7 +33,7 @@ export function seoScore(signals: SeoSignals): { score: number; rows: Array<{ ke
  * never blocks saving or publishing. Weights are ES-first and fixed.
  */
 export function SeoChecklist({ signals }: { signals: SeoSignals }) {
-  const t = useTranslations('articles');
+  const t = useTranslations('editorial');
   const { score, rows } = seoScore(signals);
   const titleLen = signals.esTitle.trim().length;
   const summaryLen = signals.esSummary.trim().length;

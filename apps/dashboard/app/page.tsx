@@ -10,7 +10,7 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { RequireAuth } from '@/shared/components/RequireAuth';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
-import { toRelativeLabel } from '@/lib/schedule';
+import { toRelativeLabel } from '@/features/editorial-shared/lib/schedule';
 
 interface MetaResponse {
   data: unknown[];

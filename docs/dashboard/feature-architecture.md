@@ -13,7 +13,8 @@ apps/dashboard/
 │   ├── articles/
 │   ├── opinions/
 │   ├── editorial-shared/ # allowlist: HistoryPanel, ScheduleSection, LocaleTabs,
-│   │                     # SeoChecklist, validate-content, revision-diff, schedule
+│   │                     # SeoChecklist, validate-content, revision-diff, schedule,
+│   │                     # transitions, types (EditorOption)
 │   ├── media/            # dueño de MediaCard + MediaPicker + MediaManager
 │   ├── categories/
 │   ├── authors/
@@ -73,8 +74,10 @@ shared
    `/articles`, `/opinions`, `/media`, `/planning`, `/notifications`.
 5. `editorial-shared` es allowlist cerrada (ver árbol); no es un segundo global.
 6. `SeoChecklist` debe dejar namespace `articles` → neutral (`editorial`) en Fase 3.
-7. `OpinionEditor → ArticleEditor (EditorOption)` se rompe en Fase 3
-   (`EditorOption` a shared/editorial-shared).
+7. `OpinionEditor → ArticleEditor (EditorOption)` roto en Fase 3
+   (`EditorOption` vive en `features/editorial-shared/types.ts`).
+   `transitions.ts` vive en `features/editorial-shared/lib/`
+   (evidencia Fase 3: usado por articles+opinions pages y ambos editores).
 8. `PlanningForm → GET /audit-log` para staff se resuelve sin tocar `apps/api`
    (abstracción cliente o documentar limitación) en Fase 8.
 9. Sin cambios de URLs, API, DB, dependencias, CSS, state manager (React Context + local state).

@@ -6,21 +6,21 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/shared/api/auth';
 import { useToast } from '@/shared/components/Toasts';
 import { ConfirmDialog, Modal } from '@/shared/components/Modal';
-import { SeoChecklist } from '@/components/SeoChecklist';
-import { LocaleTabs } from '@/components/LocaleTabs';
-import { HistoryPanel } from '@/components/HistoryPanel';
-import { ScheduleSection } from '@/components/ScheduleSection';
+import { SeoChecklist } from '@/features/editorial-shared/components/SeoChecklist';
+import { LocaleTabs } from '@/features/editorial-shared/components/LocaleTabs';
+import { HistoryPanel } from '@/features/editorial-shared/components/HistoryPanel';
+import { ScheduleSection } from '@/features/editorial-shared/components/ScheduleSection';
 import { ErrorState } from '@/shared/components/States';
 import { MediaPicker } from '@/components/MediaPicker';
 import { useDirtyGuard } from '@/shared/lib/dirty';
-import { buildTranslations } from '@/lib/validate-content';
+import { buildTranslations } from '@/features/editorial-shared/lib/validate-content';
 import {
   OPINION_FIELD_ORDER,
   validateOpinionForm,
   type OpinionFieldKey,
   type OpinionFormValue,
 } from '@/lib/validate-opinion';
-import type { EditorOption } from '@/components/ArticleEditor';
+import type { EditorOption } from '@/features/editorial-shared/types';
 
 export const EMPTY_OPINION_FORM: OpinionFormValue = {
   authorId: '',

@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/shared/api/auth';
 import { useToast } from '@/shared/components/Toasts';
 import { Modal } from '@/shared/components/Modal';
-import { fromLocalInputValue, localZoneLabel, toLocalInputValue } from '@/lib/schedule';
+import { fromLocalInputValue, localZoneLabel, toLocalInputValue } from '@/features/editorial-shared/lib/schedule';
 import type { PlanningItem } from '@/lib/planning';
 
 export interface StaffOption {

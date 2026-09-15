@@ -13,8 +13,8 @@ import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Paginator, Table } from '@/shared/components/Table';
 import { LoadingFallback } from '@/shared/components/LoadingFallback';
-import { actionsFor, type EditorialAction } from '@/lib/transitions';
-import { toLocalLabel, toUtcLabel } from '@/lib/schedule';
+import { actionsFor, type EditorialAction } from '@/features/editorial-shared/lib/transitions';
+import { toLocalLabel, toUtcLabel } from '@/features/editorial-shared/lib/schedule';
 
 interface ListItem {
   id: string;

@@ -8,7 +8,7 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { RequireAuth } from '@/shared/components/RequireAuth';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { LoadingFallback } from '@/shared/components/LoadingFallback';
-import { toRelativeLabel } from '@/lib/schedule';
+import { toRelativeLabel } from '@/features/editorial-shared/lib/schedule';
 
 interface CategoryItem {
   id: string;

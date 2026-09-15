@@ -229,6 +229,22 @@
     "seoLastUpdated": "Last updated {date}.",
     "seoScheduled": "Scheduled {date}."
   },
+  "editorial": {
+    "seoTitle": "SEO completeness",
+    "seoScore": "Completeness {score}/100 (informational)",
+    "seoEsTitle": "Spanish title",
+    "seoEsSummary": "Spanish summary",
+    "seoCover": "Cover image",
+    "seoCoverAlt": "Cover alt text",
+    "seoEn": "English translation",
+    "seoOk": "present",
+    "seoMissing": "missing",
+    "seoChars": "{count}/{recommended} characters",
+    "seoAltNote": "alt text is managed on the media asset",
+    "seoFirstPublished": "First published {date}.",
+    "seoLastUpdated": "Last updated {date}.",
+    "seoScheduled": "Scheduled {date}."
+  },
   "mediaPicker": {
     "title": "Cover",
     "searchLabel": "Search media",

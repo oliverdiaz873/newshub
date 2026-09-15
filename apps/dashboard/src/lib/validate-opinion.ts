@@ -3,7 +3,7 @@
  * core). Author is required; no category, no curation flags by design.
  */
 
-import { validateTranslationForm, type TranslationForm } from '@/lib/validate-content';
+import { validateTranslationForm, type TranslationForm } from '@/features/editorial-shared/lib/validate-content';
 
 export type { TranslationForm };
 

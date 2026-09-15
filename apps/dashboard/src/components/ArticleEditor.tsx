@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/shared/api/auth';
 import { useToast } from '@/shared/components/Toasts';
 import { ConfirmDialog, Modal } from '@/shared/components/Modal';
-import { SeoChecklist } from '@/components/SeoChecklist';
-import { LocaleTabs } from '@/components/LocaleTabs';
-import { HistoryPanel } from '@/components/HistoryPanel';
-import { ScheduleSection } from '@/components/ScheduleSection';
+import { SeoChecklist } from '@/features/editorial-shared/components/SeoChecklist';
+import { LocaleTabs } from '@/features/editorial-shared/components/LocaleTabs';
+import { HistoryPanel } from '@/features/editorial-shared/components/HistoryPanel';
+import { ScheduleSection } from '@/features/editorial-shared/components/ScheduleSection';
 import { ErrorState } from '@/shared/components/States';
 import { MediaPicker } from '@/components/MediaPicker';
 import { useDirtyGuard } from '@/shared/lib/dirty';
@@ -21,10 +21,7 @@ import {
   type FieldKey,
 } from '@/lib/validate-article';
 
-export interface EditorOption {
-  id: string;
-  label: string;
-}
+import type { EditorOption } from '@/features/editorial-shared/types';
 
 export const EMPTY_FORM: ArticleFormValue = {
   categoryId: '',

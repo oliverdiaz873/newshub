@@ -10,7 +10,7 @@ import { ConfirmDialog, Modal } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Table } from '@/shared/components/Table';
 import { LoadingFallback } from '@/shared/components/LoadingFallback';
-import { toLocalLabel } from '@/lib/schedule';
+import { toLocalLabel } from '@/features/editorial-shared/lib/schedule';
 
 interface Subscription {
   id: string;

@@ -14,7 +14,7 @@ import {
   toLocalLabel,
   toRelativeLabel,
   toUtcLabel,
-} from '@/lib/schedule';
+} from '@/features/editorial-shared/lib/schedule';
 
 /**
  * Shared schedule controls (article + opinion editors). Visible only for

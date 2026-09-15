@@ -13,7 +13,7 @@ import { Paginator, Table } from '@/shared/components/Table';
 import { LoadingFallback } from '@/shared/components/LoadingFallback';
 import { PlanningForm } from '@/components/PlanningForm';
 import { planningActionsFor, type PlanningAction, type PlanningItem } from '@/lib/planning';
-import { toLocalLabel } from '@/lib/schedule';
+import { toLocalLabel } from '@/features/editorial-shared/lib/schedule';
 
 interface ScheduledEntry {
   kind: 'article' | 'opinion';
