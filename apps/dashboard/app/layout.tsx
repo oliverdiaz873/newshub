@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { AuthProvider } from '@/lib/auth';
-import { ThemeProvider } from '@/lib/theme';
-import { themeInitScript } from '@/lib/theme-script';
-import { LocaleProvider } from '@/lib/i18n';
-import { ToastProvider } from '@/components/Toasts';
-import { Shell } from '@/components/Shell';
+import { AuthProvider } from '@/shared/api/auth';
+import { ThemeProvider } from '@/shared/lib/theme';
+import { themeInitScript } from '@/shared/lib/theme-script';
+import { LocaleProvider } from '@/shared/lib/i18n';
+import { ToastProvider } from '@/shared/components/Toasts';
+import { DashboardShell } from './dashboard-shell';
 import '../src/app.css';
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LocaleProvider>
             <AuthProvider>
               <ToastProvider>
-                <Shell>{children}</Shell>
+                <DashboardShell>{children}</DashboardShell>
               </ToastProvider>
             </AuthProvider>
           </LocaleProvider>

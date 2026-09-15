@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RequireAuth } from '@/components/RequireAuth';
-import { ArticleEditor, EMPTY_FORM } from '@/components/ArticleEditor';
-import { useAuth } from '@/lib/auth';
+import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
+import { RequireAuth } from '@/shared/components/RequireAuth';
+import { ArticleEditor, EMPTY_FORM } from '@/features/articles/components/ArticleEditor';
+import { useAuth } from '@/shared/api/auth';
 
 export default function NewArticlePage() {
   const t = useTranslations('articles');

@@ -228,6 +228,22 @@
     "seoLastUpdated": "Última actualización {date}.",
     "seoScheduled": "Programado {date}."
   },
+  "editorial": {
+    "seoTitle": "Completitud SEO",
+    "seoScore": "Completitud {score}/100 (informativo)",
+    "seoEsTitle": "Título en español",
+    "seoEsSummary": "Resumen en español",
+    "seoCover": "Portada",
+    "seoCoverAlt": "Texto alternativo de portada",
+    "seoEn": "Traducción al inglés",
+    "seoOk": "presente",
+    "seoMissing": "faltante",
+    "seoChars": "{count}/{recommended} caracteres",
+    "seoAltNote": "el alt se gestiona en el asset de media",
+    "seoFirstPublished": "Primera publicación {date}.",
+    "seoLastUpdated": "Última actualización {date}.",
+    "seoScheduled": "Programado {date}."
+  },
   "mediaPicker": {
     "title": "Portada",
     "searchLabel": "Buscar en media",
