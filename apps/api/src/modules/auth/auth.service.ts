@@ -1,5 +1,6 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
+import { AuditService } from '../history/audit.service';
 import { hashPassword, verifyPassword } from './password';
 import {
   hashToken,
@@ -17,16 +18,33 @@ export interface SessionTokens {
 
 @Injectable()
 export class AuthService {
-  constructor(@Inject(AuthRepository) private readonly auth: AuthRepository) {}
+  private readonly logger = new Logger(AuthService.name);
+
+  constructor(
+    @Inject(AuthRepository) private readonly auth: AuthRepository,
+    @Inject(AuditService) private readonly audit: AuditService,
+  ) {}
 
   async login(email: string, password: string): Promise<SessionTokens> {
     const user = await this.auth.findUserWithCredentialsByEmail(email);
     const hash = user?.credentials?.passwordHash;
     // Same failure shape whether the user or the password is wrong.
     if (!user || !hash || !(await verifyPassword(hash, password))) {
+      // Best-effort security signal; must never break the 401 contract.
+      try {
+        await this.audit.record({ action: 'login.failed', entityType: 'user', entityId: user?.id ?? null });
+      } catch (err) {
+        this.logger.warn(`login.failed audit dropped: ${err instanceof Error ? err.message : err}`);
+      }
       throw new UnauthorizedException('Invalid email or password.');
     }
-    return this.issue(user.id, user.email, user.displayName, user.role);
+    const session = await this.issue(user.id, user.email, user.displayName, user.role);
+    try {
+      await this.audit.record({ action: 'login', entityType: 'user', entityId: user.id, actorId: user.id });
+    } catch (err) {
+      this.logger.warn(`login audit dropped: ${err instanceof Error ? err.message : err}`);
+    }
+    return session;
   }
 
   async refresh(presented: string | undefined): Promise<SessionTokens> {
@@ -51,6 +69,13 @@ export class AuthService {
     if (!presented) return;
     const row = await this.auth.findRefreshByHash(hashToken(presented));
     if (row && !row.revokedAt) await this.auth.revokeRefresh(row.id);
+    if (row) {
+      try {
+        await this.audit.record({ action: 'logout', entityType: 'user', entityId: row.userId, actorId: row.userId });
+      } catch (err) {
+        this.logger.warn(`logout audit dropped: ${err instanceof Error ? err.message : err}`);
+      }
+    }
   }
 
   async me(userId: string) {

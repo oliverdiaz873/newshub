@@ -91,7 +91,7 @@ async function main() {
   assertSeedAllowed();
   console.log(`Seed target: ${describeSeedTarget(process.env.DATABASE_URL)}`);
   await prisma.$executeRawUnsafe(
-    'TRUNCATE "users", "authors", "categories", "articles", "opinions", "media_assets", "user_credentials", "refresh_tokens" RESTART IDENTITY CASCADE',
+    'TRUNCATE "users", "authors", "categories", "articles", "opinions", "media_assets", "user_credentials", "refresh_tokens", "revisions", "audit_events", "notifications", "notification_prefs", "planning_items", "webhooks", "webhook_deliveries" RESTART IDENTITY CASCADE',
   );
 
   const admin = await prisma.user.create({
@@ -100,6 +100,9 @@ async function main() {
   await prisma.user.create({
     data: { email: 'editor@newshub.local', displayName: 'Editor', role: 'editor' },
   });
+  await prisma.user.create({
+    data: { email: 'reviewer@newshub.local', displayName: 'Reviewer', role: 'reviewer' },
+  });
   // Dev-only credentials (documented, never production secrets).
   await prisma.userCredential.create({
     data: { userId: admin.id, passwordHash: await hashPassword('Admin123!') },
@@ -107,6 +110,10 @@ async function main() {
   const editor = await prisma.user.findUniqueOrThrow({ where: { email: 'editor@newshub.local' } });
   await prisma.userCredential.create({
     data: { userId: editor.id, passwordHash: await hashPassword('Editor123!') },
+  });
+  const reviewer = await prisma.user.findUniqueOrThrow({ where: { email: 'reviewer@newshub.local' } });
+  await prisma.userCredential.create({
+    data: { userId: reviewer.id, passwordHash: await hashPassword('Reviewer123!') },
   });
 
   const staff = await prisma.author.create({ data: { slug: STAFF_SLUG } });
@@ -213,8 +220,38 @@ async function main() {
     opinionCount++;
   }
 
+  const firstCategoryId = categoryIds.get(CATEGORY_ORDER[0]);
+  await prisma.planningItem.create({
+    data: {
+      type: 'pitch',
+      title: 'Cobertura elecciones locales',
+      description: 'Propuesta de cobertura especial.',
+      categoryId: firstCategoryId ?? null,
+      priority: 'high',
+      status: 'pitched',
+      dueAt: new Date(Date.now() + 7 * 24 * 3600_000),
+      createdById: editor.id,
+      updatedById: editor.id,
+    },
+  });
+  await prisma.planningItem.create({
+    data: {
+      type: 'assignment',
+      title: 'Entrevista ministra de salud',
+      description: 'Asignada a la editora.',
+      categoryId: firstCategoryId ?? null,
+      assigneeId: editor.id,
+      reviewerId: reviewer.id,
+      priority: 'normal',
+      status: 'assigned',
+      dueAt: new Date(Date.now() + 3 * 24 * 3600_000),
+      createdById: admin.id,
+      updatedById: admin.id,
+    },
+  });
+
   console.log(
-    `Seed complete: ${CATEGORY_ORDER.length} categories, ${articleCount} articles, ${opinionCount} opinions, ${mediaByPath.size} media assets (locale ${LOCALE}).`,
+    `Seed complete: ${CATEGORY_ORDER.length} categories, ${articleCount} articles, ${opinionCount} opinions, ${mediaByPath.size} media assets, 2 planning items (locale ${LOCALE}).`,
   );
 }
 

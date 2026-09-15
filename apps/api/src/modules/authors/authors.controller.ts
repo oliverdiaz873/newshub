@@ -11,32 +11,36 @@ import { DtoPipe } from '../../common/http/validation';
  */
 @Controller('authors')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'editor')
 export class AuthorsController {
   constructor(@Inject(AuthorsService) private readonly authors: AuthorsService) {}
 
   @Get()
+  @Roles('admin', 'editor', 'reviewer')
   list() {
     return this.authors.list();
   }
 
   @Get(':id')
+  @Roles('admin', 'editor', 'reviewer')
   read(@Param('id') id: string) {
     return this.authors.read(id);
   }
 
   @Post()
+  @Roles('admin', 'editor')
   create(@Body(new DtoPipe(CreateAuthorDto)) dto: CreateAuthorDto) {
     return this.authors.create(dto);
   }
 
   @Patch(':id')
+  @Roles('admin', 'editor')
   update(@Param('id') id: string, @Body(new DtoPipe(UpdateAuthorDto)) dto: UpdateAuthorDto) {
     return this.authors.update(id, dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles('admin', 'editor')
   async remove(@Param('id') id: string): Promise<void> {
     await this.authors.remove(id);
   }

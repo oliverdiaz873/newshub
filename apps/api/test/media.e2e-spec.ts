@@ -139,9 +139,14 @@ describe('F5 media (e2e)', () => {
       .expect(201);
     expect(created.body.coverMediaId).toBe(mid);
     await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${created.body.id}`)
+      .set('Authorization', auth)
+      .send({ status: 'review' })
+      .expect(200);
+    await request(app.getHttpServer())
       .post(`/api/v1/articles/${created.body.id}/publish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     const pub = await request(app.getHttpServer())
       .get('/api/v1/articles/con-portada?locale=es')
       .expect(200);

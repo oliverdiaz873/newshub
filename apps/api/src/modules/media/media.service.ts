@@ -1,7 +1,9 @@
-import { ConflictException, Inject, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import sharp from 'sharp';
 import { MediaRepository } from './media.repository';
 import { StorageService } from './storage.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../history/audit.service';
 import { coverUrl } from './cover-url';
 import { buildMeta, normalizePagination } from '../../common/pagination';
 
@@ -31,8 +33,13 @@ export interface MediaView {
 @Injectable()
 export class MediaService {
   private readonly storage = new StorageService();
+  private readonly logger = new Logger(MediaService.name);
 
-  constructor(@Inject(MediaRepository) private readonly media: MediaRepository) {}
+  constructor(
+    @Inject(MediaRepository) private readonly media: MediaRepository,
+    @Inject(PrismaService) private readonly db: PrismaService,
+    @Inject(AuditService) private readonly audit: AuditService,
+  ) {}
 
   shape(row: { id: string; storageKey: string; mime: string; width: number | null; height: number | null; createdAt: Date }): MediaView {
     return {
@@ -73,12 +80,22 @@ export class MediaService {
     }
     const key = await this.storage.save(file.buffer, ext);
     try {
-      const row = await this.media.create({
-        storageKey: key,
-        mime,
-        width: meta.width ?? null,
-        height: meta.height ?? null,
-        createdById: userId,
+      const row = await this.db.$transaction(async (tx) => {
+        const created = await this.media.create({
+          storageKey: key,
+          mime,
+          width: meta.width ?? null,
+          height: meta.height ?? null,
+          createdById: userId,
+        }, tx);
+        await this.audit.record({
+          action: 'media.upload',
+          entityType: 'media',
+          entityId: created.id,
+          actorId: userId,
+          metadata: { mime, width: meta.width ?? null, height: meta.height ?? null },
+        }, tx);
+        return created;
       });
       return this.shape(row);
     } catch (err) {
@@ -86,10 +103,21 @@ export class MediaService {
       throw err;
     }
   }
-  async remove(id: string) {
+  async remove(id: string, userId?: string) {
     const row = await this.media.findFullById(id);
     if (!row) throw new NotFoundException('Media asset not found.');
     if ((await this.media.countReferences(id)) > 0) {
+      try {
+        await this.audit.record({
+          action: 'media.delete_blocked',
+          entityType: 'media',
+          entityId: id,
+          actorId: userId,
+          metadata: { code: 'media_in_use' },
+        });
+      } catch (err) {
+        this.logger.warn(`delete_blocked audit dropped for ${id}: ${err instanceof Error ? err.message : err}`);
+      }
       throw new ConflictException({
         code: 'media_in_use',
         error: 'Conflict',
@@ -98,7 +126,10 @@ export class MediaService {
     }
     // Remove the file first: orphans are harmless, broken references are not.
     await this.storage.remove(row.storageKey);
-    await this.media.deleteById(id);
+    await this.db.$transaction(async (tx) => {
+      await this.media.deleteById(id, tx);
+      await this.audit.record({ action: 'media.delete', entityType: 'media', entityId: id, actorId: userId }, tx);
+    });
   }
 
   /**

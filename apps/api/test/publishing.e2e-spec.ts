@@ -90,10 +90,15 @@ describe('F4 publishing (e2e)', () => {
       .send({ categoryId: ids.category, translations: [ES] })
       .expect(201);
     const id = created.body.id as string;
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ status: 'review' })
+      .expect(200);
     const published = await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/publish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     expect(published.body).toMatchObject({ status: 'published' });
     expect(published.body.firstPublishedAt).toEqual(expect.any(String));
     const first = published.body.firstPublishedAt as string;
@@ -104,17 +109,22 @@ describe('F4 publishing (e2e)', () => {
     const republished = await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/publish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     expect(republished.body.firstPublishedAt).toBe(first);
     await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/unpublish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     await request(app.getHttpServer()).get('/api/v1/articles/ciclo-f4?locale=es').expect(404);
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ status: 'review' })
+      .expect(200);
     const republished2 = await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/publish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     expect(republished2.body.firstPublishedAt).toBe(first);
     await request(app.getHttpServer())
       .delete(`/api/v1/articles/${id}`)
@@ -134,7 +144,7 @@ describe('F4 publishing (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/archive`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     const direct = await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/publish`)
       .set('Authorization', auth)
@@ -143,7 +153,7 @@ describe('F4 publishing (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/restore`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     const restored = await request(app.getHttpServer())
       .get(`/api/v1/editorial/articles/${id}`)
       .set('Authorization', auth)
@@ -176,7 +186,7 @@ describe('F4 publishing (e2e)', () => {
     const published = await request(app.getHttpServer())
       .post(`/api/v1/articles/${id}/publish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     expect(published.body).toMatchObject({ status: 'published' });
     await request(app.getHttpServer())
       .patch(`/api/v1/articles/${id}`)
@@ -199,20 +209,25 @@ describe('F4 publishing (e2e)', () => {
       .expect(201);
     const id = created.body.id as string;
     await request(app.getHttpServer())
+      .patch(`/api/v1/opinions/${id}`)
+      .set('Authorization', auth)
+      .send({ status: 'review' })
+      .expect(200);
+    await request(app.getHttpServer())
       .post(`/api/v1/opinions/${id}/publish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     await request(app.getHttpServer()).get('/api/v1/opinions/op-ciclo?locale=es').expect(200);
     await request(app.getHttpServer())
       .post(`/api/v1/opinions/${id}/unpublish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     await request(app.getHttpServer()).get('/api/v1/opinions/op-ciclo?locale=es').expect(404);
     // Idempotent: already draft.
     await request(app.getHttpServer())
       .post(`/api/v1/opinions/${id}/unpublish`)
       .set('Authorization', auth)
-      .expect(201);
+      .expect(200);
     await request(app.getHttpServer())
       .delete(`/api/v1/opinions/${id}`)
       .set('Authorization', auth)

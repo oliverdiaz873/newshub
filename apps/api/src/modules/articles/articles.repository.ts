@@ -20,6 +20,8 @@ export interface EditorialArticleFilters {
   q?: string;
   breaking?: boolean;
   featured?: boolean;
+  scheduled?: boolean;
+  overdue?: boolean;
 }
 
 /**
@@ -85,6 +87,12 @@ export class ArticlesRepository {
   private qWhereAny(filters: EditorialArticleFilters & { q: string }): Prisma.Sql {
     const parts: Prisma.Sql[] = [];
     if (filters.status) parts.push(Prisma.sql`a."status" = ${filters.status}`);
+    if (filters.scheduled !== undefined) {
+      parts.push(
+        filters.scheduled ? Prisma.sql`a."scheduled_at" IS NOT NULL` : Prisma.sql`a."scheduled_at" IS NULL`,
+      );
+    }
+    if (filters.overdue) parts.push(Prisma.sql`a."scheduled_at" <= NOW()`);
     return this.qPredicates(
       parts.length > 0 ? Prisma.join(parts, ' AND ') : Prisma.sql`TRUE`,
       filters,
@@ -193,6 +201,10 @@ export class ArticlesRepository {
     if (filters.authorId) where.authorId = filters.authorId;
     if (filters.breaking !== undefined) where.isBreaking = filters.breaking;
     if (filters.featured !== undefined) where.isFeatured = filters.featured;
+    if (filters.scheduled !== undefined) {
+      where.scheduledAt = filters.scheduled ? { not: null } : null;
+    }
+    if (filters.overdue) where.scheduledAt = { lte: new Date() };
     // NOTE: `q` is intentionally absent here (see baseWhere comment).
     return where;
   }
@@ -224,8 +236,8 @@ export class ArticlesRepository {
     );
   }
 
-  findByIdFull(id: string) {
-    return this.prisma.article.findUnique({
+  findByIdFull(id: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.findUnique({
       where: { id },
       include: {
         translations: true,
@@ -248,8 +260,8 @@ export class ArticlesRepository {
     coverMediaId?: string | null;
     createdById: string;
     translations: Array<{ locale: string; slug: string; title: string; summary: string; coverAlt?: string | null; content: string[] }>;
-  }) {
-    return this.prisma.article.create({
+  }, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.create({
       data: {
         categoryId: input.categoryId,
         authorId: input.authorId ?? null,
@@ -275,8 +287,9 @@ export class ArticlesRepository {
   updateFields(
     id: string,
     input: { categoryId?: string; authorId?: string | null; coverMediaId?: string | null; status?: string; isBreaking?: boolean; isFeatured?: boolean; updatedById: string },
+    tx?: Prisma.TransactionClient,
   ) {
-    return this.prisma.article.update({
+    return (tx ?? this.prisma).article.update({
       where: { id },
       data: {
         ...(input.categoryId !== undefined ? { category: { connect: { id: input.categoryId } } } : {}),
@@ -301,8 +314,9 @@ export class ArticlesRepository {
   upsertTranslation(
     articleId: string,
     t: { locale: string; slug: string; title: string; summary: string; coverAlt?: string | null; content: string[] },
+    tx?: Prisma.TransactionClient,
   ) {
-    return this.prisma.articleTranslation.upsert({
+    return (tx ?? this.prisma).articleTranslation.upsert({
       where: { articleId_locale: { articleId, locale: t.locale } },
       update: { slug: t.slug, title: t.title, summary: t.summary, coverAlt: t.coverAlt ?? null, content: t.content },
       create: {
@@ -312,17 +326,72 @@ export class ArticlesRepository {
     });
   }
 
-  deleteById(id: string) {
-    return this.prisma.article.delete({ where: { id } });
+  deleteById(id: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.delete({ where: { id } });
   }
 
-  setStatus(id: string, input: { status: string; publishedAt?: Date | null; updatedById: string }) {
-    return this.prisma.article.update({
+  setStatus(
+    id: string,
+    input: { status: string; publishedAt?: Date | null; scheduledAt?: Date | null; scheduledById?: string | null; updatedById: string },
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).article.update({
       where: { id },
       data: {
         status: input.status,
         ...(input.publishedAt !== undefined ? { publishedAt: input.publishedAt } : {}),
+        ...(input.scheduledAt !== undefined ? { scheduledAt: input.scheduledAt } : {}),
+        ...(input.scheduledById === undefined
+          ? {}
+          : input.scheduledById === null
+            ? { scheduledBy: { disconnect: true } }
+            : { scheduledBy: { connect: { id: input.scheduledById } } }),
         updatedBy: { connect: { id: input.updatedById } },
+      },
+    });
+  }
+
+  setSchedule(id: string, input: { scheduledAt: Date; scheduledById: string; updatedById: string }, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.update({
+      where: { id },
+      data: {
+        scheduledAt: input.scheduledAt,
+        scheduledBy: { connect: { id: input.scheduledById } },
+        updatedBy: { connect: { id: input.updatedById } },
+      },
+    });
+  }
+
+  clearSchedule(id: string, updatedById: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.update({
+      where: { id },
+      data: { scheduledAt: null, scheduledBy: { disconnect: true }, updatedBy: { connect: { id: updatedById } } },
+    });
+  }
+
+  findDue(now: Date, take: number, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.findMany({
+      where: { status: 'review', scheduledAt: { lte: now } },
+      orderBy: { scheduledAt: 'asc' },
+      take,
+      include: { translations: true },
+    });
+  }
+
+  /**
+   * Guarded due-publish: flips review→published and clears the schedule
+   * only if the row is still review with the exact claimed instant
+   * (multi-instance safe; returns count 0 when raced or changed).
+   */
+  publishDue(id: string, scheduledAt: Date, publishedAt: Date, updatedById?: string, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).article.updateMany({
+      where: { id, status: 'review', scheduledAt },
+      data: {
+        status: 'published',
+        publishedAt,
+        scheduledAt: null,
+        scheduledById: null,
+        ...(updatedById ? { updatedById } : {}),
       },
     });
   }
