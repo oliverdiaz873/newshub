@@ -2,5 +2,6 @@
   "featuredNews": "Featured News",
   "latestNews": "Latest News",
   "opinion": "Opinion",
-  "breakingNews": "BREAKING NEWS"
+  "breakingNews": "BREAKING NEWS",
+  "moreInCategory": "More in {label}"
 }

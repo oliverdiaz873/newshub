@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { Breadcrumb } from '@/features/navigation/components';
-import { RecentNewsSidebar, ArticleDetail, useNewsArticle } from '@/features/news';
+import { RecentNewsSidebar, ArticleDetail } from '@/features/news';
 import { NewsLayout } from '@/shared/layouts';
 import { useArticleTranslator } from '@/features/news/hooks/useArticleTranslation';
 import type { FullNewsArticle } from '@/data/newsModels';
@@ -13,12 +13,13 @@ import type { FullNewsArticle } from '@/data/newsModels';
  * Article Page - Client Component
  *
  * Página que orquestra la visualización de una noticia individual.
- * Delega la lógica de búsqueda al hook useNewsArticle para mantener un diseño limpio.
+ * Recibe el artículo resuelto por el servidor (API-only, Fase 4) y mantiene
+ * un diseño limpio delegando el render a los componentes de presentación.
  *
  * F1.1 detail API-first: the server-resolved article (API-first) is the
- * body source, including `relatedNews` from `detail.related`. The local
- * hook remains only as the development fallback when the server could
- * not resolve from the API (NEXT_PUBLIC_API_URL unset).
+ * body source, including `relatedNews` from `detail.related`.
+ * F4.0 API-only: no local fallback; the server guarantees initialArticle
+ * (notFound/throw otherwise).
  *
  * Componentes usados:
  * - Breadcrumb: Navegación jerárquica (Inicio > Categoría > Noticia).
@@ -28,9 +29,12 @@ import type { FullNewsArticle } from '@/data/newsModels';
  */
 export const Article = ({ initialArticle }: { initialArticle?: FullNewsArticle | null }) => {
   const translateArticle = useArticleTranslator();
-  const { article: localArticle, categoryName, categorySlug } = useNewsArticle();
-  const base = initialArticle ?? localArticle ?? undefined;
+  const base = initialArticle ?? undefined;
   const article = translateArticle(base);
+  // Category data comes from the API article href (/news/<category>/<slug>).
+  const hrefParts = (article?.href ?? '').split('/').filter(Boolean);
+  const categorySlug = hrefParts[1] ?? '';
+  const categoryName = article?.category ?? '';
   const t = useTranslations('news');
   const tCommon = useTranslations('common');
   const tData = useTranslations('data');

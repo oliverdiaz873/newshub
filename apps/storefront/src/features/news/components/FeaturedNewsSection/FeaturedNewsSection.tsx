@@ -4,9 +4,6 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import {
-  featuredGrid,
-  featuredPrimary,
-  featuredSecondary,
   type FeaturedSectionContent,
   type NewsArticle,
 } from '../../../../data';
@@ -53,21 +50,15 @@ const CardLink = ({
 };
 
 interface FeaturedNewsSectionProps {
-  content?: FeaturedSectionContent;
+  content: FeaturedSectionContent;
 }
 
 /** Renderiza un bloque editorial destacado reusable para portada y categorias. */
 export const FeaturedNewsSection = ({ content }: FeaturedNewsSectionProps) => {
   const translateArticle = useArticleTranslator();
-  const t = useTranslations('home');
   const tCommon = useTranslations('common');
 
-  const rawSectionContent: FeaturedSectionContent = content ?? {
-    title: t('featuredNews'),
-    primary: featuredPrimary,
-    secondary: [featuredSecondary[0], featuredSecondary[1], featuredGrid[0]],
-    grid: [featuredGrid[1], featuredGrid[2]],
-  };
+  const rawSectionContent: FeaturedSectionContent = content;
 
   const sectionContent = {
     title: rawSectionContent.title,

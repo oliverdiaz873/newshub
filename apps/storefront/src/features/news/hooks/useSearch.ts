@@ -1,17 +1,16 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createTranslator, useLocale } from 'next-intl';
-import { newsArticles, opinionArticles } from '../../../data';
-import { hasSearchQuery, matchesSearchQuery } from '../../../shared/utils/searchUtils';
+import { useLocale } from 'next-intl';
+import { hasSearchQuery } from '../../../shared/utils/searchUtils';
 import { getApiBase, searchAll, type SearchResultItem } from '@/lib/api';
 
 /**
  * Hook para gestionar la lógica de búsqueda global de noticias y opiniones.
  *
- * F3.1 search API-first: con NEXT_PUBLIC_API_URL configurado, los
+ * F4.0 search API-only: con NEXT_PUBLIC_API_URL configurado, los
  * resultados vienen de GET /articles?q= + GET /opinions?q= en paralelo
- * (merge por publishedAt DESC). La capa local estática permanece
- * únicamente como fallback de desarrollo (API no configurada).
+ * (merge por publishedAt DESC). Sin API configurada no hay resultados
+ * locales: la búsqueda requiere backend.
  * Limitación MVP conocida: el matching API es ILIKE sensible a tildes
  * sobre title/summary; `economia` no encuentra `Economía`.
  */
@@ -20,8 +19,7 @@ export const useSearch = (overrideQuery?: string) => {
   const query = overrideQuery !== undefined ? overrideQuery : (searchParams.get('q') || '');
   const locale = useLocale();
   const apiBase = getApiBase();
-  const [enTranslator, setEnTranslator] = useState<((key: string) => string) | null>(null);
-  // F3 review fix: API results/errors are keyed by the query that produced
+  // F4.0: API results/errors are keyed by the query that produced
   // them. While a new query is in flight (or after it changed), the render
   // must not show previous-query results nor rethrow a previous error:
   // the cleanup effect runs after render, so a bare `apiError` flag would
@@ -31,21 +29,6 @@ export const useSearch = (overrideQuery?: string) => {
     results: SearchResultItem[] | null;
     error: Error | null;
   }>({ query: '', results: null, error: null });
-
-  useEffect(() => {
-    if (apiBase) return;
-    if (hasSearchQuery(query)) {
-      let cancelled = false;
-      import('../../../../messages/en.json').then((mod) => {
-        if (cancelled) return;
-        setEnTranslator(() => createTranslator({ locale: 'en', messages: mod.default }) as (key: string) => string);
-      });
-      return () => { cancelled = true; };
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional cache reset: frees the EN translator when the query is cleared; results are already [] via the useMemo guard below, so no cascading render affects output
-      setEnTranslator(null);
-    }
-  }, [query, apiBase]);
 
   useEffect(() => {
     if (!apiBase || !hasSearchQuery(query)) {
@@ -68,42 +51,11 @@ export const useSearch = (overrideQuery?: string) => {
     return () => { cancelled = true; };
   }, [query, locale, apiBase]);
 
-  // Error de backend -> error.tsx (nunca datos locales en producción).
+  // Error de backend -> error.tsx (nunca datos locales).
   // Solo cuando el error pertenece a la query actual: al cambiar de query,
   // el estado obsoleto se ignora para permitir recuperación y no mostrar
   // resultados ajenos mientras el nuevo fetch está en vuelo.
   const settled = apiState.query === query;
-
-  const localResults = useMemo(() => {
-    if (!hasSearchQuery(query) || !enTranslator) return [];
-
-    const allContent = [
-      ...newsArticles,
-      ...opinionArticles
-    ];
-
-    const getEnVal = (key: string) => enTranslator(key) ?? '';
-
-    return allContent.filter(article => {
-      const matchesOriginal =
-        matchesSearchQuery(article.title, query) ||
-        matchesSearchQuery(article.category, query) ||
-        matchesSearchQuery(article.summary, query);
-
-      if (matchesOriginal) return true;
-
-      const enTitle = getEnVal(`data.articles.${article.id}.title`);
-      const enSummary = getEnVal(`data.articles.${article.id}.summary`);
-      const categoryKey = article.category?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const enCategory = getEnVal(`data.categories.${categoryKey}.label`);
-
-      return (
-        (enTitle && matchesSearchQuery(enTitle, query)) ||
-        (enCategory && matchesSearchQuery(enCategory, query)) ||
-        (enSummary && matchesSearchQuery(enSummary, query))
-      );
-    });
-  }, [query, enTranslator]);
 
   if (!settled) {
     return {
@@ -116,7 +68,8 @@ export const useSearch = (overrideQuery?: string) => {
   }
   if (apiState.error) throw apiState.error;
 
-  const results = apiBase ? (apiState.results ?? []) : localResults;
+  // F4.0 API-only: sin API configurada no hay resultados locales.
+  const results = apiBase ? (apiState.results ?? []) : [];
 
   return {
     query,

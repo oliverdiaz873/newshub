@@ -3,17 +3,17 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { latestNews, type NewsArticle } from '../../../../data';
+import { type NewsArticle } from '../../../../data';
 import { FALLBACK_OG_IMAGE } from '@/lib/api';
 import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 
 interface LatestNewsSectionProps {
   title?: string;
-  articles?: NewsArticle[];
+  articles: NewsArticle[];
 }
 
 /** Renderiza una cuadricula editorial reusable para portada y categorias. */
-export const LatestNewsSection = ({ title, articles: rawArticles = latestNews }: LatestNewsSectionProps) => {
+export const LatestNewsSection = ({ title, articles: rawArticles }: LatestNewsSectionProps) => {
   const translateArticle = useArticleTranslator();
   const t = useTranslations('home');
   const tCommon = useTranslations('common');

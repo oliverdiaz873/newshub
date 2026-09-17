@@ -1,0 +1,35 @@
+[
+  {
+    "id": "opinion-politica",
+    "title": "Democracy and the Challenge of Transparency",
+    "summary": "Citizen trust increasingly depends on open and accountable institutions.",
+    "coverAlt": "Illustration of democratic institutions and transparency concepts",
+    "content": [
+      "In today's complex political landscape, transparency has consolidated itself not only as an ethical requirement but as the fundamental pillar supporting the legitimacy of modern democracies. Citizen trust in their representatives and institutions has been eroded by years of opacity and lack of accountability, creating a gap that can only be closed with light and honesty.",
+      "True transparency goes beyond publishing documents on web portals; it implies a real will to expose decision-making processes to public scrutiny. When governments hide the reasons behind their policies or the details of their spending, they foster a climate of suspicion that fuels populism and political disaffection.",
+      "It is imperative that our institutions adopt open technologies and citizen audit processes. A democracy that fears transparency is a democracy that doubts its own value. The challenge is enormous, but the cost of opacity is, quite simply, unacceptable for a society that aspires to be truly free."
+    ]
+  },
+  {
+    "id": "opinion-economia",
+    "title": "Where is the Global Economy Heading?",
+    "summary": "We analyze the factors that will mark the economic course in the coming years.",
+    "coverAlt": "Visual representation of global economic trends and AI technology",
+    "content": [
+      "We find ourselves at an unprecedented turning point in contemporary economic history. Globalization, as we knew it, is being redefined by geopolitical tensions, the energy transition, and the massive emergence of artificial intelligence. These factors are not only changing what we produce, but how and where we do it.",
+      "Inflation, although it seems to be under control in some regions, has left a deep mark on the cost structure of companies and family budgets. The great challenge for central banks will be to navigate this new environment without stifling the growth necessary to finance the transition to a green economy.",
+      "In the long term, sustainability will be the main driver of economic value. Those countries and companies that fail to adapt their business models to the planet's limits will find themselves marginalized. The global economy of the future will not only be digital; it will be fundamentally regenerative or it will not be at all."
+    ]
+  },
+  {
+    "id": "opinion-salud",
+    "title": "The Importance of Preventive Health",
+    "summary": "Investing in prevention is fundamental to maintaining a healthy population and reducing healthcare costs.",
+    "coverAlt": "Illustration of preventive healthcare and medical checkups",
+    "content": [
+      "The global healthcare system has historically been focused on the cure, reacting to disease once it manifests. However, the true medical revolution of the 21st century lies in prevention. Investing in preventive health is not just a matter of individual well-being; it is a survival strategy for public health systems.",
+      "Every euro invested in vaccination campaigns, early detection, and the promotion of healthy habits saves thousands of euros in chronic treatments and complex hospitalizations. Technology today allows us to monitor our health in real-time, offering us a unique opportunity to intervene before the damage is irreversible.",
+      "Preventive health requires a cultural paradigm shift: moving from being passive patients to being active managers of our own well-being. Only through education and equitable access to preventive services can we guarantee longevity that is truly healthy and dignified for everyone."
+    ]
+  }
+]
