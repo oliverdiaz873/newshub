@@ -1,8 +1,13 @@
 /**
- * Seed: loads ES editorial content from the API-owned seed-data directory
- * (apps/api/prisma/seed-data) into PostgreSQL. ES rows only — no EN content is
- * invented; EN fallback is resolved at the API layer. Re-runnable: truncates
- * the editorial tables first for a clean, reproducible seed.
+ * Seed: loads ES + EN editorial content from the API-owned seed-data directory
+ * (apps/api/prisma/seed-data) into PostgreSQL. EN rows come exclusively from
+ * the traceable editorial source (messages/en.json REAL_TRANSLATIONS,
+ * frozen into articles.en.json / opinions.en.json / categories.en.json);
+ * nothing is invented. Categories EN carry translated labels with
+ * description NULL (pending human translation); author EN has no source yet
+ * and stays ES-only (pending). EN fallback remains at the API layer only as
+ * a transitory mechanism. Re-runnable: truncates the editorial tables first
+ * for a clean, reproducible seed.
  *
  * Ownership: seed-data/*.json is the single source for seed content.
  * apps/storefront/src/data/* is legacy and coexists temporarily during the
@@ -50,6 +55,27 @@ interface SeedOpinionDetail {
   content: string[];
 }
 
+interface SeedArticleEn {
+  id: string;
+  title: string;
+  summary: string;
+  coverAlt: string | null;
+  content: string[];
+}
+
+interface SeedOpinionEn {
+  id: string;
+  title: string;
+  summary: string;
+  coverAlt: string | null;
+  content: string[];
+}
+
+interface SeedCategoriesEn {
+  order: string[];
+  labels: Record<string, string>;
+}
+
 const SEED_DIR = join(__dirname, 'seed-data');
 
 function loadJson<T>(name: string): T {
@@ -58,6 +84,7 @@ function loadJson<T>(name: string): T {
 
 const prisma = new PrismaClient();
 const LOCALE = 'es';
+const LOCALE_EN = 'en';
 const STAFF_SLUG = 'redaccion';
 
 interface SeedCategories {
@@ -70,6 +97,13 @@ const newsArticles = loadJson<SeedNewsArticle[]>('articles.json');
 const opinionArticles = loadJson<SeedOpinionArticle[]>('opinions.json');
 const opinionDetails = loadJson<Record<string, SeedOpinionDetail>>('opinion-details.json');
 const allFullArticles = loadJson<SeedFullArticle[]>('article-contents.json');
+const articlesEn = loadJson<SeedArticleEn[]>('articles.en.json');
+const opinionsEn = loadJson<SeedOpinionEn[]>('opinions.en.json');
+const categoriesEn = loadJson<SeedCategoriesEn>('categories.en.json');
+const articlesEnById = new Map<string, SeedArticleEn>();
+for (const row of articlesEn) articlesEnById.set(row.id, row);
+const opinionsEnById = new Map<string, SeedOpinionEn>();
+for (const row of opinionsEn) opinionsEnById.set(row.id, row);
 
 function mimeOf(path: string): string {
   if (path.endsWith('.avif')) return 'image/avif';
@@ -151,6 +185,18 @@ async function main() {
         description: meta.description,
       },
     });
+    const labelEn = categoriesEn.labels[slug];
+    if (labelEn) {
+      await prisma.categoryTranslation.create({
+        data: {
+          categoryId: row.id,
+          locale: LOCALE_EN,
+          slug,
+          label: labelEn,
+          description: null,
+        },
+      });
+    }
     categoryIds.set(slug, row.id);
   }
 
@@ -189,6 +235,20 @@ async function main() {
         content: full ? full.content : [article.summary],
       },
     });
+    const articleEn = articlesEnById.get(article.id);
+    if (articleEn) {
+      await prisma.articleTranslation.create({
+        data: {
+          articleId: row.id,
+          locale: LOCALE_EN,
+          slug: slugOf(article.href),
+          title: articleEn.title,
+          summary: articleEn.summary,
+          coverAlt: articleEn.coverAlt,
+          content: articleEn.content,
+        },
+      });
+    }
     articleCount++;
   }
 
@@ -217,6 +277,20 @@ async function main() {
         content: detail ? detail.content : [opinion.summary],
       },
     });
+    const opinionEn = opinionsEnById.get(opinion.id);
+    if (opinionEn) {
+      await prisma.opinionTranslation.create({
+        data: {
+          opinionId: row.id,
+          locale: LOCALE_EN,
+          slug: opinion.slug ?? slugOf(opinion.href),
+          title: opinionEn.title,
+          summary: opinionEn.summary,
+          coverAlt: opinionEn.coverAlt,
+          content: opinionEn.content,
+        },
+      });
+    }
     opinionCount++;
   }
 
@@ -251,7 +325,7 @@ async function main() {
   });
 
   console.log(
-    `Seed complete: ${CATEGORY_ORDER.length} categories, ${articleCount} articles, ${opinionCount} opinions, ${mediaByPath.size} media assets, 2 planning items (locale ${LOCALE}).`,
+    `Seed complete: ${CATEGORY_ORDER.length} categories, ${articleCount} articles, ${opinionCount} opinions, ${mediaByPath.size} media assets, 2 planning items (locales es+en; author EN pending, category EN descriptions pending).`,
   );
 }
 

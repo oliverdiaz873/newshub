@@ -11,7 +11,17 @@
     "notFoundLabel": "Category not found",
     "notFoundTitle": "We couldn't find that editorial section",
     "notFoundDescription": "The requested URL does not match any available category in the system.",
-    "recentNews": "Recent News"
+    "recentNews": "Recent News",
+    "labels": {
+      "politica": "Politics",
+      "internacional": "International",
+      "economia": "Economy",
+      "salud": "Health",
+      "deporte": "Sports",
+      "clima": "Weather",
+      "justicia": "Justice",
+      "opinion": "Opinion"
+    }
   },
   "opinion": {
     "notFoundLabel": "Opinion not found",

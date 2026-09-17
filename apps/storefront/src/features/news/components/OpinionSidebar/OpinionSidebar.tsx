@@ -3,18 +3,18 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { opinionArticles, type OpinionArticle } from '../../../../data';
+import { type OpinionArticle } from '../../../../data';
 import { FALLBACK_OG_IMAGE } from '@/lib/api';
 import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 import '../RecentNewsSidebar/RecentNewsSidebar.css';
 
 interface OpinionSidebarProps {
   title?: string;
-  articles?: OpinionArticle[];
+  articles: OpinionArticle[];
 }
 
 /** Representa una barra lateral editorial reusable para home y categorias. */
-export const OpinionSidebar = ({ title, articles: rawArticles = opinionArticles }: OpinionSidebarProps) => {
+export const OpinionSidebar = ({ title, articles: rawArticles }: OpinionSidebarProps) => {
   const translateArticle = useArticleTranslator();
   const t = useTranslations('home');
   

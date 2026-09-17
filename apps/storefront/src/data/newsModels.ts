@@ -48,8 +48,10 @@ export interface OpinionArticle {
 
 export interface FeaturedSectionContent {
   title: string;
-  primary: NewsArticle;
-  secondary: [NewsArticle, NewsArticle, NewsArticle];
+  // F4.0: API pools may be thin; callers tolerate undefined entries
+  // (FeaturedNewsSection drops them and renders nothing when empty).
+  primary: NewsArticle | undefined;
+  secondary: (NewsArticle | undefined)[];
   grid: NewsArticle[];
 }
 

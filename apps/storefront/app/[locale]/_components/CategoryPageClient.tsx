@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { useCategory, FeaturedNewsSection, LatestNewsSection, OpinionSidebar } from '@/features/news';
+import { FeaturedNewsSection, LatestNewsSection, OpinionSidebar } from '@/features/news';
 import type { CategoryPageContent } from '@/data/newsModels';
 import { NewsLayout } from '@/shared/layouts';
 import { useCategoryTranslation } from '@/features/news/hooks/useCategoryTranslation';
@@ -14,9 +14,9 @@ import { useCategoryTranslation } from '@/features/news/hooks/useCategoryTransla
  * Página que orquestra la visualización de una sección de noticias (Salud, Deporte, etc.).
  *
  * F2.2 category API-first: the server-resolved content (API composition)
- * takes precedence; the local hook remains only as the development
- * fallback when the server could not resolve from the API
- * (NEXT_PUBLIC_API_URL unset). The sidebar shows API opinions
+ * takes precedence.
+ * F4.0 API-only: no local fallback; the server guarantees initialContent
+ * (notFound/throw otherwise). The sidebar shows API opinions
  * (GET /opinions?limit=3); sidebarNews.ts is no longer a render source.
  *
  * Componentes usados:
@@ -26,8 +26,7 @@ import { useCategoryTranslation } from '@/features/news/hooks/useCategoryTransla
  * - LatestNewsSection: Listado inferior de noticias adicionales.
  */
 export const Category = ({ initialContent }: { initialContent?: CategoryPageContent | null }) => {
-  const { content: rawContent } = useCategory();
-  const content = useCategoryTranslation(initialContent ?? rawContent);
+  const content = useCategoryTranslation(initialContent ?? undefined);
   const t = useTranslations('news');
   const tCommon = useTranslations('common');
 

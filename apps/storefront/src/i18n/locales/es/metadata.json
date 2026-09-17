@@ -28,7 +28,8 @@
   },
   "category": {
     "notFound": "Categoría no encontrada",
-    "notFoundDescription": "La categoría solicitada no existe."
+    "notFoundDescription": "La categoría solicitada no existe.",
+    "description": "Últimas noticias de {label} en NewsHub."
   },
   "article": {
     "notFound": "Noticia no encontrada",

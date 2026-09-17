@@ -4,46 +4,30 @@ import type { NewsArticle, FullNewsArticle, OpinionArticle, ArticleContent } fro
 type AnyArticle = NewsArticle | FullNewsArticle | OpinionArticle | ArticleContent;
 
 /**
- * useArticleTranslation - Hook para gestionar la internacionalización de artículos.
+ * useArticleTranslator - Hook para gestionar la internacionalización de artículos.
  *
- * Implementa el patrón "Overlay & Fallback" (inspirado en Hypermercado):
- * Busca la traducción del artículo en 'data.articles.{id}',
- * si no existe, usa las propiedades originales del objeto de datos en español.
+ * F10.0 decoupled: title/summary/alt/content come from the API already
+ * resolved per locale (localeResolved/fallback flags); no data.articles.*
+ * overlay is consulted. Category display labels come from the UI namespace
+ * (news.category.labels), keyed by normalized slug. Dates are formatted
+ * per locale (UI concern, kept).
  */
 export const useArticleTranslator = () => {
   const t = useTranslations();
   const locale = useLocale();
-  
+
+  const categoryLabel = (category: string | undefined): string => {
+    const key = category?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const path = `news.category.labels.${key}`;
+    return key && t.has(path) ? t(path) : (category ?? '');
+  };
+
   return <T extends AnyArticle>(article: T | undefined | null): T => {
     if (!article || !article.id) return article as T;
 
-    const articleId = article.id;
+    const { title, summary, alt } = article;
+    const category = categoryLabel(article.category);
 
-    // F1.4: when the API already resolved the requested locale
-    // (fallback === false and localeResolved === locale), use the API
-    // values directly. The data.articles.* overlay applies only as a
-    // transitory fallback when a local key exists. Local static objects
-    // carry no provenance flags, so they keep the legacy overlay path.
-    // TRANSITORIO hasta F6: el overlay desaparece con messages/data.*.
-    const apiLocalized =
-      (article as { fallback?: boolean }).fallback === false &&
-      (article as { localeResolved?: string }).localeResolved === locale;
-
-    const getVal = (key: string, defaultValue: string) => {
-      if (apiLocalized) return defaultValue;
-      return t.has(key) ? t(key) : defaultValue;
-    };
-
-    // Obtenemos los campos traducidos con fallback al original
-    const title = getVal(`data.articles.${articleId}.title`, article.title);
-    const summary = getVal(`data.articles.${articleId}.summary`, article.summary);
-    const alt = getVal(`data.articles.${articleId}.alt`, article.alt);
-    
-    // Para la categoría, primero intentamos buscarla en el mapeo de categorías
-    // Si no, usamos el valor directo del artículo
-    const categoryKey = article.category?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const category = getVal(`data.categories.${categoryKey}.label`, article.category);
-    
     // Formateo de fecha según locale
     let dateText = article.date;
     if (article.datetime && locale) {
@@ -69,19 +53,11 @@ export const useArticleTranslator = () => {
       date: dateText,
     };
 
-    // Si el artículo tiene content (FullNewsArticle), lo traducimos también
+    // Si el artículo tiene content (FullNewsArticle), el contenido ya viene
+    // resuelto por locale desde la API.
     if ('content' in article && Array.isArray(article.content)) {
       const fullArticle = translatedBase as unknown as FullNewsArticle;
-      
-      // Intentamos obtener el contenido traducido (array)
-      const contentKey = `data.articles.${articleId}.content`;
-      if (!apiLocalized && t.has(contentKey)) {
-        const translatedContent = t.raw(contentKey);
-        if (Array.isArray(translatedContent)) {
-          fullArticle.content = translatedContent.filter((item): item is string => typeof item === 'string');
-        }
-      }
-      
+
       // Traducimos el breadcrumb si existe
       if (fullArticle.breadcrumb) {
         fullArticle.breadcrumb = {
@@ -90,27 +66,16 @@ export const useArticleTranslator = () => {
         };
       }
 
-      // TRADUCCIÓN RECURSIVA PARA RELATED NEWS
-      // (Usamos la misma lógica para traducir los metadatos de los artículos relacionados)
+      // Labels de categoría para related news (valores API + mapa UI)
       if (Array.isArray(fullArticle.relatedNews)) {
         fullArticle.relatedNews = fullArticle.relatedNews.map(rel => {
-          const relId = rel.id;
-          const relTitle = getVal(`data.articles.${relId}.title`, rel.title);
-          const relSummary = getVal(`data.articles.${relId}.summary`, rel.summary);
-          const relAlt = getVal(`data.articles.${relId}.alt`, rel.alt);
-          const relCatKey = rel.category?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          const relCat = getVal(`data.categories.${relCatKey}.label`, rel.category);
-          
           return {
             ...rel,
-            title: relTitle,
-            summary: relSummary,
-            alt: relAlt,
-            category: relCat
+            category: categoryLabel(rel.category)
           };
         });
       }
-      
+
       return fullArticle as unknown as T;
     }
 

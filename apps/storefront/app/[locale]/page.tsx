@@ -2,6 +2,14 @@ import type { Metadata } from 'next';
 import { Home } from './_components/HomePageClient';
 import { SITE_URL, SITE_NAME } from '@/shared/config/site';
 import { getTranslations } from 'next-intl/server';
+import {
+  apiGet,
+  buildHomeContent,
+  type ApiArticleListItem,
+  type ApiList,
+  type ApiOpinionListItem,
+  type HomePageContent,
+} from '@/lib/api';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -13,8 +21,37 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default function Page() {
+/**
+ * F7.0 home API-driven (Opción A, D3/D4): featured + recents + breaking +
+ * opinions from existing GET endpoints, deterministic frontend composition.
+ * No local fallback: any null fetch (API error or unconfigured) throws to
+ * the error boundary, same policy as the API-only detail pages.
+ */
+async function getHomeContent(locale: string): Promise<HomePageContent> {
+  const [featured, recents, breaking, opinions] = await Promise.all([
+    apiGet<ApiList<ApiArticleListItem>>('/articles?featured=true', locale),
+    apiGet<ApiList<ApiArticleListItem>>('/articles?sort=publishedAt:desc', locale),
+    apiGet<ApiList<ApiArticleListItem>>('/articles?breaking=true&limit=4', locale),
+    apiGet<ApiList<ApiOpinionListItem>>('/opinions?limit=3', locale),
+  ]);
+  if (!featured || !recents || !breaking || !opinions) {
+    throw new Error('Newshub API home failed');
+  }
+  const t = await getTranslations({ locale, namespace: 'home' });
+  return buildHomeContent(
+    featured.data,
+    recents.data,
+    breaking.data,
+    opinions.data,
+    t('featuredNews'),
+  );
+}
+
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const siteUrl = SITE_URL;
+
+  const initialContent = await getHomeContent(locale);
 
 
   const websiteJsonLd = {
@@ -56,7 +93,7 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
-      <Home />
+      <Home initialContent={initialContent} />
     </>
   );
 }

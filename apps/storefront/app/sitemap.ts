@@ -1,8 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL, getLocalePrefix } from '@/shared/config/site'
 import { routing } from '@/i18n/routing'
-import { newsArticles, categoryContent } from '@/data/categories'
-import { opinionArticles } from '@/data/opinionArticles'
 import {
   apiGet,
   toNewsArticle,
@@ -29,12 +27,12 @@ function alternates(baseUrl: string, href: string) {
 }
 
 /**
- * H3: sitemap merges the local layer with API-published content so
- * dashboard-published articles/opinions become crawlable. The public API
- * only returns `published` rows, so unpublish/archive automatically drops
- * URLs on the next Data Cache revalidation (60s, see src/lib/api.ts).
- * Without NEXT_PUBLIC_API_URL the output is exactly the legacy local map,
- * so `next build` never requires a running backend.
+ * F4.0 sitemap API-only: dashboard-published articles/opinions/categories
+ * become crawlable. The public API only returns `published` rows, so
+ * unpublish/archive automatically drops URLs on the next Data Cache
+ * revalidation (60s, see src/lib/api.ts). Static entries below are UI
+ * routes only (non-editorial); without NEXT_PUBLIC_API_URL the sitemap
+ * contains just those static routes.
  */
 async function fetchAll<T>(path: string, locale: string): Promise<T[] | null> {
   const items: T[] = []
@@ -48,18 +46,12 @@ async function fetchAll<T>(path: string, locale: string): Promise<T[] | null> {
   }
 }
 
-function mergeByUrl(localEntries: Entry[], apiEntries: Entry[]): Entry[] {
-  const seen = new Set(apiEntries.map((e) => e.url))
-  return [...apiEntries, ...localEntries.filter((e) => !seen.has(e.url))]
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locales = routing.locales
   const baseUrl = SITE_URL
 
   // F2.3: /search is intentionally excluded (query pages must not be
-  // indexed). Static entries are UI routes; editorial URLs come from the
-  // API-primary merge below (local branches remain as dev-build fallback).
+  // indexed). Static entries are UI routes only (non-editorial).
   const staticPages = locales.flatMap((locale) =>
     [
       '',
@@ -75,54 +67,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           es: `${baseUrl}${route}`,
           en: `${baseUrl}/en${route}`,
           'x-default': `${baseUrl}${route}`,
-        },
-      },
-    }))
-  )
-
-  const localCategoryPages: Entry[] = locales.flatMap((locale) =>
-    Object.keys(categoryContent).map((slug) => ({
-      url: `${baseUrl}${getLocalePrefix(locale)}/category/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-      alternates: {
-        languages: {
-          es: `${baseUrl}/category/${slug}`,
-          en: `${baseUrl}/en/category/${slug}`,
-          'x-default': `${baseUrl}/category/${slug}`,
-        },
-      },
-    }))
-  )
-
-  const localArticlePages: Entry[] = locales.flatMap((locale) =>
-    newsArticles.map((article) => ({
-      url: `${baseUrl}${getLocalePrefix(locale)}${article.href}`,
-      lastModified: new Date(article.datetime),
-      changeFrequency: 'daily' as const,
-      priority: 0.6,
-      alternates: {
-        languages: {
-          es: `${baseUrl}${article.href}`,
-          en: `${baseUrl}/en${article.href}`,
-          'x-default': `${baseUrl}${article.href}`,
-        },
-      },
-    }))
-  )
-
-  const localOpinionPages: Entry[] = locales.flatMap((locale) =>
-    opinionArticles.map((article) => ({
-      url: `${baseUrl}${getLocalePrefix(locale)}${article.href}`,
-      lastModified: new Date(article.datetime),
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-      alternates: {
-        languages: {
-          es: `${baseUrl}${article.href}`,
-          en: `${baseUrl}/en${article.href}`,
-          'x-default': `${baseUrl}${article.href}`,
         },
       },
     }))
@@ -175,8 +119,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
-    ...mergeByUrl(localCategoryPages, apiCategoryPages),
-    ...mergeByUrl(localArticlePages, apiArticlePages),
-    ...mergeByUrl(localOpinionPages, apiOpinionPages),
+    ...apiCategoryPages,
+    ...apiArticlePages,
+    ...apiOpinionPages,
   ]
 }

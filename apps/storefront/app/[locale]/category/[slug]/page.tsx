@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { categoryContent } from '@/data/categories';
 import type { CategoryPageContent, NewsArticle } from '@/data/newsModels';
 import { Category } from '../../_components/CategoryPageClient';
 import { SITE_URL, SITE_NAME, getLocalePrefix, getOgLocale } from '@/shared/config/site';
@@ -27,18 +26,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const path = getLocalePrefix(locale);
   const canonicalUrl = `${baseUrl}${path}/category/${slug}`;
 
-  // F2.1 metadata API-first: label/description/canonical/hreflang/OG come
-  // from GET /categories/:slug. Overlay data.categories.* applies only
-  // when a local key exists. description:null falls back to the generic
-  // category description (never empty, never local content for missing).
+  // F10.0 metadata API-only: label/description/canonical/hreflang/OG come
+  // from GET /categories/:slug. description:null falls back to the generic
+  // metadata.category.description (never empty, never placeholder).
   const outcome = await apiGetNoStoreOutcome<ApiCategoryDetail>(`/categories/${slug}`, locale);
   if (outcome.reason === 'ok') {
     const detail = outcome.data;
-    const t = await getTranslations({ locale, namespace: 'data.categories' });
-    const label = t.has(`${detail.slug}.label`) ? t(`${detail.slug}.label`) : detail.label;
-    const description = t.has(`${detail.slug}.description`)
-      ? t(`${detail.slug}.description`)
-      : (detail.description ?? tMeta('description'));
+    const label = detail.label;
+    const description = detail.description ?? tMeta('description', { label });
     const languages = detail.fallback
       ? { es: `${baseUrl}/category/${slug}`, 'x-default': `${baseUrl}/category/${slug}` }
       : {
@@ -70,56 +65,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     throw new Error(`Newshub API unavailable while generating metadata for /category/${slug}`);
   }
 
-  // Development fallback only (NEXT_PUBLIC_API_URL unset).
-  if (outcome.reason !== 'unconfigured') {
-    return {
-      title: tMeta('notFound'),
-      description: tMeta('notFoundDescription'),
-    };
-  }
-  const t = await getTranslations({ locale, namespace: 'data.categories' });
-
-  const hasCategory = t.has(`${slug}.label`);
-  const label = hasCategory ? t(`${slug}.label`) : undefined;
-  const description = hasCategory ? t(`${slug}.description`) : undefined;
-
+  // F4.0 API-only: not-found and unconfigured resolve to notFound metadata.
   return {
-    title: label ?? tMeta('notFound'),
-    description: description ?? tMeta('notFoundDescription'),
-    keywords: label ? [label, 'noticias', 'información'] : undefined,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        es: `${baseUrl}/category/${slug}`,
-        en: `${baseUrl}/en/category/${slug}`,
-        'x-default': `${baseUrl}/category/${slug}`,
-      },
-    },
-    openGraph: {
-      title: label ?? tMeta('notFound'),
-      description: description ?? tMeta('notFoundDescription'),
-      url: canonicalUrl,
-      type: 'website',
-      siteName: SITE_NAME,
-      locale: getOgLocale(locale),
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: label ?? tMeta('notFound'),
-      description: description ?? tMeta('notFoundDescription'),
-    },
+    title: tMeta('notFound'),
+    description: tMeta('notFoundDescription'),
   };
 }
 
 export default async function Page({ params }: PageProps) {
   const { slug, locale } = await params;
 
-  // F2.1 category API-first: detail + article list + opinions sidebar are
+  // F4.0 category API-only: detail + article list + opinions sidebar are
   // fetched with no-store (locked rule, no ISR60 in F2 render).
   // - ok → API composition via buildCategoryContent (deterministic, deduped).
-  // - not-found → notFound() (unknown/empty category has no fallback).
+  // - not-found/unconfigured → notFound() (unknown/empty category has no fallback).
   // - error → throw to error.tsx (never silent local in production).
-  // - unconfigured → development local fallback (categoryContent).
   let initialContent: CategoryPageContent | null = null;
   const detailOutcome = await apiGetNoStoreOutcome<ApiCategoryDetail>(`/categories/${slug}`, locale);
   if (detailOutcome.reason === 'ok') {
@@ -138,13 +98,13 @@ export default async function Page({ params }: PageProps) {
       artsOutcome.reason === 'ok' ? artsOutcome.data.data : [],
       opsOutcome.reason === 'ok' ? opsOutcome.data.data : [],
     );
-  } else if (detailOutcome.reason === 'not-found') {
+  } else if (detailOutcome.reason === 'not-found' || detailOutcome.reason === 'unconfigured') {
     notFound();
   } else if (detailOutcome.reason === 'error') {
     throw new Error(`Newshub API unavailable while loading /category/${slug}`);
   }
 
-  const category = initialContent ?? categoryContent[slug];
+  const category = initialContent;
 
   if (!category) {
     notFound();
@@ -154,9 +114,11 @@ export default async function Page({ params }: PageProps) {
   const localePath = getLocalePrefix(locale);
 
   const tHome = await getTranslations({ locale, namespace: 'metadata.home' });
-  const tCategories = await getTranslations({ locale, namespace: 'data.categories' });
+  const tNews = await getTranslations({ locale, namespace: 'news' });
   const homeLabel = tHome('title');
-  const categoryLabel = tCategories.has(`${slug}.label`) ? tCategories(`${slug}.label`) : slug;
+  const categoryLabel = tNews.has(`category.labels.${slug}`)
+    ? tNews(`category.labels.${slug}`)
+    : slug;
   const breadcrumbJsonLd = category
     ? buildBreadcrumbJsonLd([
         { name: homeLabel, item: `${baseUrl}${localePath}` },

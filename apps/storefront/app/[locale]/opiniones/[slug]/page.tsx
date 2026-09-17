@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { opinionDetails } from '@/data';
 import type { ArticleContent } from '@/data/newsModels';
 import { Opinion } from '../../_components/OpinionPageClient';
 import { SITE_URL, SITE_NAME, getLocalePrefix } from '@/shared/config/site';
@@ -66,78 +65,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     throw new Error(`Newshub API unavailable while generating metadata for /opiniones/${slug}`);
   }
 
-  // Development fallback only (NEXT_PUBLIC_API_URL unset). With a
-  // configured API, a 404 means unpublished/unknown and the body renders
-  // notFound(), so metadata must not leak local content.
-  if (outcome.reason !== 'unconfigured') {
-    return {
-      title: tMeta('notFound'),
-      description: tMeta('notFoundDescription'),
-    };
-  }
-
-  // Development fallback (NEXT_PUBLIC_API_URL unset) or API 404.
-  const article = opinionDetails[slug];
-  const canonicalUrl = article ? `${baseUrl}${path}${article.href}` : `${baseUrl}${path}/opiniones/${slug}`;
-
-  if (!article) {
-    return {
-      title: tMeta('notFound'),
-      description: tMeta('notFoundDescription'),
-    };
-  }
-
+  // F4.0 API-only: not-found and unconfigured resolve to notFound metadata.
   return {
-    title: article.title,
-    description: article.summary,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        es: `${baseUrl}${article.href}`,
-        en: `${baseUrl}/en${article.href}`,
-        'x-default': `${baseUrl}${article.href}`,
-      },
-    },
-    openGraph: {
-      type: 'article',
-      title: article.title,
-      description: article.summary,
-      url: canonicalUrl,
-      images: [resolveArticleImage(baseUrl, article.imageUrl)],
-      publishedTime: article.datetime,
-      modifiedTime: article.updatedAt ?? article.datetime,
-      siteName: SITE_NAME,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: article.title,
-      description: article.summary,
-      images: [resolveArticleImage(baseUrl, article.imageUrl)],
-    },
+    title: tMeta('notFound'),
+    description: tMeta('notFoundDescription'),
   };
 }
 
 export default async function Page({ params }: PageProps) {
   const { slug, locale } = await params;
 
-  // F1.2 opinions API-first: the API has precedence with no-store
-  // (publishing-sensitive, same as news). Sidebar comes from
-  // `detail.related`, replacing the second list fetch and the local
-  // sidebar. Production fallback policy: not-found → notFound(),
-  // error → error boundary (throw), unconfigured → local (dev only).
+  // F4.0 opinions API-only: the API is the single source.
+  // Sidebar comes from `detail.related`. Production policy: not-found and
+  // unconfigured → notFound(), error → error boundary (throw).
   let initialArticle: ArticleContent | null = null;
   let initialSidebar: ReturnType<typeof toRelatedOpinions> | null = null;
   const outcome = await apiGetNoStoreOutcome<ApiOpinionDetail>(`/opinions/${slug}`, locale);
   if (outcome.reason === 'ok') {
     initialArticle = toOpinionDetail(outcome.data);
     initialSidebar = toRelatedOpinions(outcome.data.related);
-  } else if (outcome.reason === 'not-found') {
+  } else if (outcome.reason === 'not-found' || outcome.reason === 'unconfigured') {
     notFound();
   } else if (outcome.reason === 'error') {
     throw new Error(`Newshub API unavailable while loading /opiniones/${slug}`);
   }
 
-  const article = initialArticle ?? opinionDetails[slug];
+  const article = initialArticle;
   if (!article) {
     notFound();
   }

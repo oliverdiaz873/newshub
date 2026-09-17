@@ -226,11 +226,7 @@ export function toFullArticle(
   categorySlug: string,
   relatedNews: NewsArticle[],
 ): FullNewsArticle {
-  // NOTE: callers replace `id` with the local article id when one exists so
-  // the next-intl overlay (data.articles.<id>.*) resolves exactly as in the
-  // local path. Raw API ids (slugs) miss those keys and render raw values,
-  // which is correct only for content without a messages entry.
-  // TRANSITORIO hasta F6: el overlay local se elimina con messages/data.*.
+  // NOTE: `id` is the API slug; no next-intl overlay applies (F10.0).
   return {
     ...toNewsArticle(detail, categorySlug),
     localeResolved: detail.localeResolved,
@@ -406,5 +402,71 @@ export function buildCategoryContent(
     sidebarTitle: 'Opinion',
     sidebarNews,
     opinionArticles: opinions.map(toOpinionArticle),
+  };
+}
+
+/**
+ * F4.0 deterministic home composition (frontend, no new endpoint).
+ *
+ * Locked rule (Opción A, D3/D4):
+ * - featured pool = GET /articles?featured=true (API order, publishedAt desc),
+ *   filled with GET /articles?sort=publishedAt:desc non-duplicates up to 6;
+ * - latestNews = first 6 recents not seen in featured;
+ * - breakingNews = GET /articles?breaking=true&limit=4 pool (may overlap with
+ *   featured/latest: the ticker duplicates by design, as the static one did);
+ * - opinionArticles = GET /opinions?limit=3 (separate namespace, no dedup);
+ * - never invent items; thin pools yield fewer items (callers must tolerate
+ *   short sections and hide empty ones, never assume 1+3+2/6/4/3).
+ */
+export interface HomePageContent {
+  featuredSection: {
+    title: string;
+    primary: NewsArticle | undefined;
+    secondary: (NewsArticle | undefined)[];
+    grid: NewsArticle[];
+  };
+  latestNews: NewsArticle[];
+  opinionArticles: OpinionArticle[];
+  breakingNews: NewsArticle[];
+}
+
+export function buildHomeContent(
+  featuredRaw: ApiArticleListItem[],
+  recentRaw: ApiArticleListItem[],
+  breakingRaw: ApiArticleListItem[],
+  opinionsRaw: ApiOpinionListItem[],
+  featuredTitle: string,
+): HomePageContent {
+  const featuredMapped = featuredRaw.map((item) => toNewsArticle(item, item.categorySlug));
+  const recentMapped = recentRaw.map((item) => toNewsArticle(item, item.categorySlug));
+  const seen = new Set<string>();
+  const takeUnique = (pool: NewsArticle[], count: number): NewsArticle[] => {
+    const out: NewsArticle[] = [];
+    for (const article of pool) {
+      if (out.length >= count) break;
+      if (seen.has(article.href)) continue;
+      seen.add(article.href);
+      out.push(article);
+    }
+    return out;
+  };
+  const curated = takeUnique(featuredMapped, 6);
+  const featured = [...curated, ...takeUnique(recentMapped, 6 - curated.length)];
+  const latestNews = takeUnique(recentMapped, 6);
+  const breakingNews = breakingRaw
+    .map((item) => toNewsArticle(item, item.categorySlug))
+    .slice(0, 4);
+  const opinionArticles = opinionsRaw.map(toOpinionArticle).slice(0, 3);
+  const [primary, ...rest] = featured;
+  return {
+    featuredSection: {
+      title: featuredTitle,
+      primary,
+      secondary: [rest[0], rest[1], rest[2]],
+      grid: rest.slice(3, 5),
+    },
+    latestNews,
+    opinionArticles,
+    breakingNews,
   };
 }

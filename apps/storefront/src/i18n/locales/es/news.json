@@ -11,7 +11,17 @@
     "notFoundLabel": "Categoría no encontrada",
     "notFoundTitle": "No encontramos esa sección editorial",
     "notFoundDescription": "La ruta solicitada no coincide con las categorías disponibles en el sistema.",
-    "recentNews": "Noticias Recientes"
+    "recentNews": "Noticias Recientes",
+    "labels": {
+      "politica": "Política",
+      "internacional": "Internacional",
+      "economia": "Economía",
+      "salud": "Salud",
+      "deporte": "Deporte",
+      "clima": "Clima",
+      "justicia": "Justicia",
+      "opinion": "Opinión"
+    }
   },
   "opinion": {
     "notFoundLabel": "Opinión no encontrada",

@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { Breadcrumb } from '@/features/navigation/components';
-import { RecentNewsSidebar, ArticleDetail, useOpinion } from '@/features/news';
+import { RecentNewsSidebar, ArticleDetail } from '@/features/news';
 import { NewsLayout } from '@/shared/layouts';
 import { useArticleTranslator } from '@/features/news/hooks/useArticleTranslation';
 import type { ArticleContent, OpinionArticle } from '@/data/newsModels';
@@ -15,9 +15,9 @@ import type { ArticleContent, OpinionArticle } from '@/data/newsModels';
  * Utiliza la misma plantilla que las noticias para mantener la consistencia visual.
  *
  * F1.2 opinions API-first: the server-resolved article + sidebar
- * (`detail` + `detail.related`) take precedence; the local hooks remain
- * only as the development fallback when the server could not resolve
- * from the API (NEXT_PUBLIC_API_URL unset).
+ * (`detail` + `detail.related`) take precedence.
+ * F4.0 API-only: no local fallback; the server guarantees the props
+ * (notFound/throw otherwise).
  */
 export const Opinion = ({
   initialArticle,
@@ -27,9 +27,8 @@ export const Opinion = ({
   initialSidebar?: OpinionArticle[] | null;
 }) => {
   const translateArticle = useArticleTranslator();
-  const { article: localArticle, sidebarOpinions: localSidebar } = useOpinion();
-  const rawArticle = initialArticle ?? localArticle;
-  const rawSidebar = initialSidebar ?? localSidebar;
+  const rawArticle = initialArticle ?? undefined;
+  const rawSidebar = initialSidebar ?? [];
   const article = translateArticle(rawArticle);
   const sidebarOpinions = rawSidebar?.map(translateArticle) || [];
   const t = useTranslations('news');

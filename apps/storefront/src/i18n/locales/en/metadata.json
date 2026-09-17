@@ -28,7 +28,8 @@
   },
   "category": {
     "notFound": "Category not found",
-    "notFoundDescription": "The requested category does not exist."
+    "notFoundDescription": "The requested category does not exist.",
+    "description": "Latest {label} news on NewsHub."
   },
   "article": {
     "notFound": "Article not found",

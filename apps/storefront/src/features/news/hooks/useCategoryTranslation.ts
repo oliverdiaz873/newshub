@@ -4,29 +4,28 @@ import { useArticleTranslator } from './useArticleTranslation';
 
 /**
  * useCategoryTranslation - Hook para gestionar la internacionalización de datos de categoría.
+ *
+ * F10.0 decoupled: labels/descriptions come from the API (CategoryTranslation);
+ * presentation strings come from UI namespaces (home.*, metadata.category.*).
+ * No data.categories.* overlay is consulted.
  */
 export const useCategoryTranslation = (content?: CategoryPageContent): CategoryPageContent | undefined => {
-  const t = useTranslations();
+  const tHome = useTranslations('home');
+  const tMeta = useTranslations('metadata.category');
   const translateArticle = useArticleTranslator();
-  
-  if (!content || !content.slug) return content;
 
-  const basePath = `data.categories.${content.slug}`;
-  
-  const getVal = (key: string, defaultValue: string) => {
-    return t.has(key) ? t(key) : defaultValue;
-  };
+  if (!content || !content.slug) return content;
 
   // Traducimos los campos base de la categoría
   const translatedContent: CategoryPageContent = {
     ...content,
-    label: getVal(`${basePath}.label`, content.label),
-    description: getVal(`${basePath}.description`, content.description),
-    latestTitle: getVal(`${basePath}.latestTitle`, content.latestTitle),
-    sidebarTitle: getVal(`${basePath}.sidebarTitle`, content.sidebarTitle),
+    label: content.label,
+    description: content.description || tMeta('description', { label: content.label }),
+    latestTitle: tHome('moreInCategory', { label: content.label }),
+    sidebarTitle: tHome('opinion'),
     featuredSection: {
       ...content.featuredSection,
-      title: getVal(`${basePath}.featuredSectionTitle`, content.featuredSection.title),
+      title: content.featuredSection.title,
       // Traducimos los artículos destacados
       primary: translateArticle(content.featuredSection.primary),
       secondary: [

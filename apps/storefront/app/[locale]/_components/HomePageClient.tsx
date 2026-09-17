@@ -1,27 +1,28 @@
 'use client';
 
-import { useHome } from '@/features/news';
 import {
   BreakingNewsBanner,
   FeaturedNewsSection,
   LatestNewsSection,
   OpinionSidebar,
 } from '@/features/news/components';
+import type { HomePageContent } from '@/lib/api';
 
 /**
  * Home Page
- * 
- * Representa la página principal del periódico y compone los bloques editoriales visibles en portada. 
- * Utiliza el hook useHome para centralizar la lógica de contenidos.
- * 
+ *
+ * Representa la página principal del periódico y compone los bloques editoriales visibles en portada.
+ * F7.0: 100% API-driven. El contenido viene del servidor (initialContent,
+ * composición determinista desde PostgreSQL/API); sin fallback local.
+ *
  * Componentes usados:
  * - BreakingNewsBanner: Marquesina de última hora.
  * - FeaturedNewsSection: Bloque principal de noticias destacadas.
  * - LatestNewsSection: Listado de noticias más recientes.
  * - OpinionSidebar: Columna lateral con artículos de opinión.
  */
-export const Home = () => {
-  const { featuredSection, latestNews, opinionArticles } = useHome();
+export const Home = ({ initialContent }: { initialContent: HomePageContent }) => {
+  const { featuredSection, latestNews, opinionArticles, breakingNews } = initialContent;
 
   return (
     <>
@@ -30,17 +31,17 @@ export const Home = () => {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-9">
             <section className="mb-2">
-              <BreakingNewsBanner />
+              <BreakingNewsBanner articles={breakingNews} />
             </section>
 
             <div className="space-y-8">
               <FeaturedNewsSection content={featuredSection} />
-              <LatestNewsSection articles={latestNews} />
+              {latestNews.length > 0 && <LatestNewsSection articles={latestNews} />}
             </div>
           </div>
 
           <div className="lg:col-span-3">
-            <OpinionSidebar articles={opinionArticles} />
+            {opinionArticles.length > 0 && <OpinionSidebar articles={opinionArticles} />}
           </div>
         </div>
       </div>

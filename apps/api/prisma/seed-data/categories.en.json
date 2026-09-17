@@ -1,0 +1,20 @@
+{
+  "order": [
+    "politica",
+    "internacional",
+    "economia",
+    "salud",
+    "deporte",
+    "clima",
+    "justicia"
+  ],
+  "labels": {
+    "politica": "Politics",
+    "internacional": "International",
+    "economia": "Economy",
+    "salud": "Health",
+    "deporte": "Sports",
+    "clima": "Weather",
+    "justicia": "Justice"
+  }
+}

@@ -1,21 +1,21 @@
 'use client';
 
 import { Link } from '@/i18n/routing';
-import { featuredPrimary, featuredGrid, latestNews } from '../../../../data';
+import type { NewsArticle } from '../../../../data';
 import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 import { BreakingNewsBadge } from './BreakingNewsBadge';
 
-/** Obtiene los 4 artículos editorialmente seleccionados marcados como última hora */
-const getBreakingNews = () => {
-  const allNews = [featuredPrimary, ...featuredGrid, ...latestNews];
-  return allNews.filter(article => article.isBreaking === true).slice(0, 4);
-};
+interface BreakingNewsBannerProps {
+  articles: NewsArticle[];
+}
 
 /** Representa el banner de "Última hora" de la home con múltiples titulares en formato ticker. */
-export const BreakingNewsBanner = () => {
+export const BreakingNewsBanner = ({ articles }: BreakingNewsBannerProps) => {
   const translateArticle = useArticleTranslator();
-  const breakingNews = getBreakingNews();
+  const breakingNews = articles;
   const translatedNews = breakingNews.map(translateArticle);
+
+  if (translatedNews.length === 0) return null;
 
   return (
     <section className="breaking-news rounded-md">
