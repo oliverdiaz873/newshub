@@ -3,12 +3,11 @@ import { SITE_URL, getLocalePrefix } from '@/shared/config/site'
 import { routing } from '@/i18n/routing'
 import {
   apiGet,
-  toNewsArticle,
-  toOpinionArticle,
   type ApiArticleListItem,
   type ApiList,
   type ApiOpinionListItem,
 } from '@/lib/api'
+import { toNewsArticle, toOpinionArticle } from '@/features/news/services/news-content'
 
 type Entry = MetadataRoute.Sitemap[number]
 

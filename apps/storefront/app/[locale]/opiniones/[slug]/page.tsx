@@ -5,11 +5,13 @@ import { SITE_URL, SITE_NAME, getLocalePrefix } from '@/shared/config/site';
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
 import {
   apiGetNoStoreOutcome,
+  type ApiOpinionDetail,
+} from '@/lib/api';
+import {
   resolveArticleImage,
   toOpinionDetail,
   toRelatedOpinions,
-  type ApiOpinionDetail,
-} from '@/lib/api';
+} from '@/features/news/services/news-content';
 
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';

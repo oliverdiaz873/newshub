@@ -6,7 +6,7 @@ import {
   LatestNewsSection,
   OpinionSidebar,
 } from '@/features/news/components';
-import type { HomePageContent } from '@/lib/api';
+import type { HomePageContent } from '../_lib/page-content';
 
 /**
  * Home Page

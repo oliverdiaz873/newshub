@@ -5,12 +5,12 @@ import { SITE_URL, SITE_NAME, getLocalePrefix, getOgLocale } from '@/shared/conf
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
 import {
   apiGetNoStoreOutcome,
-  buildCategoryContent,
   type ApiArticleListItem,
   type ApiCategoryDetail,
   type ApiList,
   type ApiOpinionListItem,
 } from '@/lib/api';
+import { buildCategoryContent } from '../../_lib/page-content';
 
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';

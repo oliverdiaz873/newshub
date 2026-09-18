@@ -4,14 +4,18 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { SearchIcon, CloseIcon } from '../icons';
-import { useSearch } from '../../../features/news/hooks/useSearch';
-import { useArticleTranslator } from '../../../features/news/hooks/useArticleTranslation';
+import { SearchIcon, CloseIcon } from '@/shared/components/icons';
+import { useSearch } from '../../hooks/useSearch';
+import { useArticleTranslator } from '../../hooks/useArticleTranslation';
 
 /**
  * SearchBar
- * 
- * Componente de búsqueda global con orden dinámico:
+ *
+ * Componente de búsqueda del dominio editorial (features/news).
+ * Conoce useSearch + traductor de artículos, por eso vive en la feature
+ * y no en shared/components (shared no debe depender de features).
+ *
+ * Orden dinámico:
  * Escritorio: [Input] [Lupa] (Input a la izquierda)
  * Móvil: [Lupa] [Input] (Input a la derecha)
  */
@@ -23,7 +27,7 @@ export const SearchBar = ({ onSearchComplete }: { onSearchComplete?: () => void 
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations('navbar');
-  
+
   const translateArticle = useArticleTranslator();
   const { results: rawResults, hasQuery } = useSearch(searchTerm);
   const results = rawResults.map(translateArticle);
@@ -67,16 +71,16 @@ export const SearchBar = ({ onSearchComplete }: { onSearchComplete?: () => void 
 
   return (
     <div className="relative flex w-full lg:w-[45px] lg:h-[45px] items-center justify-center" ref={searchRef}>
-      <form 
-        className="flex w-full items-center lg:flex-row lg:justify-center" 
-        role="search" 
+      <form
+        className="flex w-full items-center lg:flex-row lg:justify-center"
+        role="search"
         onSubmit={handleSearch}
       >
         {/* Desktop: El input va antes [Input][Lupa]
             Mobile: Queremos [Lupa][Input]
         */}
         <div className="flex w-full items-center md:flex-row-reverse">
-          
+
           {/* Botón de la lupa */}
           <button
             className={`flex h-[45px] w-[45px] flex-shrink-0 items-center justify-center rounded-md border border-transparent transition-all duration-300 ${
@@ -89,10 +93,10 @@ export const SearchBar = ({ onSearchComplete }: { onSearchComplete?: () => void 
           </button>
 
           {/* Input */}
-          <div 
+          <div
             className={`transition-all duration-500 ease-in-out ${
-              isExpanded 
-                ? 'flex-1 opacity-100 scale-100 ml-2 md:ml-0 md:mr-2' 
+              isExpanded
+                ? 'flex-1 opacity-100 scale-100 ml-2 md:ml-0 md:mr-2'
                 : 'w-0 opacity-0 scale-95 pointer-events-none'
             } lg:absolute lg:right-full lg:flex-none lg:w-[300px]`}
           >
@@ -122,9 +126,9 @@ export const SearchBar = ({ onSearchComplete }: { onSearchComplete?: () => void 
                     >
 
                       {article.imageUrl && (
-                        <Image 
-                          src={article.imageUrl} 
-                          alt="" 
+                        <Image
+                          src={article.imageUrl}
+                          alt=""
                           width={40}
                           height={40}
                           className="rounded object-cover"

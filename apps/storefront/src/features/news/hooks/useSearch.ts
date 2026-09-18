@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { hasSearchQuery } from '../../../shared/utils/searchUtils';
-import { getApiBase, searchAll, type SearchResultItem } from '@/lib/api';
+import { getApiBase } from '@/lib/api';
+import { searchAll, type SearchResultItem } from '../services/news-content';
 
 /**
  * Hook para gestionar la lógica de búsqueda global de noticias y opiniones.

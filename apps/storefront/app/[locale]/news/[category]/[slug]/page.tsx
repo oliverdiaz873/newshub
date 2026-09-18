@@ -5,11 +5,13 @@ import { SITE_URL, SITE_NAME, getLocalePrefix } from '@/shared/config/site';
 import { buildBreadcrumbJsonLd } from '@/shared/config/seo';
 import {
   apiGetNoStoreOutcome,
+  type ApiArticleDetail,
+} from '@/lib/api';
+import {
   resolveArticleImage,
   toFullArticle,
   toRelatedNews,
-  type ApiArticleDetail,
-} from '@/lib/api';
+} from '@/features/news/services/news-content';
 
 type PageProps = {
   params: Promise<{ locale: string; category: string; slug: string }>;
