@@ -3,8 +3,8 @@
  * (apps/api/prisma/seed-data) into PostgreSQL. EN rows come exclusively from
  * the traceable editorial source (messages/en.json REAL_TRANSLATIONS,
  * frozen into articles.en.json / opinions.en.json / categories.en.json);
- * nothing is invented. Categories EN carry translated labels with
- * description NULL (pending human translation); author EN has no source yet
+ * nothing is invented. Categories EN carry translated labels and approved
+ * EN descriptions (Feature 2); author EN has no source yet
  * and stays ES-only (pending). EN fallback remains at the API layer only as
  * a transitory mechanism. Re-runnable: truncates the editorial tables first
  * for a clean, reproducible seed.
@@ -74,6 +74,7 @@ interface SeedOpinionEn {
 interface SeedCategoriesEn {
   order: string[];
   labels: Record<string, string>;
+  descriptions?: Record<string, string>;
 }
 
 const SEED_DIR = join(__dirname, 'seed-data');
@@ -193,7 +194,7 @@ async function main() {
           locale: LOCALE_EN,
           slug,
           label: labelEn,
-          description: null,
+          description: categoriesEn.descriptions?.[slug] ?? null,
         },
       });
     }
@@ -325,7 +326,7 @@ async function main() {
   });
 
   console.log(
-    `Seed complete: ${CATEGORY_ORDER.length} categories, ${articleCount} articles, ${opinionCount} opinions, ${mediaByPath.size} media assets, 2 planning items (locales es+en; author EN pending, category EN descriptions pending).`,
+    `Seed complete: ${CATEGORY_ORDER.length} categories, ${articleCount} articles, ${opinionCount} opinions, ${mediaByPath.size} media assets, 2 planning items (locales es+en; author EN pending).`,
   );
 }
 

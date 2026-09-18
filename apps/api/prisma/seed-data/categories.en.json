@@ -16,5 +16,14 @@
     "deporte": "Sports",
     "clima": "Weather",
     "justicia": "Justice"
+  },
+  "descriptions": {
+    "politica": "Coverage of government, the legislature, political parties, transparency, and public decisions with national impact.",
+    "internacional": "Global coverage focused on diplomacy, conflicts, strategic alliances, and key geopolitical developments.",
+    "economia": "Markets, inflation, businesses, employment, and financial decisions shaping the economic landscape at home and around the world.",
+    "salud": "Information on healthcare systems, prevention, medical research, and trends that impact collective well-being.",
+    "deporte": "Sports coverage focused on results, athletes, tournaments, and the competitive pulse of major disciplines.",
+    "clima": "Weather updates, alerts, extreme weather events, and environmental impacts on communities and productive sectors.",
+    "justicia": "Court proceedings, criminal investigations, legal reforms, and institutional decisions related to justice."
   }
 }
