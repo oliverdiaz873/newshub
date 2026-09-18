@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { Footer, Header } from '@/shared/layouts';
+import { Footer } from '@/shared/layouts';
+import { SiteHeader } from './_components/SiteHeader';
 import { ScrollToTop } from '@/shared/components/ScrollToTop';
 import { Providers } from './providers';
 import { NextIntlClientProvider } from 'next-intl';
@@ -16,7 +17,7 @@ import './_components/OpinionPageClient.css';
 import '@/features/news/components/BreakingNewsBanner/BreakingNewsBanner.css';
 import '@/shared/layouts/LegalLayout/LegalLayout.css';
 import '@/shared/layouts/Footer/Footer.css';
-import '@/shared/layouts/Header/Header.css';
+import './_components/SiteHeader.css';
 import '@/shared/components/ThemeToggle/ThemeToggle.css';
 
 import { getTranslations } from 'next-intl/server';
@@ -115,7 +116,7 @@ export default async function RootLayout({
         <Providers>
           <div className="flex min-h-screen flex-col bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
             <ScrollToTop />
-            <Header />
+            <SiteHeader />
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>

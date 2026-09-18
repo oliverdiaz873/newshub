@@ -4,18 +4,21 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { MenuIcon, CloseIcon } from '../../components/icons';
-import logoImg from '../../../assets/images/logo/logo.jpg';
-import { DesktopNav, TabletNav, MobileNav } from '../../../features/navigation/components';
-import { SearchBar, ThemeToggle, LanguageSelector } from '../../components';
+import { MenuIcon, CloseIcon } from '@/shared/components/icons';
+import logoImg from '@/assets/images/logo/logo.jpg';
+import { DesktopNav, TabletNav, MobileNav } from '@/features/navigation/components';
+import { SearchBar } from '@/features/news/components';
+import { ThemeToggle, LanguageSelector } from '@/shared/components';
 
 /**
- * Header
- * 
- * Componente de cabecera global.
- * Gestiona el menú móvil y contiene la navegación principal, búsqueda, cambio de tema y selector de idioma.
+ * SiteHeader
+ *
+ * Composition root del header (capa app/).
+ * Compone navigation (features/navigation) + búsqueda editorial
+ * (features/news) + controles transversales (shared).
+ * Vive en app/ porque shared/ no debe depender de features/.
  */
-export const Header = () => {
+export const SiteHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const t = useTranslations('navbar');
 

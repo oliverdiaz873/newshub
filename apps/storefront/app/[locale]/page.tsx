@@ -4,12 +4,11 @@ import { SITE_URL, SITE_NAME } from '@/shared/config/site';
 import { getTranslations } from 'next-intl/server';
 import {
   apiGet,
-  buildHomeContent,
   type ApiArticleListItem,
   type ApiList,
   type ApiOpinionListItem,
-  type HomePageContent,
 } from '@/lib/api';
+import { buildHomeContent, type HomePageContent } from './_lib/page-content';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
