@@ -1,21 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
+import { EDITOR, REVIEWER, switchApiSession, useApiSession } from '../fixtures/auth';
 
 const RUN = Date.now().toString(36);
 const API = 'http://localhost:3211/api/v1';
-const EDITOR = { email: 'editor@newshub.local', password: 'Editor123!' };
-const REVIEWER = { email: 'reviewer@newshub.local', password: 'Reviewer123!' };
 
-async function uiLogin(page: Page, email: string, password: string) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Contraseña').fill(password);
-  await page.getByRole('button', { name: 'Acceder' }).click();
-  await expect(page).toHaveURL('http://localhost:3212/');
-}
-
-async function uiLogout(page: Page) {
-  await page.getByRole('button', { name: 'Salir' }).click();
-  await expect(page).toHaveURL(/\/login/);
+/** Starts the page as the given role without hitting the login UI. */
+async function loginAsRole(page: Page, role: { email: string; password: string }) {
+  await useApiSession(page, role);
+  await page.goto('/');
 }
 
 async function gotoPlanning(page: Page) {
@@ -59,7 +51,7 @@ function rowByTitle(page: Page, title: string) {
 }
 
 test('editor creates a pitch through the form', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   await gotoPlanning(page);
   await page.getByRole('button', { name: 'Nuevo elemento' }).click();
   await page.getByLabel('Título', { exact: true }).fill(`E2E Pitch largo ${RUN}`);
@@ -70,7 +62,7 @@ test('editor creates a pitch through the form', async ({ page }) => {
 });
 
 test('assignment runs the full cycle from the list', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   const token = await apiToken(page);
   const me = await apiMe(page, token);
   const title = `E2E Assign largo ${RUN}`;
@@ -90,16 +82,14 @@ test('assignment runs the full cycle from the list', async ({ page }) => {
 });
 
 test('reviewer sees the queue and completes in-review work', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   const token = await apiToken(page);
   const me = await apiMe(page, token);
   const title = `E2E Review largo ${RUN}`;
   const id = await apiCreateAssignment(page, token, title, me, new Date(Date.now() + 48 * 3600_000).toISOString());
   await apiTransition(page, token, id, 'start');
   await apiTransition(page, token, id, 'submit');
-  await uiLogout(page);
-
-  await uiLogin(page, REVIEWER.email, REVIEWER.password);
+  await switchApiSession(page, REVIEWER);
   // Unified review queue on the overview shows planning work still in review.
   await expect(page.getByText(title).first()).toBeVisible();
 
@@ -113,7 +103,7 @@ test('reviewer sees the queue and completes in-review work', async ({ page }) =>
 });
 
 test('calendar shows due items and navigates months', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   const token = await apiToken(page);
   const me = await apiMe(page, token);
   const title = `E2E Cal largo ${RUN}`;

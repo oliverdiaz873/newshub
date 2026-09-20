@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { fetchApiToken } from '../fixtures/auth';
 
 const STOREFRONT = 'http://localhost:3210';
 const API = 'http://localhost:3211/api/v1';
@@ -7,13 +8,7 @@ const API = 'http://localhost:3211/api/v1';
 const RUN = Date.now().toString(36);
 
 async function apiToken(): Promise<string> {
-  const res = await fetch(`${API}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'editor@newshub.local', password: 'Editor123!' }),
-  });
-  if (!res.ok) throw new Error(`API login failed: ${res.status}`);
-  return ((await res.json()) as { accessToken: string }).accessToken;
+  return fetchApiToken();
 }
 
 const resultHeadings = (pageText: import('@playwright/test').Page) =>
@@ -58,12 +53,19 @@ test('short and empty queries never hit the API', async ({ page }) => {
     return route.continue();
   });
   await page.goto(`${STOREFRONT}/es/search?q=a`, { waitUntil: 'networkidle' });
+  // Negative assertion: queries shorter than 2 chars never fetch (see
+  // hasSearchQuery in storefront searchUtils + useSearch gate). The bounded
+  // wait is the observation window proving no late request fires.
   await page.waitForTimeout(1000);
   // EmptyState legitimately renders its own heading: assert no result cards.
   expect(await page.locator('main article').count()).toBe(0);
   expect(apiCalls).toBe(0);
   await page.goto(`${STOREFRONT}/es/search?q=zzzqnadaxyz`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1500);
+  // Settled empty response (auto-retried): replaces the former fixed wait —
+  // the assertion itself polls until the API round-trip completes.
+  await expect(page.getByText(/No se encontraron|noActiveSearch/i).first()).toBeVisible({
+    timeout: 30_000,
+  });
   expect(await page.locator('main article').count()).toBe(0);
   const body = await page.content();
   expect(/No se encontraron|noActiveSearch/i.test(body)).toBe(true);
@@ -91,8 +93,11 @@ test('stale results never render after query change', async ({ page }) => {
     timeout: 30_000,
   });
   // Switch query while B is still in flight: A results must disappear.
+  // The storefront clears previous-query results while unsettled (see
+  // useSearch settled logic), so assert absence with auto-retry instead of
+  // a fixed wait: polls until stale headings are gone.
   await page.goto(`${STOREFRONT}/es/search?q=guerra`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(400);
+  await expect(page.locator('main h3', { hasText: /inflaci/i })).toHaveCount(0, { timeout: 15_000 });
   expect((await resultHeadings(page)).join(' ')).not.toMatch(/inflaci/i);
   await expect(page.locator('main h3', { hasText: /guerra|ucrania/i }).first()).toBeVisible({
     timeout: 30_000,
@@ -114,25 +119,34 @@ test('publish appears in search, unpublish disappears', async ({ page }) => {
     await fetch(`${API}/categories?locale=es&limit=100`)
   ).json()) as { data: Array<{ id: string }> };
   const title = `E2E Search ${RUN} titulo largo`;
-  const created = (await (
-    await fetch(`${API}/articles`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        categoryId: cats.data[0].id,
-        translations: [
-          {
-            locale: 'es',
-            slug: `e2e-search-${RUN}`,
-            title,
-            summary: 'Resumen suficientemente largo para la validacion.',
-            content: ['Cuerpo publicado para busqueda.'],
-          },
-        ],
-      }),
-    })
-  ).json()) as { id: string };
-  await fetch(`${API}/articles/${created.id}/publish`, { method: 'POST', headers });
+  const createRes = await fetch(`${API}/articles`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      categoryId: cats.data[0].id,
+      translations: [
+        {
+          locale: 'es',
+          slug: `e2e-search-${RUN}`,
+          title,
+          summary: 'Resumen suficientemente largo para la validacion.',
+          content: ['Cuerpo publicado para busqueda.'],
+        },
+      ],
+    }),
+  });
+  if (!createRes.ok) throw new Error(`API article create failed: ${createRes.status}`);
+  const created = (await createRes.json()) as { id: string };
+  // Two-step approval: drafts cannot publish directly (409). Submit for
+  // review first, then publish — each step asserted, nothing assumed.
+  const reviewRes = await fetch(`${API}/articles/${created.id}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({ status: 'review' }),
+  });
+  if (!reviewRes.ok) throw new Error(`API submit-for-review failed: ${reviewRes.status}`);
+  const publishRes = await fetch(`${API}/articles/${created.id}/publish`, { method: 'POST', headers });
+  if (!publishRes.ok) throw new Error(`API publish failed: ${publishRes.status}`);
 
   await page.goto(`${STOREFRONT}/es/search?q=${RUN}`, { waitUntil: 'domcontentloaded' });
   await expect(page.locator('main h3', { hasText: new RegExp(RUN) }).first()).toBeVisible({
@@ -141,9 +155,15 @@ test('publish appears in search, unpublish disappears', async ({ page }) => {
 
   await fetch(`${API}/articles/${created.id}/unpublish`, { method: 'POST', headers });
   // no-store: the unpublish is visible on the next request, no ISR window.
+  // Wait for the settled search round-trip (observable network condition)
+  // instead of a fixed delay, then assert the empty result.
+  const searchResponse = page.waitForResponse(
+    (resp) => /\/api\/v1\/articles\?/.test(resp.url()),
+    { timeout: 30_000 },
+  );
   await page.goto(`${STOREFRONT}/es/search?q=${RUN}`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2000);
-  expect(await page.locator('main article').count()).toBe(0);
+  await searchResponse;
+  await expect(page.locator('main article')).toHaveCount(0, { timeout: 15_000 });
 
   await fetch(`${API}/articles/${created.id}`, { method: 'DELETE', headers });
 });

@@ -1,23 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
+import { EDITOR, REVIEWER, switchApiSession, useApiSession } from '../fixtures/auth';
 
-const EDITOR = { email: 'editor@newshub.local', password: 'Editor123!' };
-const REVIEWER = { email: 'reviewer@newshub.local', password: 'Reviewer123!' };
-
-async function uiLogin(page: Page, email: string, password: string) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Contraseña').fill(password);
-  await page.getByRole('button', { name: 'Acceder' }).click();
-  await expect(page).toHaveURL('http://localhost:3212/');
-}
-
-async function uiLogout(page: Page) {
-  await page.getByRole('button', { name: 'Salir' }).click();
-  await expect(page).toHaveURL(/\/login/);
+/** Starts the page as the given role without hitting the login UI. */
+async function loginAsRole(page: Page, role: { email: string; password: string }) {
+  await useApiSession(page, role);
+  await page.goto('/');
 }
 
 test('overview shows Tier 1 widgets', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   await expect(page.getByText('Tier 1', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Publicaciones por semana' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Cobertura de idioma' })).toBeVisible();
@@ -25,7 +16,7 @@ test('overview shows Tier 1 widgets', async ({ page }) => {
 });
 
 test('analytics page loads Tier 1 sections', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   await page.getByRole('link', { name: 'Analíticas' }).click();
   await expect(page).toHaveURL('http://localhost:3212/analytics');
   await expect(page.getByRole('heading', { name: 'Analíticas' })).toBeVisible();
@@ -35,7 +26,7 @@ test('analytics page loads Tier 1 sections', async ({ page }) => {
 });
 
 test('editor sees SEO completeness, reviewer is blocked from analytics', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   await page.getByRole('link', { name: 'Artículos' }).click();
   await expect(page).toHaveURL('http://localhost:3212/articles');
   await page.getByRole('link', { name: 'Nuevo artículo' }).click();
@@ -43,8 +34,7 @@ test('editor sees SEO completeness, reviewer is blocked from analytics', async (
   await expect(page.getByRole('heading', { name: 'Completitud SEO' })).toBeVisible();
   await expect(page.getByText('Completitud 0/100').first()).toBeVisible();
 
-  await uiLogout(page);
-  await uiLogin(page, REVIEWER.email, REVIEWER.password);
+  await switchApiSession(page, REVIEWER);
   await page.getByRole('link', { name: 'Analíticas' }).click();
   await expect(page).toHaveURL('http://localhost:3212/analytics');
   await expect(page.getByText('Rol insuficiente para esta sección.')).toBeVisible();
