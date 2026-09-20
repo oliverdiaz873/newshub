@@ -7,6 +7,7 @@
   "scripts": {
     "pretest": "node scripts/pretest.cjs",
     "test": "playwright test",
+    "mcp:start": "npx --yes @playwright/mcp@0.0.82 --config mcp.config.json",
     "type-check": "tsc --noEmit",
     "lint": "eslint"
   },
