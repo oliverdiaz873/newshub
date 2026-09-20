@@ -1,15 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { ADMIN, EDITOR, useApiSession } from '../fixtures/auth';
 
 const RUN = Date.now().toString(36);
-const ADMIN = { email: 'admin@newshub.local', password: 'Admin123!' };
-const EDITOR = { email: 'editor@newshub.local', password: 'Editor123!' };
 
-async function uiLogin(page: Page, email: string, password: string) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Contraseña').fill(password);
-  await page.getByRole('button', { name: 'Acceder' }).click();
-  await expect(page).toHaveURL('http://localhost:3212/');
+/** Starts the page as the given role without hitting the login UI. */
+async function loginAsRole(page: Page, role: { email: string; password: string }) {
+  await useApiSession(page, role);
+  await page.goto('/');
 }
 
 async function uiLogout(page: Page) {
@@ -23,7 +20,7 @@ async function gotoSyndication(page: Page) {
 }
 
 test('admin manages webhooks: create, secret once, ping, rotate, delete', async ({ page }) => {
-  await uiLogin(page, ADMIN.email, ADMIN.password);
+  await loginAsRole(page, ADMIN);
   await gotoSyndication(page);
 
   const url = `http://127.0.0.1:9/hook-${RUN}`;
@@ -60,7 +57,7 @@ test('admin manages webhooks: create, secret once, ping, rotate, delete', async 
 });
 
 test('editor is blocked from syndication admin', async ({ page }) => {
-  await uiLogin(page, EDITOR.email, EDITOR.password);
+  await loginAsRole(page, EDITOR);
   await gotoSyndication(page);
   await expect(page.getByText('Rol insuficiente para esta sección.')).toBeVisible();
   await uiLogout(page);

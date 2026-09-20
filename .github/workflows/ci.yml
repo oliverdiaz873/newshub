@@ -105,6 +105,15 @@ jobs:
         working-directory: apps/e2e
     env:
       E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/newshub_e2e
+      # CI-only test identities: must match the E2E seed dev credentials
+      # (apps/api/prisma/seed.ts). Isolated newshub_e2e database.
+      E2E_EDITOR_EMAIL: editor@newshub.local
+      E2E_EDITOR_PASSWORD: Editor123!
+      E2E_REVIEWER_EMAIL: reviewer@newshub.local
+      E2E_REVIEWER_PASSWORD: Reviewer123!
+      E2E_ADMIN_EMAIL: admin@newshub.local
+      E2E_ADMIN_PASSWORD: Admin123!
+      E2E_JWT_SECRET: e2e-ci-secret
       CI: true
     steps:
       - uses: actions/checkout@v4

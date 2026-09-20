@@ -7,6 +7,16 @@ const STOREFRONT_DIR = path.resolve(__dirname, '../storefront');
 // Overridable for CI (which sets a password); local default uses trust auth.
 const E2E_DB =
   process.env.E2E_DATABASE_URL ?? 'postgresql://postgres@localhost:5433/newshub_e2e';
+// Sensitive: must come from the environment (CI job env or local gitignored
+// .env.e2e, see .env.example). No fallback value in code.
+const E2E_JWT = process.env.E2E_JWT_SECRET;
+if (!E2E_JWT) {
+  throw new Error(
+    'E2E setup refused: E2E_JWT_SECRET is unset. ' +
+      'Set it to the JWT secret the E2E API should boot with ' +
+      '(any test-only value; isolated newshub_e2e database).',
+  );
+}
 
 /**
  * Browser E2E (P0-3): dashboard + storefront + API against an isolated
@@ -36,11 +46,13 @@ export default defineConfig({
       env: {
         DATABASE_URL: E2E_DB,
         TEST_DATABASE_URL: E2E_DB,
-        JWT_SECRET: 'e2e-test-secret',
+        JWT_SECRET: E2E_JWT,
         PORT: '3211',
         DASHBOARD_URL: 'http://localhost:3212',
         STOREFRONT_URL: 'http://localhost:3210',
         API_PUBLIC_URL: 'http://localhost:3211',
+        // Isolated uploads: never the dev storage/ (see scripts/pretest.cjs).
+        MEDIA_DIR: path.resolve(API_DIR, '.tmp', 'e2e-storage'),
       },
     },
     {
