@@ -63,3 +63,30 @@ decisión → (si merece) Playwright Test → assertion → CI
 ```
 
 Un descubrimiento no es un test hasta que un humano lo formaliza.
+
+## Notas del piloto
+
+### Chromium del runtime MCP
+
+Si Playwright MCP reporta que Chromium no está instalado, instalar el
+browser requerido mediante:
+
+npx @playwright/mcp@0.0.82 install-browser chromium
+
+El navegador se instala en la caché del usuario y no dentro del repositorio.
+No es necesario convertirlo en una dependencia del proyecto ni modificar
+el CI actual.
+
+El Chromium utilizado por Playwright Test y el runtime de Playwright MCP
+son runtimes independientes.
+
+### Screenshots y outputDir
+
+`browser_take_screenshot` puede resolver el filename respecto al working
+directory aunque el servidor MCP tenga configurado `outputDir`.
+
+Después de generar una captura, verificar físicamente su ubicación antes
+de considerarla evidencia definitiva. Si es necesario, moverla al
+directorio de evidencia documentado:
+
+`apps/e2e/.tmp/mcp-output/`
