@@ -46,6 +46,24 @@ async function apiTransition(page: Page, token: string, id: string, action: stri
   expect(res.status()).toBe(expected);
 }
 
+/**
+ * Isolation: deletes planning items created by the test (matched by unique
+ * title). Titles embed RUN, so cleanup never touches other runs' items.
+ */
+async function apiCleanupTitle(page: Page, token: string, needle: string) {
+  const res = await page.request.get(`${API}/planning?limit=100`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  expect(res.ok()).toBeTruthy();
+  const body = (await res.json()) as { data: Array<{ id: string; title: string }> };
+  for (const item of body.data.filter((i) => i.title.includes(needle))) {
+    const del = await page.request.delete(`${API}/planning/${item.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(del.ok()).toBeTruthy();
+  }
+}
+
 function rowByTitle(page: Page, title: string) {
   return page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
 }
@@ -59,6 +77,9 @@ test('editor creates a pitch through the form', async ({ page }) => {
   await expect(page.getByText('Elemento creado.').first()).toBeVisible();
   await page.locator('#planning-q').fill(RUN);
   await expect(rowByTitle(page, `E2E Pitch largo ${RUN}`).getByRole('cell', { name: 'Propuesto' })).toBeVisible();
+
+  const token = await apiToken(page);
+  await apiCleanupTitle(page, token, `E2E Pitch largo ${RUN}`);
 });
 
 test('assignment runs the full cycle from the list', async ({ page }) => {
@@ -79,6 +100,8 @@ test('assignment runs the full cycle from the list', async ({ page }) => {
   await expect(row.getByRole('cell', { name: 'En revisión' })).toBeVisible();
   await row.getByRole('button', { name: 'Completar' }).click();
   await expect(row.getByRole('cell', { name: 'Terminado' })).toBeVisible();
+
+  await apiCleanupTitle(page, token, title);
 });
 
 test('reviewer sees the queue and completes in-review work', async ({ page }) => {
@@ -100,6 +123,8 @@ test('reviewer sees the queue and completes in-review work', async ({ page }) =>
   await expect(row.getByRole('cell', { name: 'En revisión' })).toBeVisible();
   await row.getByRole('button', { name: 'Completar' }).click();
   await expect(page.getByText('Elemento actualizado.').first()).toBeVisible();
+
+  await apiCleanupTitle(page, token, title);
 });
 
 test('calendar shows due items and navigates months', async ({ page }) => {
@@ -117,4 +142,6 @@ test('calendar shows due items and navigates months', async ({ page }) => {
   await page.getByRole('button', { name: 'Mes siguiente' }).click();
   await page.getByRole('button', { name: 'Hoy' }).click();
   await expect(calendar.getByRole('list')).toBeVisible();
+
+  await apiCleanupTitle(page, token, title);
 });

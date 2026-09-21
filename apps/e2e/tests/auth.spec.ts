@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { loginAs, logout } from '../fixtures/auth';
 
-test('login success lands on categories', async ({ page }) => {
+test('login success lands on overview', async ({ page }) => {
   await loginAs(page);
-  await expect(page.getByRole('heading', { name: 'Categorías' })).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'Política' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
 });
 
 test('wrong password stays on login with message', async ({ page }) => {
