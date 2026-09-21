@@ -1,7 +1,30 @@
 import { expect, test, type Page } from '@playwright/test';
-import { EDITOR, REVIEWER, switchApiSession, useApiSession } from '../fixtures/auth';
+import { EDITOR, REVIEWER, fetchApiToken, switchApiSession, useApiSession } from '../fixtures/auth';
 
 const RUN = Date.now().toString(36);
+const API = 'http://localhost:3211/api/v1';
+
+async function apiHeaders(): Promise<Record<string, string>> {
+  const token = await fetchApiToken();
+  return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+}
+
+/** Isolation: removes the article created by the test (unpublishing first when needed). */
+async function cleanupArticle(id: string, published: boolean) {
+  const headers = await apiHeaders();
+  if (published) {
+    const unpub = await fetch(`${API}/articles/${id}/unpublish`, { method: 'POST', headers });
+    if (!unpub.ok) throw new Error(`cleanup unpublish failed: ${unpub.status}`);
+  }
+  const del = await fetch(`${API}/articles/${id}`, { method: 'DELETE', headers });
+  if (!del.ok) throw new Error(`cleanup delete failed: ${del.status}`);
+}
+
+function articleIdFromUrl(url: string): string {
+  const id = url.split('/').pop() ?? '';
+  expect(id).toMatch(/^[0-9a-f-]{36}$/);
+  return id;
+}
 
 /**
  * Starts the page as the given role without hitting the login UI
@@ -30,7 +53,9 @@ async function createDraftViaNew(page: Page, slug: string, title: string) {
   await page.getByLabel('Resumen', { exact: true }).first().fill('Resumen suficientemente largo para la validacion.');
   await page.getByLabel(/Contenido/, { exact: true }).first().fill('Cuerpo de revision.');
   await page.getByRole('button', { name: 'Crear', exact: true }).click();
-  await expect(page).toHaveURL(/\/articles\/.+/);
+  // Exclude /articles/new itself: a loose /articles/.+/ pattern also matches
+  // the form while creation is still in flight (see articles.spec.ts).
+  await expect(page).toHaveURL(/\/articles\/(?!new)[^/]+/, { timeout: 30_000 });
 }
 
 test('editor submits review, reviewer approves, content becomes published', async ({ page }) => {
@@ -38,6 +63,7 @@ test('editor submits review, reviewer approves, content becomes published', asyn
   const slug = `e2e-rev-${RUN}`;
   const title = `E2E Revision titulo largo ${RUN}`;
   await createDraftViaNew(page, slug, title);
+  const articleId = articleIdFromUrl(page.url());
 
   // Draft direct-publish is gone from the UI (two-step approval).
   await expect(page.getByRole('button', { name: 'Publicar' })).toHaveCount(0);
@@ -58,6 +84,8 @@ test('editor submits review, reviewer approves, content becomes published', asyn
   await page.getByLabel('Estado').first().selectOption('all');
   const publishedRow = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
   await expect(publishedRow.getByRole('cell', { name: 'published' })).toBeVisible();
+
+  await cleanupArticle(articleId, true);
 });
 
 test('reviewer rejects with reason, content returns to draft', async ({ page }) => {
@@ -65,6 +93,7 @@ test('reviewer rejects with reason, content returns to draft', async ({ page }) 
   const slug = `e2e-rej-${RUN}`;
   const title = `E2E Rechazo titulo largo ${RUN}`;
   await createDraftViaNew(page, slug, title);
+  const articleId = articleIdFromUrl(page.url());
   await page.getByRole('button', { name: 'Enviar a revisión' }).click();
   await expect(page.getByText('Artículo guardado.')).toBeVisible();
 
@@ -92,6 +121,8 @@ test('reviewer rejects with reason, content returns to draft', async ({ page }) 
   await expect(page).toHaveURL('http://localhost:3212/notifications');
   await expect(page.getByRole('heading', { name: 'Notificaciones' })).toBeVisible();
   await expect(page.getByRole('table')).toBeVisible();
+
+  await cleanupArticle(articleId, false);
 });
 
 test('notification preferences toggle persists via API', async ({ page }) => {

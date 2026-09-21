@@ -1,8 +1,11 @@
-const { rmSync } = require('node:fs');
+const { mkdirSync, rmSync } = require('node:fs');
 const { execSync } = require('node:child_process');
 const { resolve } = require('node:path');
 
 const PORTS = [3210, 3211, 3212];
+// Isolated E2E media storage (mirrors MEDIA_DIR in playwright.config.ts).
+// Wiped every run so uploads never leak across reseeds or into dev data.
+const E2E_STORAGE = resolve(__dirname, '..', '..', 'api', '.tmp', 'e2e-storage');
 
 /**
  * Pretest hygiene (local runs, runs before Playwright boots webServers):
@@ -17,6 +20,10 @@ for (const app of ['storefront', 'dashboard']) {
   rmSync(resolve(__dirname, '..', app, '.next'), { recursive: true, force: true });
 }
 console.log('cleared storefront/dashboard .next');
+
+rmSync(E2E_STORAGE, { recursive: true, force: true });
+mkdirSync(E2E_STORAGE, { recursive: true });
+console.log('reset e2e media storage');
 
 if (process.platform === 'win32') {
   try {
