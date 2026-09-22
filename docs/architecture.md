@@ -2,139 +2,107 @@
 
 ## Overview
 
-This project is a Next.js `16.2.6` App Router news website for a bilingual digital news platform. It uses React `19.2.4`, TypeScript, `next-intl`, Tailwind CSS, component-level CSS files, and local TypeScript article data.
+Newshub is a monorepo with four apps that evolve independently:
 
-The application does not currently use a backend API, database, route handlers, or remote content service. All article, category, and opinion data are imported from local modules under `src/data/`.
+```text
+apps/api         NestJS + PostgreSQL + Prisma — editorial API (REST /api/v1)
+apps/dashboard   Next.js — editorial back-office (feature-based)
+apps/storefront  Next.js 16 App Router — bilingual public news site
+apps/e2e         Playwright — centralized E2E harness (isolated database)
+```
 
-## Route Model
+Data direction (ADR-012, status `Proposed` — implemented in substance,
+formal gates G0–G4 and `src/data` deletion F6 still pending):
 
-Routes are defined under `app/[locale]/`. The `[locale]` segment is handled by `next-intl`, which provides locale-aware routing, message loading, and navigation wrappers.
+```text
+PostgreSQL (persistence source of truth)
+  ↓
+Prisma (mirrors the physical model)
+  ↓
+NestJS API (/api/v1, sole application-facing source of truth)
+  ↓
+Storefront / Dashboard (API clients, never direct DB access)
+```
 
-| Route area | Route file |
-| --- | --- |
-| Locale layout | `app/[locale]/layout.tsx` |
-| Home | `app/[locale]/page.tsx` |
-| Category (generic) | `app/[locale]/category/[slug]/page.tsx` |
-| Category: Clima | `app/[locale]/clima/page.tsx` |
-| Category: Deporte | `app/[locale]/deporte/page.tsx` |
-| Category: Economia | `app/[locale]/economia/page.tsx` |
-| Category: Internacional | `app/[locale]/internacional/page.tsx` |
-| Category: Justicia | `app/[locale]/justicia/page.tsx` |
-| Category: Politica | `app/[locale]/politica/page.tsx` |
-| Category: Salud | `app/[locale]/salud/page.tsx` |
-| News article | `app/[locale]/news/[category]/[slug]/page.tsx` |
-| Opinion article | `app/[locale]/opiniones/[slug]/page.tsx` |
-| Search | `app/[locale]/search/page.tsx` |
-| Legal: Privacy | `app/[locale]/legal/privacy/page.tsx` |
-| Legal: Terms | `app/[locale]/legal/terms/page.tsx` |
+Each app installs and runs on its own (`apps/<name>/package.json`; no root
+`package.json`, no workspaces). Ports — dev vs E2E differ intentionally:
 
-Route-level loading files exist for the home page and individual news articles.
+| Service | Development | E2E harness |
+|---|---|---|
+| API | `:3001` | `:3211` |
+| Dashboard | `:3002` | `:3212` |
+| Storefront | `:3000` | `:3210` |
 
-## Internationalization
+Canonical detail lives in specialized docs (linked per section, not
+duplicated here): API/data → `apps/api/docs/`; dashboard →
+`docs/dashboard/`; E2E/coverage/MCP → `apps/e2e/docs/`; decisions → `docs/adr/`.
 
-Internationalization is implemented with `next-intl`.
+## API (`apps/api`)
 
-- Supported locales: `es`, `en`.
-- Default locale: `es`.
-- Routing configuration: `src/i18n/routing.ts`.
-- Request configuration: `src/i18n/request.ts`.
-- Middleware: `proxy.ts`.
-- Compiled messages: `messages/es.json` and `messages/en.json`.
+NestJS modular monolith organized by features (`src/modules/`: articles,
+opinions, categories, authors, editorial, media, planning, scheduling,
+notifications, history, syndication, auth), plus `PrismaModule`, health,
+scheduling and throttling. Global prefix `api/v1`, helmet, CORS restricted
+to dashboard/storefront origins, `ValidationPipe`, JWT access (15 min) +
+httpOnly refresh rotation with reuse detection, role guards
+(`admin, editor, reviewer`).
 
-The i18n pipeline works in two layers:
+Layering per feature: **Controller → Service → Repository → PostgreSQL**
+via `PrismaService`. Repositories own all Prisma access; the frontend never
+touches the database (`scripts/ssot-guard.mjs` enforces the boundary).
 
-1. **Static translations** live in `src/i18n/locales/{locale}/*.json` (navbar, footer, home, news, search, legal, metadata, common).
-2. **Dynamic content** (articles, categories, opinions) lives in `src/data/` and is extracted by `scripts/build-locales.ts`.
-3. **Compilation** (`npm run build:locales`) merges both into `messages/{locale}.json`, which is consumed by `next-intl` at runtime.
+## Dashboard (`apps/dashboard`)
 
-The locale layout validates the locale, calls `setRequestLocale()`, loads messages with `getMessages()`, and wraps the application with `NextIntlClientProvider`.
+Next.js back-office with `app/` (thin routing + composition), `features/`
+(domain modules incl. transversal `editorial-shared`: history panel,
+locale tabs, scheduling, validators) and `shared/` (UI only, no domain).
+Dependency direction `app → features → shared` (`shared → features`
+forbidden). Rulebook: `docs/dashboard/feature-architecture.md`.
+Dev on `:3002` (E2E serves it on `:3212`).
 
-## Layout Composition
+## Storefront (`apps/storefront`)
 
-The root locale layout (`app/[locale]/layout.tsx`) wraps all pages with:
+Next.js `16` App Router bilingual (015, `es` default via `next-intl`) public
+site, **API-first**: pages fetch `GET {NEXT_PUBLIC_API_URL}/api/v1`
+(`next.revalidate: 60`); `src/data/` holds only TypeScript types under
+ADR-012 quarantine (boundary enforced, deletion gate F6 pending). Home is
+API-only — fetch failure reaches the error boundary, never stale local data.
+Detail routes keep `notFound()` semantics; `next/image` uses remote patterns
+derived from the API URL.
 
-- `ThemeProvider` from `src/theme/`.
-- Global `Header` with navigation, search, language selector, and theme toggle.
-- Global `Footer` with links and social icons.
-- `ScrollToTop` for user experience.
+Routes under `app/[locale]/`: home, 7 fixed + 1 dynamic category pages,
+news detail (`news/[category]/[slug]`), opinion detail (`opiniones/[slug]`),
+search, legal (privacy/terms), plus `sitemap.ts`/`robots.ts`.
 
-This makes theme state, navigation, search, and footer links available across all routes.
+i18n pipeline (unchanged, still local): static `src/i18n/locales/{locale}/*.json`
++ `scripts/build-locales.ts` (runs before `dev`/`build`) → `messages/{locale}.json`
+consumed by `next-intl` (`routing.ts`, `request.ts`, `proxy.ts` middleware).
 
-## Theme System
+Layout/theming: root layout (html, fonts, theme script) + locale layout
+(locale validation, `NextIntlClientProvider`, Header/Footer, ScrollToTop);
+custom theme system (`light/dark/system`) in `src/theme/`; Server Components
+by default with client islands (theme, nav, search); Tailwind + co-located CSS.
 
-The custom theme system lives in `src/theme/` and supports `light`, `dark`, and `system` preferences.
+## E2E (`apps/e2e`)
 
-- `ThemeProvider`: React context provider that manages theme state.
-- `useTheme`: Hook to read and set the current theme.
-- `system.ts`: Detects `prefers-color-scheme` media queries.
-- `storage.ts`: Persists preference to `localStorage`.
-- `theme-script.ts`: Inline script that prevents flash of unstyled content (FOUC) on page load.
-- `theme.css`: CSS custom properties for both light and dark color schemes.
+Centralized Playwright harness: `playwright.config.ts` spins API `:3211` +
+dashboard `:3212` + storefront `:3210` against an isolated `newshub_e2e`
+database (name asserted in `global-setup.ts`, migrate + deterministic seed).
+`pretest.cjs` cleans build output, e2e storage and ports. Specs mix UI flows
+with direct-API setup/cleanup; role sessions avoid the login rate limit.
+Coverage matrix and residual risks: `apps/e2e/docs/coverage.md`.
 
-## Rendering Strategy
+Playwright MCP exists solely as exploration/debugging infrastructure
+(minimal `mcp.config.json`, read-only prompts, never in CI — see
+`apps/e2e/docs/mcp/README.md`).
 
-The project follows the App Router default of Server Components unless a file is marked with `"use client"`.
+## Database
 
-Server-side responsibilities include:
-
-- Route metadata through `generateMetadata`.
-- Locale message loading in the root layout.
-- Local article and category lookups in route pages.
-
-Client-side responsibilities include:
-
-- Theme toggling and persistence.
-- Navigation viewport state and interactions (desktop, tablet, mobile).
-- Search interactions and result filtering.
-- Article detail interactivity.
-- Opinion article rendering.
-
-## Data Flow
-
-Article data is local and static:
-
-- `src/data/newsModels.ts`: TypeScript interfaces.
-- `src/data/categories.ts`: Category definitions with labels and descriptions.
-- `src/data/articleContent/*.ts`: Full article content organized by category.
-- `src/data/opinionContent/*.ts`: Opinion article content.
-- `src/data/homeContent.ts`, `sidebarNews.ts`, `legalContent.ts`: Additional content modules.
-
-Article detail flow:
-
-1. The route receives `category` and `slug` from `params`.
-2. The server page looks up the article in the local data through `useNewsArticle` or equivalent lookup.
-3. Missing articles call `notFound()`.
-4. Article metadata is generated from the article data.
-5. The article data is passed to `ArticleDetail` for translated rendering.
-
-Category flow:
-
-1. The route receives `slug` from `params`.
-2. The server page finds the category in local category data.
-3. Missing categories call `notFound()`.
-4. Articles matching the category are filtered and rendered.
-
-## State Management
-
-The project uses local React state and React Context. It does not use Redux, Zustand, or other global state libraries.
-
-- Theme state is managed through React Context (`ThemeProvider`).
-- Navigation state (mobile menu open/closed, search active) uses local `useState`.
-- Article and category data are derived from static imports, not fetched state.
-
-## API Communication
-
-No API communication is currently implemented.
-
-- There are no App Router route handlers.
-- There are no remote `fetch` calls in application source.
-- Search is client-side against local article data.
-
-## Styling and Assets
-
-- Global styles live in `src/styles/index.css` (Tailwind directives).
-- Feature and UI component styles live next to components as `.css` files.
-- Tailwind CSS is configured through `tailwind.config.js` with dark mode via `data-theme` attribute.
-- Static assets (images, favicons) live under `public/`.
-- `next/image` is used for article, logo, and opinion imagery.
-- The Domine font is self-hosted via `next/font/local`.
+PostgreSQL is the persistence source of truth; Prisma mirrors it
+(`prisma migrate deploy`, `prisma generate`, `tsx prisma/seed.ts`;
+14 migrations applied). Documented end to end in `apps/api/docs/`:
+business rules (BR-001…BR-023), conceptual/logical/physical models,
+retention policy (BR-023: terminal webhook deliveries 30 days, actives
+never). Locales are data (`locales` table); content translations are weak
+entities; history (`revisions`/`audit_events`) is append-only and survives
+content deletion by design.
