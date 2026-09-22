@@ -44,6 +44,20 @@ model User {
   @@map("users")
 }
 
+// M-02: locales as data (D5). Seed: es (default), en.
+// Translation locale columns are FKs to locales.code (RESTRICT/UPDATE CASCADE).
+model Locale {
+  code       String   @id
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  authorTranslations   AuthorTranslation[]   @relation("AuthorTranslationLocale")
+  categoryTranslations CategoryTranslation[] @relation("CategoryTranslationLocale")
+  articleTranslations  ArticleTranslation[]  @relation("ArticleTranslationLocale")
+  opinionTranslations  OpinionTranslation[]  @relation("OpinionTranslationLocale")
+
+  @@map("locales")
+}
+
 model Author {
   id         String               @id @default(uuid()) @db.Uuid
   slug       String               @unique
@@ -62,6 +76,7 @@ model AuthorTranslation {
   name     String
   bio      String?
   author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  localeRef Locale @relation("AuthorTranslationLocale", fields: [locale], references: [code], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([authorId, locale])
   @@unique([locale, name])
@@ -91,6 +106,7 @@ model CategoryTranslation {
   label       String
   description String?
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  localeRef   Locale   @relation("CategoryTranslationLocale", fields: [locale], references: [code], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([categoryId, locale])
   @@unique([locale, slug])
@@ -133,6 +149,7 @@ model ArticleTranslation {
   coverAlt  String? @map("cover_alt")
   content   Json
   article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  localeRef Locale  @relation("ArticleTranslationLocale", fields: [locale], references: [code], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([articleId, locale])
   @@unique([locale, slug])
@@ -171,6 +188,7 @@ model OpinionTranslation {
   coverAlt  String? @map("cover_alt")
   content   Json
   opinion   Opinion @relation(fields: [opinionId], references: [id], onDelete: Cascade)
+  localeRef Locale  @relation("OpinionTranslationLocale", fields: [locale], references: [code], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([opinionId, locale])
   @@unique([locale, slug])
