@@ -80,6 +80,7 @@ Constraints estructurales (origen: `apps/api/prisma/migrations/20260906201307_in
 | BR-020 | Entrega webhook idempotente por (suscripción, entidad, acción) con claim y reaper | Concurrencia, Temporal | Webhook, WebhookDelivery | BD + API | `UNIQUE (subscription,entity,action)` + CHECKs + índices | `enqueue` vía `upsert(update:{})`; `claim` atómico pending→inflight + reaper 5 min; fan-out best-effort | Upsert + claim atómico | Cumple | `webhooks` migration, `syndication.repository.ts:enqueue/claim/dueDeliveries/settle`, `syndication.service.ts:fanout/processDue` |
 | BR-021 | Borrado respeta dependencias: crítico restringe, histórico conserva, derivados en cascada | Integridad referencial | Todas | BD | `RESTRICT` (categoría/autor de opinión), `SET NULL` (autoría/auditoría/portadas), `CASCADE` (traducciones, credenciales, tokens, notificaciones, deliveries) | Borrado de artículo audita snapshot en la misma transacción | Transacción | Cumple | `init/auth/history/notifications/webhooks` migrations, `articles.service.ts:remove` |
 | BR-022 | Límites operativos (bulk, prefs, paginación) | Límite/cantidad | Article (bulk), NotificationPref | API | — | Bulk > máx. → 422, por-ítem aislado sin transacción envolvente; prefs máx. 20; paginación normalizada | Sin garantía de concurrencia (diseño) | Cumple | `articles.service.ts:bulk`, `notifications.service.ts:setPrefs`, `common/pagination` |
+| BR-023 | Deliveries terminales se conservan 30 días y se purgan; activos nunca (R-1) | Temporal, Límite/cantidad | WebhookDelivery | API | Predicado `status IN (delivered,failed) AND createdAt < now−30d` | Purga al cierre de cada tick (`processDue`); pendientes/inflight estructuralmente intocables | Purga idempotente por predicado; claims protegen activas | Cumple | `syndication.service.ts:13,311-342`, `syndication.repository.ts:200-204`; decisión en `syndication-retention.md` |
 
 ## 5. Reglas detalladas
 
@@ -262,18 +263,18 @@ Ninguna regla de negocio requerida por el dominio actual queda a medio garantiza
 - BR-018/BR-016 dependen de ausencia de superficie API, no de prohibición a nivel DB.
 - Documentación arquitectónica desactualizada (`docs/architecture.md`, `folder-structure.md`, `getting-started.md`) contradice al código; la válida es `ADR-012` + features. Riesgo de onboarding, no de integridad.
 
-### Necesita investigación (1)
+### Necesita investigación (0 abierto; 1 resuelto)
 
-- Política de retención/purga de `webhook_deliveries` terminales (`purgeDeliveries(before)` existe pero el llamante/ventana de retención no se audita aquí como regla de negocio; no se afirma ni se niega regla).
+- ~~Política de retención/purga de `webhook_deliveries`~~ → resuelto como **BR-023** (R-1, `syndication-retention.md`): terminales 30 días, activos nunca. Pendiente no bloqueante: confirmación de producto sobre la ventana + volumen real en producción.
 
 ### Nota sobre candidatas descartadas
 
-- `BR-023 (createdAt/updatedAt)`: excluida como regla independiente. Los timestamps existen en casi todas las tablas y **soportan** historial/ordenación/auditoría (BR-008/BR-013/BR-016…), pero no hay una regla del tipo "X debe registrarse con fecha" que los exija por sí mismos. Si el rediseño introduce SLAs o retención temporal, reabrir como regla.
+- Candidata `timestamps` (createdAt/updatedAt como regla independiente): excluida sin ID asignado. Los timestamps existen en casi todas las tablas y **soportan** historial/ordenación/auditoría (BR-008/BR-013/BR-016…), pero no hay una regla del tipo "X debe registrarse con fecha" que los exija por sí mismos. (Nota: el ID BR-023 corresponde a retención de deliveries, R-1.)
 
 ## 8. Conclusión
 
 Newshub representa correctamente sus reglas de negocio editoriales: unicidad e integridad en PostgreSQL (UNIQUE, FK, CHECK, índices parciales) + workflow, autorización, scheduling, historial y concurrencia en NestJS (máquinas de estado, guards, transacciones, claims atómicos, upserts idempotentes, retries). La distribución BD/API/frontend respeta el apunte (frontend nunca autoridad; DB garantiza integridad independiente del escritor; backend aporta comportamiento). No se encontró lógica de negocio compleja indebida en la DB (sin triggers; CHECKs solo para invariantes expresables), lo cual es correcto.
 
-Resumen: **22 reglas reales identificadas; 22 cumplen; 0 parciales; 3 riesgos de diseño aceptado (fan-out, bulk, garantía por ausencia); múltiples N/A de ecommerce; 1 necesita investigación (retención de deliveries).** Garantizadas por PostgreSQL (total o parcial): BR-001…BR-009, BR-011, BR-016, BR-020, BR-021. Principalmente por NestJS: BR-010, BR-012…BR-015, BR-017…BR-019, BR-022. Multicapa: BR-001…BR-003, BR-005…BR-008, BR-013…BR-014, BR-016, BR-020, BR-021.
+Resumen: **23 reglas reales identificadas; 23 cumplen; 0 parciales; 3 riesgos de diseño aceptado (fan-out, bulk, garantía por ausencia); múltiples N/A de ecommerce; 0 pendientes de investigación (R-1 resuelto como BR-023).** Garantizadas por PostgreSQL (total o parcial): BR-001…BR-009, BR-011, BR-016, BR-020, BR-021. Principalmente por NestJS: BR-010, BR-012…BR-015, BR-017…BR-019, BR-022, BR-023. Multicapa: BR-001…BR-003, BR-005…BR-008, BR-013…BR-014, BR-016, BR-020, BR-021.
 
-Gaps reales para el futuro rediseño: (a) crear la matriz BR era inexistente — este documento la inaugura; (b) actualizar `docs/architecture.md`/`folder-structure.md`/`getting-started.md`; (c) decidir si la inmutabilidad de auditoría merece prohibición a nivel DB; (d) definir política de retención de deliveries/notificaciones; (e) si el negocio pidiera multi-categoría por artículo, el actual `category_id` único exigiría tabla puente (evolución prevista por el apunte, no fallo actual).
+Gaps reales para el futuro rediseño: (a) crear la matriz BR era inexistente — este documento la inaugura; (b) actualizar `docs/architecture.md`/`folder-structure.md`/`getting-started.md`; (c) decidir si la inmutabilidad de auditoría merece prohibición a nivel DB; (d) retención de deliveries resuelta (BR-023); queda pendiente la de notificaciones si su volumen lo exige; (e) si el negocio pidiera multi-categoría por artículo, el actual `category_id` único exigiría tabla puente (evolución prevista por el apunte, no fallo actual).
