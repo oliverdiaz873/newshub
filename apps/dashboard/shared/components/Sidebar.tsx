@@ -28,16 +28,44 @@ const SYSTEM: Array<{ href: string; key: string }> = [
  * Shared navigation. The notifications badge count is injected by the app
  * layer (see app/dashboard-shell.tsx) so shared never imports features.
  */
-export function Sidebar({ onNavigate, unreadCount = 0 }: { onNavigate?: () => void; unreadCount?: number }) {
+export function Sidebar({
+  onNavigate,
+  unreadCount = 0,
+  navCounts,
+}: {
+  onNavigate?: () => void;
+  unreadCount?: number;
+  navCounts?: { articles?: number; opinions?: number; categories?: number; authors?: number; media?: number };
+}) {
   const t = useTranslations('nav');
   const tn = useTranslations('notifications');
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useSidebarCollapsed();
   const unread = unreadCount;
 
+  function countFor(key: string): number | undefined {
+    if (!navCounts) return undefined;
+    switch (key) {
+      case 'articles':
+        return navCounts.articles;
+      case 'opinions':
+        return navCounts.opinions;
+      case 'categories':
+        return navCounts.categories;
+      case 'authors':
+        return navCounts.authors;
+      case 'media':
+        return navCounts.media;
+      default:
+        return undefined;
+    }
+  }
+
   function navLink(item: { href: string; key: string }) {
     const label = t(item.key);
     const showBadge = item.key === 'notifications' && unread > 0;
+    const count = countFor(item.key);
+    const showCount = typeof count === 'number' && !showBadge;
     return (
       <Link
         href={item.href}
@@ -63,6 +91,11 @@ export function Sidebar({ onNavigate, unreadCount = 0 }: { onNavigate?: () => vo
               <span className="nh-sr-only">{tn('unreadCount', { count: unread })}</span>
             </span>
           )}
+          {showCount && (
+            <span className="nh-count" aria-label={`${label}: ${count}`}>
+              {count > 99 ? '99+' : count}
+            </span>
+          )}
         </span>
       </Link>
     );
@@ -71,6 +104,10 @@ export function Sidebar({ onNavigate, unreadCount = 0 }: { onNavigate?: () => vo
   return (
     <aside className={collapsed ? 'nh-sidebar collapsed' : 'nh-sidebar'} aria-label={t('primary')}>
       <div className="nh-sidebar-brand">
+        <span className="nh-brand-mark" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo.jpeg" alt="" width={28} height={28} />
+        </span>
         <strong>Newshub</strong>
         <button
           className="nh-icon-btn side-toggle"

@@ -34,3 +34,43 @@ export function actionsFor(status: string): EditorialAction[] {
   if (status === 'review') return ['publish', 'reject', 'archive', 'delete'];
   return ['archive', 'delete'];
 }
+
+export type StatusLabelKey = 'statusDraft' | 'statusReview' | 'statusPublished' | 'statusArchived';
+
+/**
+ * Badge class for an editorial status (mockup b-* parity, nh-* contract).
+ * Purely presentational; the status strings stay API-owned.
+ */
+export function statusBadgeClass(status: string): string {
+  switch (status) {
+    case 'draft':
+      return 'nh-badge nh-badge-draft';
+    case 'review':
+      return 'nh-badge nh-badge-review';
+    case 'published':
+      return 'nh-badge nh-badge-published';
+    case 'archived':
+      return 'nh-badge nh-badge-archived';
+    default:
+      return 'nh-badge';
+  }
+}
+
+/**
+ * Articles-namespace i18n key for an editorial status label, or null when
+ * unknown (callers fall back to the raw status string).
+ */
+export function statusLabelKey(status: string): StatusLabelKey | null {
+  switch (status) {
+    case 'draft':
+      return 'statusDraft';
+    case 'review':
+      return 'statusReview';
+    case 'published':
+      return 'statusPublished';
+    case 'archived':
+      return 'statusArchived';
+    default:
+      return null;
+  }
+}

@@ -70,8 +70,8 @@
   position: absolute;
   right: 0;
   top: 100%;
-  transform: translateY(-6px);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transform: translateY(-4px);
+  transition: opacity 130ms ease-in, transform 130ms ease-in;
   z-index: 40;
 }
 
@@ -79,6 +79,21 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+  transition: opacity 170ms ease-out, transform 170ms ease-out;
+}
+
+/* Instant close used only when switching directly to another dropdown:
+   the previous menu disappears immediately while the new one animates. */
+.theme-toggle-menu.is-instant,
+.theme-toggle-menu.is-instant.is-open {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-menu,
+  .theme-toggle-menu.is-open {
+    transition: none;
+  }
 }
 
 .theme-toggle-option {

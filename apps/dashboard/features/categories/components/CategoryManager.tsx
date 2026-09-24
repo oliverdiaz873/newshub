@@ -170,18 +170,26 @@ export function CategoryManager() {
     return t('required');
   }
 
-  function textField(key: 'esSlug' | 'esLabel' | 'enSlug' | 'enLabel', label: string) {
+  function textField(key: 'esSlug' | 'esLabel' | 'enSlug' | 'enLabel', label: string, required = false) {
     const id = `cat-${key}`;
     const message = fieldMessage(key);
     return (
       <div className="nh-field">
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={id}>
+          {label}
+          {required && (
+            <span className="nh-req" aria-hidden="true">
+              {' *'}
+            </span>
+          )}
+        </label>
         <input
           id={id}
           value={form[key]}
           onChange={set(key)}
           aria-invalid={message ? true : undefined}
           aria-describedby={message ? `${id}-err` : undefined}
+          className={message ? 'invalid' : undefined}
         />
         {message && (
           <span id={`${id}-err`} className="nh-muted" role="alert">
@@ -210,15 +218,22 @@ export function CategoryManager() {
         <form onSubmit={editing ? saveEdit : create} noValidate>
           <div className="nh-field">
             <label htmlFor="cat-sort">{t('fieldSort')}</label>
-            <input id="cat-sort" value={form.sort} onChange={set('sort')} inputMode="numeric" aria-invalid={touched && fieldErrors.sort ? true : undefined} />
+            <input
+              id="cat-sort"
+              value={form.sort}
+              onChange={set('sort')}
+              inputMode="numeric"
+              aria-invalid={touched && fieldErrors.sort ? true : undefined}
+              className={touched && fieldErrors.sort ? 'invalid' : undefined}
+            />
             {touched && fieldErrors.sort && (
               <span className="nh-muted" role="alert">
                 {t('required')}
               </span>
             )}
           </div>
-          {textField('esSlug', t('fieldSlugEs'))}
-          {textField('esLabel', t('fieldLabelEs'))}
+          {textField('esSlug', t('fieldSlugEs'), true)}
+          {textField('esLabel', t('fieldLabelEs'), true)}
           <div className="nh-field">
             <label htmlFor="cat-esDesc">{t('fieldDescEs')}</label>
             <textarea id="cat-esDesc" value={form.esDesc} onChange={set('esDesc')} rows={2} />
@@ -280,8 +295,11 @@ export function CategoryManager() {
               </thead>
               <tbody>
                 {pageItems.map((row) => (
-                  <tr key={row.id}>
-                    <td>{row.label}</td>
+                  <tr key={row.id} className={editing === row.id ? 'is-selected' : undefined}>
+                    <td>
+                      <div>{row.label}</div>
+                      {row.description && <div className="nh-muted">{row.description}</div>}
+                    </td>
                     <td>
                       <span className="nh-muted">{row.slug}</span>
                     </td>

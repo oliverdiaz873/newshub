@@ -11,7 +11,8 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Paginator, Table } from '@/shared/components/Table';
-import { actionsFor, type EditorialAction } from '@/features/editorial-shared/lib/transitions';
+import { actionsFor, statusBadgeClass, statusLabelKey, type EditorialAction } from
+'@/features/editorial-shared/lib/transitions';
 import { toLocalLabel, toUtcLabel } from '@/features/editorial-shared/lib/schedule';
 import { getOpinionAuthors, listOpinions, removeOpinion, transitionOpinion } from '../services/opinionService';
 import type { OpinionAuthorOption, OpinionListItem } from '../types';
@@ -34,6 +35,11 @@ export function OpinionList() {
   const { notify } = useToast();
 
   const editorialLocale = previewLang === 'en-first' ? 'en' : 'es';
+
+  function statusCell(status: string) {
+    const key = statusLabelKey(status);
+    return <span className={statusBadgeClass(status)}>{key ? ta(key) : status}</span>;
+  }
 
   const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') ?? 'all');
   const [authorFilter, setAuthorFilter] = useState(() => searchParams.get('author') ?? '');
@@ -345,7 +351,7 @@ export function OpinionList() {
                       </div>
                     )}
                   </td>
-                  <td>{item.status}</td>
+                  <td>{statusCell(item.status)}</td>
                   <td className="nh-muted">{item.updatedAt ?? ''}</td>
                   <td>
                     <div className="nh-row">

@@ -179,17 +179,25 @@ export function AuthorManager() {
     return t('required');
   }
 
-  function textField(key: 'slug' | 'esName' | 'enName', id: string, label: string) {
+  function textField(key: 'slug' | 'esName' | 'enName', id: string, label: string, required = false) {
     const message = fieldMessage(key);
     return (
       <div className="nh-field">
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={id}>
+          {label}
+          {required && (
+            <span className="nh-req" aria-hidden="true">
+              {' *'}
+            </span>
+          )}
+        </label>
         <input
           id={id}
           value={form[key]}
           onChange={set(key)}
           aria-invalid={message ? true : undefined}
           aria-describedby={message ? `${id}-err` : undefined}
+          className={message ? 'invalid' : undefined}
         />
         {message && (
           <span id={`${id}-err`} className="nh-muted" role="alert">
@@ -217,8 +225,8 @@ export function AuthorManager() {
       <section className="nh-card" aria-label={editing ? t('edit') : t('new')}>
         <h2>{editing ? t('edit') : t('new')}</h2>
         <form onSubmit={editing ? saveEdit : create} noValidate>
-          {textField('slug', 'au-slug', t('fieldSlug'))}
-          {textField('esName', 'au-esName', t('fieldNameEs'))}
+          {textField('slug', 'au-slug', t('fieldSlug'), true)}
+          {textField('esName', 'au-esName', t('fieldNameEs'), true)}
           <div className="nh-field">
             <label htmlFor="au-esBio">{t('fieldBioEs')}</label>
             <textarea id="au-esBio" value={form.esBio} onChange={set('esBio')} rows={2} />
@@ -281,9 +289,26 @@ export function AuthorManager() {
                 </tr>
               </thead>
               <tbody>
-                {pageItems.map((row) => (
-                  <tr key={row.id}>
-                    <td>{nameOf(row)}</td>
+                {pageItems.map((row) => {
+                  const name = nameOf(row);
+                  const bio = row.translations.find((tr) => tr.locale === 'es')?.bio ?? '';
+                  const initials = name
+                    .split(/\s+/)
+                    .map((part) => part.slice(0, 1))
+                    .join('')
+                    .slice(0, 2)
+                    .toUpperCase();
+                  return (
+                  <tr key={row.id} className={editing === row.id ? 'is-selected' : undefined}>
+                    <td>
+                      <span className="nh-user-chip">
+                        <span className="nh-avatar" aria-hidden="true">
+                          {initials}
+                        </span>
+                        <span>{name}</span>
+                      </span>
+                      {bio && <div className="nh-muted">{bio}</div>}
+                    </td>
                     <td>
                       <span className="nh-muted">{row.slug}</span>
                     </td>
@@ -298,7 +323,8 @@ export function AuthorManager() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </Table>
             <div className="nh-row">

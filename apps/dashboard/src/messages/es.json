@@ -122,7 +122,15 @@
     "invalid": "Credenciales inválidas.",
     "emailRequired": "El email es obligatorio.",
     "emailInvalid": "Introduce un email válido.",
-    "passwordRequired": "La contraseña es obligatoria."
+    "passwordRequired": "La contraseña es obligatoria.",
+    "brandKicker": "Editorial · ES / EN",
+    "brandTitle1": "La redacción,",
+    "brandTitle2": "en orden.",
+    "brandSub": "Artículos, opiniones, portadas y ediciones del día en un solo panel editorial.",
+    "brandP1": "Publicación y curaduría breaking",
+    "brandP2": "Traducciones ES → EN",
+    "brandP3": "Portadas y archivo multimedia",
+    "brandFooter": "Acceso restringido a editores"
   },
   "articles": {
     "title": "Artículos",

@@ -11,7 +11,8 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Paginator, Table } from '@/shared/components/Table';
-import { actionsFor, type EditorialAction } from '@/features/editorial-shared/lib/transitions';
+import { actionsFor, statusBadgeClass, statusLabelKey, type EditorialAction } from
+'@/features/editorial-shared/lib/transitions';
 import { toLocalLabel, toUtcLabel } from '@/features/editorial-shared/lib/schedule';
 import {
   bulkArticles,
@@ -40,6 +41,11 @@ export function ArticleList() {
   const { notify } = useToast();
 
   const editorialLocale = previewLang === 'en-first' ? 'en' : 'es';
+
+  function statusCell(status: string) {
+    const key = statusLabelKey(status);
+    return <span className={statusBadgeClass(status)}>{key ? t(key) : status}</span>;
+  }
 
   const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') ?? 'all');
   const [curationFilter, setCurationFilter] = useState(() => searchParams.get('curation') ?? 'all');
@@ -532,7 +538,12 @@ export function ArticleList() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.id} data-row={item.id} data-status={item.status}>
+                <tr
+                  key={item.id}
+                  data-row={item.id}
+                  data-status={item.status}
+                  className={selected.has(item.id) ? 'is-selected' : undefined}
+                >
                   <td>
                     <input
                       type="checkbox"
@@ -551,25 +562,11 @@ export function ArticleList() {
                       </div>
                     )}
                   </td>
-                  <td>{item.status}</td>
+                  <td>{statusCell(item.status)}</td>
                   <td>{item.categorySlug}</td>
                   <td>
-                    {item.isFeatured ? (
-                      <>
-                        <span aria-hidden="true">★</span>
-                        <span className="nh-sr-only">{t('fieldFeatured')}</span>{' '}
-                      </>
-                    ) : (
-                      ''
-                    )}
-                    {item.isBreaking ? (
-                      <>
-                        <span aria-hidden="true">●</span>
-                        <span className="nh-sr-only">{t('fieldBreaking')}</span>
-                      </>
-                    ) : (
-                      ''
-                    )}
+                    {item.isFeatured && <span className="nh-badge nh-badge-featured">{t('fieldFeatured')}</span>}{' '}
+                    {item.isBreaking && <span className="nh-badge nh-badge-breaking">{t('fieldBreaking')}</span>}
                   </td>
                   <td className="nh-muted">{item.updatedAt ?? ''}</td>
                   <td>

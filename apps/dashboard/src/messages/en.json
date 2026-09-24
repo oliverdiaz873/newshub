@@ -123,7 +123,15 @@
     "invalid": "Invalid credentials.",
     "emailRequired": "Email is required.",
     "emailInvalid": "Enter a valid email address.",
-    "passwordRequired": "Password is required."
+    "passwordRequired": "Password is required.",
+    "brandKicker": "Editorial · ES / EN",
+    "brandTitle1": "The newsroom,",
+    "brandTitle2": "in order.",
+    "brandSub": "Articles, opinions, front pages, and daily editions in one editorial workspace.",
+    "brandP1": "Publishing & breaking curation",
+    "brandP2": "ES → EN translations",
+    "brandP3": "Front pages & media archive",
+    "brandFooter": "Restricted access for editors"
   },
   "articles": {
     "title": "Articles",

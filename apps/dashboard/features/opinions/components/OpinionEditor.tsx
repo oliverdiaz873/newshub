@@ -240,7 +240,7 @@ export function OpinionEditor({
     }
   }
 
-  function trField(locale: 'es' | 'en', key: keyof OpinionFormValue['es'], label: string, multiline = false) {
+  function trField(locale: 'es' | 'en', key: keyof OpinionFormValue['es'], label: string, multiline = false, required = false) {
     const id = `oe-${locale}-${key}`;
     const errKey = `${locale}.${key}` as OpinionFieldKey;
     const message = fieldMessage(errKey);
@@ -253,12 +253,20 @@ export function OpinionEditor({
       onBlur: () => {
         if (touched) setFieldErrors(validateOpinionForm({ ...form }));
       },
+      className: message ? 'invalid' : undefined,
       'aria-invalid': message ? true : undefined,
       'aria-describedby': message ? `${id}-err` : undefined,
     };
     return (
       <div className="nh-field">
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={id}>
+          {label}
+          {required && (
+            <span className="nh-req" aria-hidden="true">
+              {' *'}
+            </span>
+          )}
+        </label>
         {multiline ? <textarea rows={6} {...common} /> : <input type="text" {...common} />}
         {message && (
           <span id={`${id}-err`} className="nh-muted" role="alert">
@@ -273,7 +281,7 @@ export function OpinionEditor({
     <div>
       {loadError && <ErrorState message={loadError} />}
       {dirty && (
-        <p className="nh-muted" role="status">
+        <p className="nh-dirty-flag" role="status">
           {ta('unsaved')}
         </p>
       )}
@@ -297,12 +305,13 @@ export function OpinionEditor({
         <HistoryPanel kind="opinion" id={opinionId} onRestored={() => onSaved(opinionId)} />
       ) : (
         <>
+          <div className="nh-form-grid">
           {tab === 'es' ? (
         <section className="nh-card" role="tabpanel" id="oe-locale-panel" aria-label={ta('tabEs')}>
-          {trField('es', 'slug', ta('fieldSlug'))}
-          {trField('es', 'title', ta('fieldTitle'))}
-          {trField('es', 'summary', ta('fieldSummary'))}
-          {trField('es', 'content', ta('fieldContent'), true)}
+          {trField('es', 'slug', ta('fieldSlug'), false, true)}
+          {trField('es', 'title', ta('fieldTitle'), false, true)}
+          {trField('es', 'summary', ta('fieldSummary'), false, true)}
+          {trField('es', 'content', ta('fieldContent'), true, true)}
         </section>
       ) : (
         <section className="nh-card" role="tabpanel" id="oe-locale-panel" aria-label={ta('tabEn')}>
@@ -315,7 +324,12 @@ export function OpinionEditor({
 
       <section className="nh-card" aria-label={ta('relations')}>
         <div className="nh-field">
-          <label htmlFor="oe-author">{t('authorRequired')}</label>
+          <label htmlFor="oe-author">
+            {t('authorRequired')}
+            <span className="nh-req" aria-hidden="true">
+              {' *'}
+            </span>
+          </label>
           <select
             id="oe-author"
             value={form.authorId}
@@ -345,6 +359,7 @@ export function OpinionEditor({
           )}
         </div>
       </section>
+      </div>
 
       {mode === 'edit' && published && (
         <div className="nh-card" role="note">

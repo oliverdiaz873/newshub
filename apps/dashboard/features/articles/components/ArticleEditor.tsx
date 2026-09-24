@@ -266,6 +266,7 @@ export function ArticleEditor({
     key: keyof ArticleFormValue['es'],
     label: string,
     multiline = false,
+    required = false,
   ) {
     const id = `ae-${locale}-${key}`;
     const errKey = `${locale}.${key}` as FieldKey;
@@ -280,6 +281,7 @@ export function ArticleEditor({
       onBlur: () => {
         if (touched) setFieldErrors(validateArticleForm({ ...form }));
       },
+      className: message ? 'invalid' : undefined,
       'aria-invalid': message ? true : undefined,
       'aria-describedby': message ? `${id}-err` : undefined,
       ref: (el: HTMLInputElement | HTMLTextAreaElement | null) => {
@@ -288,7 +290,14 @@ export function ArticleEditor({
     };
     return (
       <div className="nh-field">
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={id}>
+          {label}
+          {required && (
+            <span className="nh-req" aria-hidden="true">
+              {' *'}
+            </span>
+          )}
+        </label>
         {multiline ? <textarea rows={6} {...common} /> : <input type="text" {...common} />}
         {message && (
           <span id={`${id}-err`} className="nh-muted" role="alert">
@@ -302,7 +311,11 @@ export function ArticleEditor({
   return (
     <div>
       {loadError && <ErrorState message={loadError} />}
-      {dirty && <p className="nh-muted" role="status">{t('unsaved')}</p>}
+      {dirty && (
+        <p className="nh-dirty-flag" role="status">
+          {t('unsaved')}
+        </p>
+      )}
 
       <LocaleTabs tab={tab} onTab={setTab} labelEs={t('tabEs')} labelEn={t('tabEn')} panelId="ae-locale-panel" />
 
@@ -323,12 +336,13 @@ export function ArticleEditor({
         <HistoryPanel kind="article" id={articleId} onRestored={() => onSaved(articleId)} />
       ) : (
         <>
+          <div className="nh-form-grid">
           {tab === 'es' ? (
         <section className="nh-card" role="tabpanel" id="ae-locale-panel" aria-label={t('tabEs')}>
-          {trField('es', 'slug', t('fieldSlug'))}
-          {trField('es', 'title', t('fieldTitle'))}
-          {trField('es', 'summary', t('fieldSummary'))}
-          {trField('es', 'content', t('fieldContent'), true)}
+          {trField('es', 'slug', t('fieldSlug'), false, true)}
+          {trField('es', 'title', t('fieldTitle'), false, true)}
+          {trField('es', 'summary', t('fieldSummary'), false, true)}
+          {trField('es', 'content', t('fieldContent'), true, true)}
         </section>
       ) : (
         <section className="nh-card" role="tabpanel" id="ae-locale-panel" aria-label={t('tabEn')}>
@@ -341,7 +355,12 @@ export function ArticleEditor({
 
       <section className="nh-card" aria-label={t('relations')}>
         <div className="nh-field">
-          <label htmlFor="ae-category">{t('category')}</label>
+          <label htmlFor="ae-category">
+            {t('category')}
+            <span className="nh-req" aria-hidden="true">
+              {' *'}
+            </span>
+          </label>
           <select
             id="ae-category"
             value={form.categoryId}
@@ -386,8 +405,8 @@ export function ArticleEditor({
             <MediaPicker value={form.coverMediaId || null} onChange={(id) => set('coverMediaId', id ?? '')} />
           )}
         </div>
-        <div className="nh-row">
-          <label>
+        <div className="nh-checks">
+          <label className="nh-check">
             <input
               type="checkbox"
               checked={form.isBreaking}
@@ -396,7 +415,7 @@ export function ArticleEditor({
             />{' '}
             {t('fieldBreaking')}
           </label>
-          <label>
+          <label className="nh-check">
             <input
               type="checkbox"
               checked={form.isFeatured}
@@ -407,6 +426,7 @@ export function ArticleEditor({
           </label>
         </div>
       </section>
+      </div>
 
       {mode === 'edit' && published && (
         <div className="nh-card" role="note">
