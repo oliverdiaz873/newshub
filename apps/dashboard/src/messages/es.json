@@ -78,7 +78,14 @@
     "articlesCol": "Artículos",
     "opinionsCol": "Opiniones",
     "esOnly": "{count} solo español",
-    "esEn": "{count} español + inglés"
+    "esEn": "{count} español + inglés",
+    "greetMorning": "Buenos días, {name}",
+    "greetAfternoon": "Buenas tardes, {name}",
+    "greetEvening": "Buenas noches, {name}",
+    "headerSub": "El pulso editorial de hoy: borradores, publicados, destacados y breaking.",
+    "viewArticles": "Ver artículos",
+    "newArticle": "Nuevo artículo",
+    "unit": "artículos"
   },
   "analytics": {
     "title": "Analíticas",

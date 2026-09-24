@@ -221,10 +221,32 @@ export function OverviewBoard() {
     { label: t('breaking'), value: counts.breaking, href: '/articles' },
   ];
 
+  function greetingKey(now = new Date()): 'greetMorning' | 'greetAfternoon' | 'greetEvening' {
+    const hour = now.getHours();
+    if (hour >= 5 && hour < 12) return 'greetMorning';
+    if (hour >= 12 && hour < 20) return 'greetAfternoon';
+    return 'greetEvening';
+  }
+
   return (
     <main>
       <Breadcrumbs trail={[{ label: 'Home' }]} />
-      <h1>{t('title')}</h1>
+      <div className="nh-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>{user?.displayName ? t(greetingKey(), { name: user.displayName }) : t('title')}</h1>
+          <p className="nh-muted">{t('headerSub')}</p>
+        </div>
+        <div className="nh-row">
+          <Link className="nh-btn" href="/articles">
+            {t('viewArticles')}
+          </Link>
+          {!isReviewer && (
+            <Link className="nh-btn primary" href="/articles/new">
+              {t('newArticle')}
+            </Link>
+          )}
+        </div>
+      </div>
       <p className="nh-muted">{t('subtitle')}</p>
       <p>
         <span className="nh-badge" title={t('tier1hint')}>
@@ -237,6 +259,9 @@ export function OverviewBoard() {
           <Link key={kpi.label} href={kpi.href} className="nh-kpi" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span className="nh-muted">{kpi.label}</span>
             <strong>{kpi.value}</strong>
+            <span className="nh-muted">
+              {kpi.value} {t('unit')}
+            </span>
           </Link>
         ))}
       </div>
