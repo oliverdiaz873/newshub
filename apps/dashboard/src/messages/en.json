@@ -131,6 +131,7 @@
     "emailRequired": "Email is required.",
     "emailInvalid": "Enter a valid email address.",
     "passwordRequired": "Password is required.",
+    "brandName": "Newshub",
     "brandKicker": "Editorial · ES / EN",
     "brandTitle1": "The newsroom,",
     "brandTitle2": "in order.",

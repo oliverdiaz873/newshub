@@ -130,6 +130,7 @@
     "emailRequired": "El email es obligatorio.",
     "emailInvalid": "Introduce un email válido.",
     "passwordRequired": "La contraseña es obligatoria.",
+    "brandName": "Newshub",
     "brandKicker": "Editorial · ES / EN",
     "brandTitle1": "La redacción,",
     "brandTitle2": "en orden.",

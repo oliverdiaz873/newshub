@@ -79,6 +79,7 @@ export function LoginForm() {
     <div className="nh-login-shell">
       <aside className="nh-login-brand" aria-hidden="true">
         <div className="nh-login-brand-core">
+          <p className="nh-login-brand-name">{t('brandName')}</p>
           <p className="nh-login-kicker">{t('brandKicker')}</p>
           <h2>
             {t('brandTitle1')}
