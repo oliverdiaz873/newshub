@@ -112,30 +112,35 @@ export function LoginForm() {
         <div className="nh-login-mobile-brand">
           <span className="nh-login-tile">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo.jpeg" alt="" width={44} height={44} />
+            <img src="/brand/logo-transparent.png" alt="" width={44} height={44} />
           </span>
           <strong>Newshub · Editorial</strong>
         </div>
         <section className="nh-card nh-login-card" aria-labelledby="login-title">
           <div className="nh-login-tile">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo.jpeg" alt="" width={64} height={64} />
+            <img src="/brand/logo-transparent.png" alt="" width={64} height={64} />
           </div>
           <div className="nh-login-head">
             <h1 id="login-title">{t('title')}</h1>
             <p className="nh-muted">{t('subtitle')}</p>
           </div>
           {error && (
-            <div className="nh-error" role="alert">
-              {error}
+            <div className="nh-error nh-login-alert" role="alert">
+              <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
           <form onSubmit={submit} noValidate>
             <div className="nh-field">
               <label htmlFor="email">{t('email')}</label>
               <div className="nh-login-control">
-                <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-.781.375L8 7.054l6.719-3.679A1 1 0 0 0 14 3zM14 5.029 8 8.822 2 5.029V12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1z" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lead" aria-hidden="true">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
                 <input
                   id="email"
@@ -144,13 +149,14 @@ export function LoginForm() {
                   onChange={(event) => setEmail(event.target.value)}
                   autoComplete="username"
                   required
+                  placeholder={t('emailPh')}
                   aria-invalid={emailError ? true : undefined}
                   aria-describedby={emailError ? 'email-err' : undefined}
                   className={emailError ? 'invalid' : undefined}
                 />
               </div>
               {emailError && (
-                <span id="email-err" className="nh-muted" role="alert">
+                <span id="email-err" className="nh-login-inline-err" role="alert">
                   {emailError}
                 </span>
               )}
@@ -158,8 +164,9 @@ export function LoginForm() {
             <div className="nh-field">
               <label htmlFor="password">{t('password')}</label>
               <div className="nh-login-control">
-                <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lead" aria-hidden="true">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
                 <input
                   id="password"
@@ -168,21 +175,35 @@ export function LoginForm() {
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="current-password"
                   required
+                  placeholder={t('passPh')}
                   aria-invalid={passwordError ? true : undefined}
                   aria-describedby={passwordError ? 'password-err' : undefined}
-                  className={passwordError ? 'invalid' : undefined}
+                  className={`has-toggle${passwordError ? ' invalid' : ''}`}
                 />
                 <button
                   className="nh-login-toggle"
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-pressed={showPassword}
+                  aria-label={showPassword ? t('hide') : t('show')}
                 >
-                  {showPassword ? t('hide') : t('show')}
+                  {showPassword ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                      <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                      <line x1="2" x2="22" y1="2" y2="22" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
                 </button>
               </div>
               {passwordError && (
-                <span id="password-err" className="nh-muted" role="alert">
+                <span id="password-err" className="nh-login-inline-err" role="alert">
                   {passwordError}
                 </span>
               )}

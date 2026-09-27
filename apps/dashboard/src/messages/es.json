@@ -1,5 +1,8 @@
 {
   "nav": {
+    "editorial": "Editorial",
+    "planningGroup": "Planificación",
+    "analysis": "Análisis",
     "manage": "Gestionar",
     "system": "Sistema",
     "primary": "Principal",
@@ -10,14 +13,14 @@
     "articles": "Artículos",
     "opinions": "Opiniones",
     "scheduled": "Programados",
-    "planning": "Planificación",
+    "planning": "Plan editorial",
     "media": "Media",
     "categories": "Categorías",
     "authors": "Autores",
-    "analytics": "Analíticas",
+    "analytics": "Métricas",
     "notifications": "Notificaciones",
     "syndication": "Sindicación",
-    "auditLog": "Auditoría",
+    "auditLog": "Registro de auditoría",
     "settings": "Ajustes"
   },
   "topbar": {
@@ -118,8 +121,8 @@
     "refreshed": "Comprobación de sesión completada."
   },
   "login": {
-    "title": "Acceder",
-    "subtitle": "Acceso editorial. Usa la sesión existente del API (cookie HttpOnly + token de acceso).",
+    "title": "Bienvenido de nuevo",
+    "subtitle": "Accede a tu espacio editorial.",
     "email": "Email",
     "password": "Contraseña",
     "show": "Mostrar",
@@ -138,7 +141,9 @@
     "brandP1": "Publicación y curaduría breaking",
     "brandP2": "Traducciones ES → EN",
     "brandP3": "Portadas y archivo multimedia",
-    "brandFooter": "Acceso restringido a editores"
+    "brandFooter": "Acceso restringido a editores",
+    "emailPh": "nombre@newshub.dev",
+    "passPh": "••••••••"
   },
   "articles": {
     "title": "Artículos",

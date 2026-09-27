@@ -3,25 +3,50 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import type { ComponentType } from 'react';
 import { useSidebarCollapsed } from '@/shared/lib/ui-prefs';
+import {
+  AnalyticsIcon,
+  ArticleIcon,
+  AuditLogIcon,
+  AuthorIcon,
+  CategoryIcon,
+  MediaIcon,
+  NotificationIcon,
+  OpinionIcon,
+  OverviewIcon,
+  PlanningIcon,
+  ScheduledIcon,
+  SettingsIcon,
+  SyndicationIcon,
+} from './icons';
 
-const MANAGE: Array<{ href: string; key: string }> = [
-  { href: '/', key: 'overview' },
-  { href: '/articles', key: 'articles' },
-  { href: '/opinions', key: 'opinions' },
-  { href: '/scheduled', key: 'scheduled' },
-  { href: '/planning', key: 'planning' },
-  { href: '/analytics', key: 'analytics' },
-  { href: '/media', key: 'media' },
-  { href: '/categories', key: 'categories' },
-  { href: '/authors', key: 'authors' },
+type SidebarIconComponent = ComponentType<{ className?: string }>;
+type NavItem = { href: string; key: string; icon: SidebarIconComponent };
+
+const EDITORIAL: NavItem[] = [
+  { href: '/', key: 'overview', icon: OverviewIcon },
+  { href: '/articles', key: 'articles', icon: ArticleIcon },
+  { href: '/opinions', key: 'opinions', icon: OpinionIcon },
+  { href: '/media', key: 'media', icon: MediaIcon },
+  { href: '/categories', key: 'categories', icon: CategoryIcon },
+  { href: '/authors', key: 'authors', icon: AuthorIcon },
 ];
 
-const SYSTEM: Array<{ href: string; key: string }> = [
-  { href: '/notifications', key: 'notifications' },
-  { href: '/syndication', key: 'syndication' },
-  { href: '/audit-log', key: 'auditLog' },
-  { href: '/settings', key: 'settings' },
+const PLANNING: NavItem[] = [
+  { href: '/planning', key: 'planning', icon: PlanningIcon },
+  { href: '/scheduled', key: 'scheduled', icon: ScheduledIcon },
+];
+
+const ANALYSIS: NavItem[] = [
+  { href: '/analytics', key: 'analytics', icon: AnalyticsIcon },
+];
+
+const SYSTEM: NavItem[] = [
+  { href: '/notifications', key: 'notifications', icon: NotificationIcon },
+  { href: '/syndication', key: 'syndication', icon: SyndicationIcon },
+  { href: '/audit-log', key: 'auditLog', icon: AuditLogIcon },
+  { href: '/settings', key: 'settings', icon: SettingsIcon },
 ];
 
 /**
@@ -61,8 +86,9 @@ export function Sidebar({
     }
   }
 
-  function navLink(item: { href: string; key: string }) {
+  function navLink(item: NavItem) {
     const label = t(item.key);
+    const Icon = item.icon;
     const showBadge = item.key === 'notifications' && unread > 0;
     const count = countFor(item.key);
     const showCount = typeof count === 'number' && !showBadge;
@@ -76,7 +102,7 @@ export function Sidebar({
         title={showBadge ? `${label} (${tn('unreadCount', { count: unread })})` : label}
       >
         <span aria-hidden="true" className="nh-side-short">
-          {label.slice(0, 1).toUpperCase()}
+          <Icon />
           {showBadge && (
             <span className="nh-badge nh-badge-dot" aria-hidden="true">
               {unread > 99 ? '99+' : unread}
@@ -84,6 +110,7 @@ export function Sidebar({
           )}
         </span>
         <span className="nh-side-full">
+          <span className="nh-side-icon" aria-hidden="true"><Icon /></span>
           {label}
           {showBadge && (
             <span className="nh-badge" aria-label={tn('unreadCount', { count: unread })}>
@@ -106,7 +133,7 @@ export function Sidebar({
       <div className="nh-sidebar-brand">
         <span className="nh-brand-mark" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.jpeg" alt="" width={28} height={28} />
+          <img src="/brand/logo-sidebar.png" alt="" width={40} height={40} />
         </span>
         <strong>Newshub</strong>
         <button
@@ -119,9 +146,21 @@ export function Sidebar({
           {collapsed ? '»' : '«'}
         </button>
       </div>
-      <p className="nh-sidebar-group">{t('manage')}</p>
+      <p className="nh-sidebar-group">{t('editorial')}</p>
       <ul>
-        {MANAGE.map((item) => (
+        {EDITORIAL.map((item) => (
+          <li key={item.href}>{navLink(item)}</li>
+        ))}
+      </ul>
+      <p className="nh-sidebar-group">{t('planningGroup')}</p>
+      <ul>
+        {PLANNING.map((item) => (
+          <li key={item.href}>{navLink(item)}</li>
+        ))}
+      </ul>
+      <p className="nh-sidebar-group">{t('analysis')}</p>
+      <ul>
+        {ANALYSIS.map((item) => (
           <li key={item.href}>{navLink(item)}</li>
         ))}
       </ul>

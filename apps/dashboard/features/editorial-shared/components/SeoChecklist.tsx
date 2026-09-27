@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { toLocalLabel } from '@/features/editorial-shared/lib/schedule';
 
 export interface SeoSignals {
   esTitle: string;
@@ -39,7 +38,7 @@ export function SeoChecklist({ signals }: { signals: SeoSignals }) {
   const summaryLen = signals.esSummary.trim().length;
 
   return (
-    <section className="nh-card" aria-label={t('seoTitle')}>
+    <section className="nh-card nh-seo-card" aria-label={t('seoTitle')}>
       <h2>{t('seoTitle')}</h2>
       <p className="nh-muted" role="status">
         {t('seoScore', { score })}
@@ -47,7 +46,7 @@ export function SeoChecklist({ signals }: { signals: SeoSignals }) {
       <div aria-hidden="true">
         <span className="nh-bar" style={{ width: `${Math.max(score, 2)}%` }} />
       </div>
-      <ul>
+      <ul className="nh-seo-list">
         {rows.map((row) => (
           <li key={row.key}>
             <span aria-hidden="true">{row.ok ? '✓' : row.neutral ? '–' : '!'}</span>{' '}
@@ -65,13 +64,6 @@ export function SeoChecklist({ signals }: { signals: SeoSignals }) {
           </li>
         ))}
       </ul>
-      {(signals.firstPublishedAt || signals.updatedAt || signals.scheduledAt) && (
-        <p className="nh-muted">
-          {signals.firstPublishedAt && <span>{t('seoFirstPublished', { date: toLocalLabel(signals.firstPublishedAt) })} </span>}
-          {signals.updatedAt && <span>{t('seoLastUpdated', { date: toLocalLabel(signals.updatedAt) })} </span>}
-          {signals.scheduledAt && <span>{t('seoScheduled', { date: toLocalLabel(signals.scheduledAt) })}</span>}
-        </p>
-      )}
     </section>
   );
 }

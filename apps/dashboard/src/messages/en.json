@@ -1,5 +1,8 @@
 {
   "nav": {
+    "editorial": "Editorial",
+    "planningGroup": "Planning",
+    "analysis": "Analysis",
     "manage": "Manage",
     "system": "System",
     "primary": "Primary",
@@ -119,8 +122,8 @@
     "refreshed": "Session check completed."
   },
   "login": {
-    "title": "Sign in",
-    "subtitle": "Editorial access only. Uses the existing API session (HttpOnly refresh cookie + access token).",
+    "title": "Welcome back",
+    "subtitle": "Sign in to your editorial workspace.",
     "email": "Email",
     "password": "Password",
     "show": "Show",
@@ -139,7 +142,9 @@
     "brandP1": "Publishing & breaking curation",
     "brandP2": "ES → EN translations",
     "brandP3": "Front pages & media archive",
-    "brandFooter": "Restricted access for editors"
+    "brandFooter": "Restricted access for editors",
+    "emailPh": "name@newshub.dev",
+    "passPh": "••••••••"
   },
   "articles": {
     "title": "Articles",

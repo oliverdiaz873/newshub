@@ -7,7 +7,7 @@ import { useAuth } from '@/shared/api/auth';
 import { useTheme, type ThemePreference } from '@/shared/lib/theme';
 import { useDashboardLocale, type DashboardLocale } from '@/shared/lib/i18n';
 import { useToast } from '@/shared/components/Toasts';
-import { CheckIcon, ChevronDownIcon, MoonIcon, SunIcon, SystemIcon, WorldIcon } from './icons';
+import { CheckIcon, ChevronDownIcon, MoonIcon, SearchIcon, SunIcon, SystemIcon, WorldIcon } from './icons';
 
 /**
  * Dropdown open/close behavior (storefront parity: hover with 200ms close
@@ -214,6 +214,7 @@ export function LocaleToggle() {
 
 export function UserChip() {
   const { user, ready } = useAuth();
+  const tRole = useTranslations('roles');
   if (!ready) return <span className="nh-user-chip nh-muted">…</span>;
   if (!user) return null;
   const initials = user.displayName
@@ -227,7 +228,10 @@ export function UserChip() {
       <span className="nh-avatar" aria-hidden="true">
         {initials}
       </span>
-      <span>{user.displayName}</span>
+      <span className="nh-user-details">
+        <span className="nh-user-name">{user.displayName}</span>
+        <span className="nh-user-role">{tRole(user.role)}</span>
+      </span>
     </span>
   );
 }
@@ -263,6 +267,7 @@ export function Topbar({
       </button>
       <strong className="nh-brand">{tTop('brand')}</strong>
       <div className="nh-search">
+        <SearchIcon className="nh-search-icon" />
         <input
           id="global-q"
           type="search"
@@ -283,7 +288,7 @@ export function Topbar({
       {ready && !user && <Link href="/login">{tTop('signIn')}</Link>}
       {ready && user && (
         <button
-          className="nh-btn"
+          className="nh-btn nh-topbar-signout"
           type="button"
           onClick={() => {
             void logout().then(() => notify(tTop('signedOut')));

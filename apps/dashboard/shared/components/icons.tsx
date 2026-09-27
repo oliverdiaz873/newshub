@@ -1,8 +1,126 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 interface IconProps {
   className?: string;
 }
+
+export const SearchIcon = ({ className }: IconProps) => (
+  <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+  </svg>
+);
+
+const SidebarIcon = ({ className, children }: IconProps & { children: ReactNode }) => (
+  <svg
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {children}
+  </svg>
+);
+
+export const OverviewIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </SidebarIcon>
+);
+
+export const ArticleIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="M6 3h9l3 3v15H6z" />
+    <path d="M15 3v4h4M9 12h6M9 16h6" />
+  </SidebarIcon>
+);
+
+export const OpinionIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="M5 5h14v10H9l-4 4z" />
+    <path d="M9 9h6M9 12h4" />
+  </SidebarIcon>
+);
+
+export const MediaIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <circle cx="8" cy="9" r="1.5" />
+    <path d="m4 17 5-5 4 4 3-3 4 4" />
+  </SidebarIcon>
+);
+
+export const CategoryIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="M4 5h7l2 2h7v12H4z" />
+    <path d="M4 7h16" />
+  </SidebarIcon>
+);
+
+export const AuthorIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <circle cx="12" cy="8" r="3" />
+    <path d="M5 20c.8-3.3 3.1-5 7-5s6.2 1.7 7 5" />
+  </SidebarIcon>
+);
+
+export const PlanningIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <rect x="4" y="5" width="16" height="15" rx="2" />
+    <path d="M8 3v4M16 3v4M4 10h16M8 14h3M8 17h5" />
+  </SidebarIcon>
+);
+
+export const ScheduledIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <circle cx="12" cy="12" r="8" />
+    <path d="M12 8v4l3 2" />
+  </SidebarIcon>
+);
+
+export const AnalyticsIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="M5 19V9M12 19V5M19 19v-7" />
+    <path d="M3 19h18" />
+  </SidebarIcon>
+);
+
+export const NotificationIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="M6 10a6 6 0 0 1 12 0c0 5 2 5 2 7H4c0-2 2-2 2-7" />
+    <path d="M10 20h4" />
+  </SidebarIcon>
+);
+
+export const SyndicationIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <circle cx="6" cy="18" r="1.5" />
+    <path d="M6 12a6 6 0 0 1 6 6M6 6a12 12 0 0 1 12 12" />
+  </SidebarIcon>
+);
+
+export const AuditLogIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="M6 4h12v16H6z" />
+    <path d="M9 8h6M9 12h6M9 16h4" />
+  </SidebarIcon>
+);
+
+export const SettingsIcon = ({ className }: IconProps) => (
+  <SidebarIcon className={className}>
+    <path d="m12 3 1 2.1 2.3.5.9-1.1 1.4 1.4-1.1.9.5 2.3 2.1 1v2l-2.1 1-.5 2.3 1.1.9-1.4 1.4-.9-1.1-2.3.5-1 2.1h-2l-1-2.1-2.3-.5-.9 1.1-1.4-1.4 1.1-.9-.5-2.3-2.1-1v-2l2.1-1 .5-2.3-1.1-.9 1.4-1.4.9 1.1 2.3-.5L10 3z" />
+    <circle cx="12" cy="12" r="2.5" />
+  </SidebarIcon>
+);
 
 /**
  * Newshub design-system icons — exact SVG paths/viewBoxes/strokes reused

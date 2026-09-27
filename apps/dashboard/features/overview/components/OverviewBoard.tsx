@@ -258,7 +258,7 @@ export function OverviewBoard() {
         {kpis.map((kpi) => (
           <Link key={kpi.label} href={kpi.href} className="nh-kpi" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span className="nh-muted">{kpi.label}</span>
-            <strong>{kpi.value}</strong>
+            <strong className="nh-kpi-value">{kpi.value}</strong>
             <span className="nh-muted">
               {kpi.value} {t('unit')}
             </span>
@@ -366,13 +366,19 @@ export function OverviewBoard() {
           </p>
           {(donut.esOnly + donut.esEn) > 0 && (
             <>
-              <div
-                aria-hidden="true"
-                className="nh-donut"
-                style={{
-                  background: `conic-gradient(var(--accent, #1d4ed8) 0 ${(donut.esEn / (donut.esOnly + donut.esEn)) * 100}%, var(--surface-2) 0 100%)`,
-                }}
-              />
+              <div className="nh-donut-wrap">
+                <div
+                  aria-hidden="true"
+                  className="nh-donut"
+                  style={{
+                    background: `conic-gradient(var(--accent, #1d4ed8) 0 ${(donut.esEn / (donut.esOnly + donut.esEn)) * 100}%, var(--surface-2) 0 100%)`,
+                  }}
+                >
+                  <span className="nh-donut-center" aria-hidden="true">
+                    {Math.round((donut.esEn / (donut.esOnly + donut.esEn)) * 100)}% EN
+                  </span>
+                </div>
+              </div>
               <ul className="nh-sr-only">
                 <li>{t('esOnly', { count: donut.esOnly })}</li>
                 <li>{t('esEn', { count: donut.esEn })}</li>
