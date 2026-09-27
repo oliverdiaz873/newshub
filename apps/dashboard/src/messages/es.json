@@ -368,7 +368,9 @@
     "publishedOk": "Opinión publicada.",
     "publishedNotice": "Esta opinión está publicada. Despublícala antes de editar.",
     "archiveTitle": "Archivar opinión",
-    "archiveMessage": "¿Archivar «{title}»? Dejará el sitio público."
+    "archiveMessage": "¿Archivar «{title}»? Dejará el sitio público.",
+    "opinionNotFound": "La opinión ya no existe o no está disponible.",
+    "apiValidationFailed": "La API rechazó los datos de la opinión. Revisa los campos e inténtalo de nuevo."
   },
   "categories": {
     "title": "Categorías",

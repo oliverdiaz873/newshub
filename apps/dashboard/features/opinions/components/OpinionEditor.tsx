@@ -73,6 +73,7 @@ export function OpinionEditor({
   const t = useTranslations('opinions');
   const ta = useTranslations('articles');
   const th = useTranslations('history');
+  const tc = useTranslations('common');
   const { apiFetch, user } = useAuth();
   const { notify } = useToast();
   const router = useRouter();
@@ -82,10 +83,11 @@ export function OpinionEditor({
   const [form, setForm] = useState<OpinionFormValue>(initial);
   const [liveStatus, setLiveStatus] = useState(status ?? 'draft');
   const [tab, setTab] = useState<'es' | 'en'>('es');
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<OpinionFieldKey, 'required' | 'slug'>>>({});
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<OpinionFieldKey, 'required' | 'slug' | 'summaryMin' | 'summaryMax'>>>({});
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<'archive' | 'delete' | 'discard' | 'unpublish' | 'reject' | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [rejectError, setRejectError] = useState<string | null>(null);
@@ -126,6 +128,36 @@ export function OpinionEditor({
     })();
   }, [apiFetch]);
 
+  function apiErrorMessage(status: number, code: string | null): string {
+    if (code === 'slug_taken') return ta('invalidSlug');
+    if (code === 'invalid_transition') return ta('invalidTransition');
+    if (code === 'forbidden') return tc('insufficientRole');
+    if (code === 'unauthorized') return tc('sessionRequired');
+    if (code === 'not_found') return t('opinionNotFound');
+    if (code === 'validation_failed') return t('apiValidationFailed');
+    if (code === 'rate_limited') return ta('rateLimited');
+    if (code === 'internal_error' || code === 'service_unavailable') return ta('serverError');
+    if (code === 'bad_request' || code === 'conflict') return ta('requestRejected');
+    return tc('httpError', { status });
+  }
+
+  useEffect(() => {
+    if (!dirty) return;
+    const onDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      const link = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || url.href === window.location.href) return;
+      event.preventDefault();
+      setPendingNavigation(`${url.pathname}${url.search}${url.hash}`);
+      setConfirm('discard');
+    };
+    document.addEventListener('click', onDocumentClick, true);
+    return () => document.removeEventListener('click', onDocumentClick, true);
+  }, [dirty]);
+
   function runValidation(): boolean {
     const errors = validateOpinionForm(form);
     setFieldErrors(errors);
@@ -143,7 +175,10 @@ export function OpinionEditor({
   function fieldMessage(key: OpinionFieldKey): string | null {
     const err = touched ? fieldErrors[key] : undefined;
     if (!err) return null;
-    return err === 'slug' ? ta('invalidSlug') : ta('required');
+    if (err === 'slug') return ta('invalidSlug');
+    if (err === 'summaryMin') return ta('summaryMin');
+    if (err === 'summaryMax') return ta('summaryMax');
+    return ta('required');
   }
 
   async function persist(action: 'create' | 'save' | 'review'): Promise<string | null> {
@@ -163,7 +198,7 @@ export function OpinionEditor({
             setFieldErrors({ 'es.slug': 'slug' });
             document.getElementById('oe-es-slug')?.focus();
           } else {
-            setLoadError(code === 'invalid_transition' ? ta('invalidTransition') : `HTTP ${res.status}`);
+            setLoadError(apiErrorMessage(res.status, code));
           }
           return null;
         }
@@ -186,7 +221,7 @@ export function OpinionEditor({
           setFieldErrors({ 'es.slug': 'slug' });
           document.getElementById('oe-es-slug')?.focus();
         } else {
-          setLoadError(code === 'invalid_transition' ? ta('invalidTransition') : `HTTP ${res.status}`);
+          setLoadError(apiErrorMessage(res.status, code));
         }
         return null;
       }
@@ -194,6 +229,9 @@ export function OpinionEditor({
       if (action === 'review') setLiveStatus('review');
       notify(t('saved'), 'ok');
       return opinionId;
+    } catch {
+      setLoadError(tc('networkError'));
+      return null;
     } finally {
       setBusy(false);
     }
@@ -212,7 +250,7 @@ export function OpinionEditor({
       );
       if (!res.ok) {
         const code = errorCode(await res.json().catch(() => null));
-        notify(code === 'invalid_transition' && action === 'publish' && liveStatus === 'draft' ? ta('publishNeedsReview') : code === 'invalid_transition' ? ta('invalidTransition') : `HTTP ${res.status}`, 'err');
+        notify(code === 'invalid_transition' && action === 'publish' && liveStatus === 'draft' ? ta('publishNeedsReview') : apiErrorMessage(res.status, code), 'err');
         return;
       }
       const updated = (await res.json().catch(() => null)) as { status?: string } | null;
@@ -220,6 +258,8 @@ export function OpinionEditor({
       markClean();
       notify(action === 'publish' ? t('publishedOk') : action === 'reject' ? t('rejectedOk') : t('saved'), 'ok');
       if (action === 'publish' || action === 'restore') onSaved(opinionId);
+    } catch {
+      notify(tc('networkError'), 'err');
     } finally {
       setBusy(false);
     }
@@ -231,10 +271,13 @@ export function OpinionEditor({
     try {
       const res = await removeOpinion(apiFetch, opinionId);
       if (!res.ok) {
-        notify(`HTTP ${res.status}`, 'err');
+        const code = errorCode(await res.json().catch(() => null));
+        notify(apiErrorMessage(res.status, code), 'err');
         return;
       }
       onDeleted();
+    } catch {
+      notify(tc('networkError'), 'err');
     } finally {
       setBusy(false);
     }
@@ -485,8 +528,10 @@ export function OpinionEditor({
           className="nh-btn"
           type="button"
           onClick={() => {
-            if (dirty) setConfirm('discard');
-            else router.push('/opinions');
+            if (dirty) {
+              setPendingNavigation('/opinions');
+              setConfirm('discard');
+            } else router.push('/opinions');
           }}
         >
           {'← /opinions'}
@@ -587,8 +632,11 @@ export function OpinionEditor({
           title={ta('discardTitle')}
           message={ta('discardMessage')}
           confirmLabel={ta('leave')}
-          onConfirm={() => router.push('/opinions')}
-          onCancel={() => setConfirm(null)}
+          onConfirm={() => router.push(pendingNavigation ?? '/opinions')}
+          onCancel={() => {
+            setConfirm(null);
+            setPendingNavigation(null);
+          }}
         />
       )}
     </div>

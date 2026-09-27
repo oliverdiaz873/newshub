@@ -368,7 +368,9 @@
     "publishedOk": "Opinion published.",
     "publishedNotice": "This opinion is published. Unpublish it before editing.",
     "archiveTitle": "Archive opinion",
-    "archiveMessage": "Archive “{title}”? It will leave the public site."
+    "archiveMessage": "Archive “{title}”? It will leave the public site.",
+    "opinionNotFound": "The opinion no longer exists or is unavailable.",
+    "apiValidationFailed": "The API rejected the opinion data. Review the fields and try again."
   },
   "categories": {
     "title": "Categories",
