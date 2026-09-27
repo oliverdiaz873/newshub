@@ -52,6 +52,10 @@ export class MediaController {
     }
     res.setHeader('Content-Type', asset.mime);
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    // Public bytes are embedded cross-origin (<img> in storefront :3000 and
+    // dashboard :3002); helmet's default CORP 'same-origin' makes browsers
+    // reject them (ERR_BLOCKED_BY_RESPONSE.NotSameOrigin). Scoped here only.
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.sendFile(asset.absolutePath);
   }
 
