@@ -361,6 +361,7 @@ export function OpinionList() {
               <tr>
                 <th>{t('colTitle')}</th>
                 <th>{t('colStatus')}</th>
+                <th>{t('colAuthor')}</th>
                 <th>{t('colUpdated')}</th>
                 <th>{t('colActions')}</th>
               </tr>
@@ -379,6 +380,7 @@ export function OpinionList() {
                     )}
                   </td>
                   <td>{statusCell(item.status)}</td>
+                  <td className="nh-muted">{item.author?.name ?? ''}</td>
                   <td className="nh-muted" title={item.updatedAt ? toUtcLabel(item.updatedAt) : undefined}>
                     {item.updatedAt ? toLocalLabel(item.updatedAt) : ''}
                   </td>
