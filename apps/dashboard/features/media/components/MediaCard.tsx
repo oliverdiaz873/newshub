@@ -1,6 +1,7 @@
 'use client';
 
 import type { MediaOption } from '../types';
+import { resolveMediaUrl } from '../lib/media-url';
 
 /**
  * Shared media thumbnail cell (manager grid + picker grid).
@@ -11,7 +12,7 @@ export function MediaThumb({ item, width = 120, height = 80 }: { item: MediaOpti
   return (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
-      src={item.url}
+      src={resolveMediaUrl(item.url)}
       alt=""
       width={width}
       height={height}
