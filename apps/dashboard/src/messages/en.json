@@ -1,5 +1,8 @@
 {
   "nav": {
+    "editorial": "Editorial",
+    "planningGroup": "Planning",
+    "analysis": "Analysis",
     "manage": "Manage",
     "system": "System",
     "primary": "Primary",
@@ -79,7 +82,14 @@
     "articlesCol": "Articles",
     "opinionsCol": "Opinions",
     "esOnly": "{count} Spanish only",
-    "esEn": "{count} Spanish + English"
+    "esEn": "{count} Spanish + English",
+    "greetMorning": "Good morning, {name}",
+    "greetAfternoon": "Good afternoon, {name}",
+    "greetEvening": "Good evening, {name}",
+    "headerSub": "Today’s editorial pulse: drafts, published, featured and breaking.",
+    "viewArticles": "View articles",
+    "newArticle": "New article",
+    "unit": "articles"
   },
   "analytics": {
     "title": "Analytics",
@@ -112,8 +122,8 @@
     "refreshed": "Session check completed."
   },
   "login": {
-    "title": "Sign in",
-    "subtitle": "Editorial access only. Uses the existing API session (HttpOnly refresh cookie + access token).",
+    "title": "Welcome back",
+    "subtitle": "Sign in to your editorial workspace.",
     "email": "Email",
     "password": "Password",
     "show": "Show",
@@ -123,7 +133,18 @@
     "invalid": "Invalid credentials.",
     "emailRequired": "Email is required.",
     "emailInvalid": "Enter a valid email address.",
-    "passwordRequired": "Password is required."
+    "passwordRequired": "Password is required.",
+    "brandName": "Newshub",
+    "brandKicker": "Editorial · ES / EN",
+    "brandTitle1": "The newsroom,",
+    "brandTitle2": "in order.",
+    "brandSub": "Articles, opinions, front pages, and daily editions in one editorial workspace.",
+    "brandP1": "Publishing & breaking curation",
+    "brandP2": "ES → EN translations",
+    "brandP3": "Front pages & media archive",
+    "brandFooter": "Restricted access for editors",
+    "emailPh": "name@newshub.dev",
+    "passPh": "••••••••"
   },
   "articles": {
     "title": "Articles",
@@ -183,6 +204,11 @@
     "rejectReasonTooLong": "Reason must be 500 characters or fewer.",
     "cancelAction": "Cancel",
     "slugTaken": "That slug already exists for the language.",
+    "articleNotFound": "The article no longer exists or is unavailable.",
+    "apiValidationFailed": "The API rejected the article data. Review the fields and try again.",
+    "requestRejected": "The API rejected the request. Review the data and try again.",
+    "rateLimited": "Too many requests. Wait a moment and try again.",
+    "serverError": "The server could not process the request. Try again.",
     "selectCategory": "Select a category.",
     "tabEs": "Spanish (required)",
     "tabEn": "English (optional)",
@@ -196,6 +222,8 @@
     "fieldBreaking": "Breaking",
     "fieldFeatured": "Featured",
     "required": "This field is required.",
+    "summaryMin": "The summary must be at least 10 characters.",
+    "summaryMax": "The summary cannot exceed 2000 characters.",
     "invalidSlug": "Lowercase letters, numbers and hyphens only.",
     "unsaved": "Unsaved changes.",
     "discardTitle": "Discard changes",
@@ -340,7 +368,9 @@
     "publishedOk": "Opinion published.",
     "publishedNotice": "This opinion is published. Unpublish it before editing.",
     "archiveTitle": "Archive opinion",
-    "archiveMessage": "Archive “{title}”? It will leave the public site."
+    "archiveMessage": "Archive “{title}”? It will leave the public site.",
+    "opinionNotFound": "The opinion no longer exists or is unavailable.",
+    "apiValidationFailed": "The API rejected the opinion data. Review the fields and try again."
   },
   "categories": {
     "title": "Categories",

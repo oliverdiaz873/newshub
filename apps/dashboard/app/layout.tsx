@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { AuthProvider } from '@/shared/api/auth';
 import { ThemeProvider } from '@/shared/lib/theme';
 import { themeInitScript } from '@/shared/lib/theme-script';
 import { LocaleProvider } from '@/shared/lib/i18n';
 import { ToastProvider } from '@/shared/components/Toasts';
-import { DashboardShell } from './dashboard-shell';
+import { ShellSwitch } from './shell-switch';
 import '../src/app.css';
 
 export const metadata: Metadata = {
@@ -17,14 +18,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+        <Script id="nh-theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
       </head>
       <body>
         <ThemeProvider>
           <LocaleProvider>
             <AuthProvider>
               <ToastProvider>
-                <DashboardShell>{children}</DashboardShell>
+                <ShellSwitch>{children}</ShellSwitch>
               </ToastProvider>
             </AuthProvider>
           </LocaleProvider>

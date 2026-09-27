@@ -21,7 +21,8 @@ export type OpinionFieldKey =
   | 'es.summary'
   | 'es.content'
   | 'en.slug'
-  | 'en.title';
+  | 'en.title'
+  | 'en.summary';
 
 export const OPINION_FIELD_ORDER: OpinionFieldKey[] = [
   'authorId',
@@ -31,6 +32,7 @@ export const OPINION_FIELD_ORDER: OpinionFieldKey[] = [
   'es.content',
   'en.slug',
   'en.title',
+  'en.summary',
 ];
 
 function empty(value: string): boolean {
@@ -38,16 +40,17 @@ function empty(value: string): boolean {
 }
 
 /** Field errors keyed by OpinionFieldKey; empty record means valid. */
-export function validateOpinionForm(value: OpinionFormValue): Partial<Record<OpinionFieldKey, 'required' | 'slug'>> {
-  const errors: Partial<Record<OpinionFieldKey, 'required' | 'slug'>> = {};
+export function validateOpinionForm(value: OpinionFormValue): Partial<Record<OpinionFieldKey, 'required' | 'slug' | 'summaryMin' | 'summaryMax'>> {
+  const errors: Partial<Record<OpinionFieldKey, 'required' | 'slug' | 'summaryMin' | 'summaryMax'>> = {};
   if (empty(value.authorId)) errors.authorId = 'required';
-  const es = validateTranslationForm(value.es, true);
+  const es = validateTranslationForm(value.es, true, true);
   if (es.slug) errors['es.slug'] = es.slug;
   if (es.title) errors['es.title'] = es.title;
   if (es.summary) errors['es.summary'] = es.summary;
   if (es.content) errors['es.content'] = es.content;
-  const en = validateTranslationForm(value.en, false);
+  const en = validateTranslationForm(value.en, false, true);
   if (en.slug) errors['en.slug'] = en.slug;
   if (en.title) errors['en.title'] = en.title;
+  if (en.summary) errors['en.summary'] = en.summary;
   return errors;
 }

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 import { useTranslations } from 'next-intl';
 import { SunIcon, MoonIcon, SystemIcon, ChevronDownIcon } from '../icons';
 import { useTheme, type ThemePreference } from '../../../theme';
+import { useDropdownMenu } from '../useDropdownMenu';
 
 const iconByTheme: Record<ThemePreference, ReactElement> = {
   light: <SunIcon className="h-[1.25rem] w-[1.25rem] shrink-0" />,
@@ -20,38 +21,12 @@ const options: Array<{ value: ThemePreference; labelKey: string }> = [
 export const ThemeToggle = () => {
   const t = useTranslations('common');
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, instant, rootRef, menuId, open, close, toggle, scheduleClose } = useDropdownMenu();
   const [mounted, setMounted] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const menuId = useId();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional mount guard: prevents hydration mismatch by rendering null on the server/first paint; the pattern must stay, do not refactor into render
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleEscape);
-    };
   }, []);
 
   if (!mounted) {
@@ -64,7 +39,7 @@ export const ThemeToggle = () => {
 
   const handleSelect = (nextTheme: ThemePreference) => {
     setTheme(nextTheme);
-    setIsOpen(false);
+    close();
   };
 
   return (
@@ -72,13 +47,8 @@ export const ThemeToggle = () => {
       ref={rootRef}
       className="theme-toggle"
       aria-label={t('theme.selectorLabel', { preference: selectedLabel, applied: resolvedThemeLabel })}
-      onMouseEnter={() => {
-        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-        setIsOpen(true);
-      }}
-      onMouseLeave={() => {
-        hoverTimeoutRef.current = setTimeout(() => setIsOpen(false), 200);
-      }}
+      onMouseEnter={open}
+      onMouseLeave={scheduleClose}
     >
       <button
         type="button"
@@ -87,7 +57,7 @@ export const ThemeToggle = () => {
         aria-expanded={isOpen}
         aria-controls={menuId}
         aria-label={t('theme.triggerLabel', { preference: selectedLabel, applied: resolvedThemeLabel })}
-        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        onClick={toggle}
       >
         {iconByTheme[theme]}
         <span className="theme-toggle-trigger-value">{selectedLabel}</span>
@@ -98,7 +68,7 @@ export const ThemeToggle = () => {
 
       <div
         id={menuId}
-        className={`theme-toggle-menu ${isOpen ? 'is-open' : ''}`}
+        className={`theme-toggle-menu ${isOpen ? 'is-open' : ''}${instant ? ' is-instant' : ''}`}
         role="menu"
         aria-label={t('theme.menuLabel')}
       >

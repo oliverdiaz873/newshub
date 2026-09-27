@@ -8,6 +8,7 @@ import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { MediaThumb, mediaLabel } from './MediaCard';
 import type { MediaOption } from '../types';
 import { listMediaOptions, uploadMedia } from '../services/mediaService';
+import { resolveMediaUrl } from '../lib/media-url';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
@@ -110,7 +111,7 @@ export function MediaPicker({
       {selected ? (
         <div className="nh-row">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={selected.url} alt="" width={96} height={64} style={{ objectFit: 'cover', borderRadius: 6 }} />
+          <img src={resolveMediaUrl(selected.url)} alt="" width={96} height={64} style={{ objectFit: 'cover', borderRadius: 6 }} />
           <span className="nh-muted">
             {selected.mime}
             {selected.width && selected.height ? ` · ${selected.width}×${selected.height}` : ''}

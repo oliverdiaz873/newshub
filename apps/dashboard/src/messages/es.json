@@ -1,5 +1,8 @@
 {
   "nav": {
+    "editorial": "Editorial",
+    "planningGroup": "Planificación",
+    "analysis": "Análisis",
     "manage": "Gestionar",
     "system": "Sistema",
     "primary": "Principal",
@@ -10,14 +13,14 @@
     "articles": "Artículos",
     "opinions": "Opiniones",
     "scheduled": "Programados",
-    "planning": "Planificación",
+    "planning": "Plan editorial",
     "media": "Media",
     "categories": "Categorías",
     "authors": "Autores",
-    "analytics": "Analíticas",
+    "analytics": "Métricas",
     "notifications": "Notificaciones",
     "syndication": "Sindicación",
-    "auditLog": "Auditoría",
+    "auditLog": "Registro de auditoría",
     "settings": "Ajustes"
   },
   "topbar": {
@@ -78,7 +81,14 @@
     "articlesCol": "Artículos",
     "opinionsCol": "Opiniones",
     "esOnly": "{count} solo español",
-    "esEn": "{count} español + inglés"
+    "esEn": "{count} español + inglés",
+    "greetMorning": "Buenos días, {name}",
+    "greetAfternoon": "Buenas tardes, {name}",
+    "greetEvening": "Buenas noches, {name}",
+    "headerSub": "El pulso editorial de hoy: borradores, publicados, destacados y breaking.",
+    "viewArticles": "Ver artículos",
+    "newArticle": "Nuevo artículo",
+    "unit": "artículos"
   },
   "analytics": {
     "title": "Analíticas",
@@ -111,8 +121,8 @@
     "refreshed": "Comprobación de sesión completada."
   },
   "login": {
-    "title": "Acceder",
-    "subtitle": "Acceso editorial. Usa la sesión existente del API (cookie HttpOnly + token de acceso).",
+    "title": "Bienvenido de nuevo",
+    "subtitle": "Accede a tu espacio editorial.",
     "email": "Email",
     "password": "Contraseña",
     "show": "Mostrar",
@@ -122,7 +132,18 @@
     "invalid": "Credenciales inválidas.",
     "emailRequired": "El email es obligatorio.",
     "emailInvalid": "Introduce un email válido.",
-    "passwordRequired": "La contraseña es obligatoria."
+    "passwordRequired": "La contraseña es obligatoria.",
+    "brandName": "Newshub",
+    "brandKicker": "Editorial · ES / EN",
+    "brandTitle1": "La redacción,",
+    "brandTitle2": "en orden.",
+    "brandSub": "Artículos, opiniones, portadas y ediciones del día en un solo panel editorial.",
+    "brandP1": "Publicación y curaduría breaking",
+    "brandP2": "Traducciones ES → EN",
+    "brandP3": "Portadas y archivo multimedia",
+    "brandFooter": "Acceso restringido a editores",
+    "emailPh": "nombre@newshub.dev",
+    "passPh": "••••••••"
   },
   "articles": {
     "title": "Artículos",
@@ -182,6 +203,11 @@
     "rejectReasonTooLong": "El motivo debe tener 500 caracteres o menos.",
     "cancelAction": "Cancelar",
     "slugTaken": "Ese slug ya existe para el idioma.",
+    "articleNotFound": "El artículo ya no existe o no está disponible.",
+    "apiValidationFailed": "La API rechazó los datos del artículo. Revisa los campos e inténtalo de nuevo.",
+    "requestRejected": "La API rechazó la solicitud. Revisa los datos e inténtalo de nuevo.",
+    "rateLimited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+    "serverError": "El servidor no pudo procesar la solicitud. Inténtalo de nuevo.",
     "selectCategory": "Selecciona una categoría.",
     "tabEs": "Español (obligatorio)",
     "tabEn": "Inglés (opcional)",
@@ -195,6 +221,8 @@
     "fieldBreaking": "Última hora",
     "fieldFeatured": "Destacado",
     "required": "Este campo es obligatorio.",
+    "summaryMin": "El resumen debe tener al menos 10 caracteres.",
+    "summaryMax": "El resumen no puede superar los 2000 caracteres.",
     "invalidSlug": "Solo minúsculas, números y guiones.",
     "unsaved": "Cambios sin guardar.",
     "discardTitle": "Descartar cambios",
@@ -340,7 +368,9 @@
     "publishedOk": "Opinión publicada.",
     "publishedNotice": "Esta opinión está publicada. Despublícala antes de editar.",
     "archiveTitle": "Archivar opinión",
-    "archiveMessage": "¿Archivar «{title}»? Dejará el sitio público."
+    "archiveMessage": "¿Archivar «{title}»? Dejará el sitio público.",
+    "opinionNotFound": "La opinión ya no existe o no está disponible.",
+    "apiValidationFailed": "La API rechazó los datos de la opinión. Revisa los campos e inténtalo de nuevo."
   },
   "categories": {
     "title": "Categorías",

@@ -214,7 +214,7 @@ export function MediaManager() {
           {preview && (
             <div className="nh-field">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={preview} alt={t('preview')} style={{ maxWidth: 320, borderRadius: 8 }} />
+              <img src={preview} alt={t('preview')} className="nh-cover-preview" />
             </div>
           )}
           <button className="nh-btn primary" type="submit" disabled={busy || !file}>
@@ -276,6 +276,7 @@ export function MediaManager() {
                 <article key={row.id} className="nh-media-card" aria-label={mediaLabel(row)}>
                   <MediaThumb item={row} width={240} height={150} />
                   <div className="nh-media-meta">
+                    <span className="nh-badge nh-badge-mime">{row.mime.split('/')[1] ?? row.mime}</span>
                     <span className="nh-muted">{row.mime}</span>
                     <span className="nh-muted">
                       {row.width && row.height ? `${row.width}×${row.height}` : '—'}

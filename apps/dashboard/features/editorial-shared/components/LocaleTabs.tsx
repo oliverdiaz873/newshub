@@ -68,7 +68,7 @@ export function LocaleTabs({
   }
 
   return (
-    <div className="nh-row" role="tablist" aria-label="Locales">
+    <div className="nh-row nh-tabs" role="tablist" aria-label="Locales">
       {renderTab('es', labelEs, esRef)}
       {renderTab('en', labelEn, enRef)}
     </div>

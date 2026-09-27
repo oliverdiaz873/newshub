@@ -1,6 +1,7 @@
 ﻿'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -11,7 +12,8 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Paginator, Table } from '@/shared/components/Table';
-import { actionsFor, type EditorialAction } from '@/features/editorial-shared/lib/transitions';
+import { actionsFor, statusBadgeClass, statusLabelKey, type EditorialAction } from
+'@/features/editorial-shared/lib/transitions';
 import { toLocalLabel, toUtcLabel } from '@/features/editorial-shared/lib/schedule';
 import {
   bulkArticles,
@@ -28,6 +30,47 @@ type BulkAction = EditorialAction;
 const PAGE_SIZE_KEY = 'newshub-pagesize-articles';
 const PAGE_SIZES = [10, 20, 50];
 
+function RowActionsMenu({ children, label }: { children: ReactNode; label: string }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        rootRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="menu"]')?.focus();
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+
+  return (
+    <div ref={rootRef} className="nh-dropdown nh-row-actions-menu">
+      <button
+        className="nh-icon-btn nh-row-actions-trigger"
+        type="button"
+        aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span aria-hidden="true">⋯</span>
+      </button>
+      <div className={`nh-dropdown-menu${open ? ' is-open' : ''}`} role="menu" aria-label={label} onClick={() => setOpen(false)}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function ArticleList() {
   const t = useTranslations('articles');
   const ts = useTranslations('scheduling');
@@ -40,6 +83,11 @@ export function ArticleList() {
   const { notify } = useToast();
 
   const editorialLocale = previewLang === 'en-first' ? 'en' : 'es';
+
+  function statusCell(status: string) {
+    const key = statusLabelKey(status);
+    return <span className={statusBadgeClass(status)}>{key ? t(key) : status}</span>;
+  }
 
   const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') ?? 'all');
   const [curationFilter, setCurationFilter] = useState(() => searchParams.get('curation') ?? 'all');
@@ -73,6 +121,45 @@ export function ArticleList() {
   const [reloadToken, setReloadToken] = useState(0);
   const [confirm, setConfirm] = useState<{ action: BulkAction; ids: string[]; title: string; message: string } | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const pendingSingleRef = useRef(new Set<string>());
+  const [pendingSingle, setPendingSingle] = useState<Set<string>>(new Set());
+  const hydratedUrlRef = useRef(false);
+  const initialLimitRef = useRef(limit);
+  const previousUrlContextRef = useRef<string | null>(null);
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const fromUrl = Number(searchParams.get('limit') ?? 0);
+    const nextLimit = fromUrl === 10 || fromUrl === 20 || fromUrl === 50 ? fromUrl : hydratedUrlRef.current ? 20 : initialLimitRef.current;
+    const nextPage = Number(searchParams.get('page') ?? 1) || 1;
+    const rawSelection = searchParams.get('select');
+    const urlContext = JSON.stringify({
+      q: searchParams.get('q') ?? '',
+      status: searchParams.get('status') ?? 'all',
+      curation: searchParams.get('curation') ?? 'all',
+      category: searchParams.get('category') ?? '',
+      author: searchParams.get('author') ?? '',
+      sort: searchParams.get('sort') ?? 'publishedAt:desc',
+      page: nextPage,
+      limit: nextLimit,
+    });
+
+    setStatusFilter(searchParams.get('status') ?? 'all');
+    setCurationFilter(searchParams.get('curation') ?? 'all');
+    setCategoryFilter(searchParams.get('category') ?? '');
+    setAuthorFilter(searchParams.get('author') ?? '');
+    setQuery(searchParams.get('q') ?? '');
+    setQueryInput(searchParams.get('q') ?? '');
+    setSort(searchParams.get('sort') ?? 'publishedAt:desc');
+    setPage(nextPage);
+    setLimit(nextLimit);
+    const contextChanged = previousUrlContextRef.current !== null && previousUrlContextRef.current !== urlContext;
+    const urlSelection = new Set(rawSelection ? rawSelection.split(',').filter(Boolean) : []);
+    setSelected(contextChanged && urlSelection.size === 0 ? new Set() : urlSelection);
+    previousUrlContextRef.current = urlContext;
+    hydratedUrlRef.current = true;
+  }, [searchParams]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const paramsKey = useMemo(
     () =>
@@ -112,8 +199,11 @@ export function ArticleList() {
       if (next.sort !== 'publishedAt:desc') params.set('sort', next.sort);
       if (next.page !== 1) params.set('page', String(next.page));
       if (next.limit !== 20) params.set('limit', String(next.limit));
+      const contextChanged = Object.keys(patch).some((key) =>
+        ['status', 'curation', 'category', 'author', 'q', 'sort', 'page', 'limit'].includes(key),
+      );
       const select = [...selected];
-      if (select.length > 0) params.set('select', select.join(','));
+      if (!contextChanged && select.length > 0) params.set('select', select.join(','));
       const qs = params.toString();
       router.replace(qs ? `/articles?${qs}` : '/articles', { scroll: false });
     },
@@ -121,6 +211,7 @@ export function ArticleList() {
   );
 
   function resetPage(patch: Parameters<typeof syncUrl>[0]) {
+    setSelected(new Set());
     syncUrl({ ...patch, page: 1 });
     setPage(1);
   }
@@ -217,10 +308,15 @@ export function ArticleList() {
           meta: { total: number; totalPages: number };
         };
         setItems(json.data);
+        const visibleIds = new Set(json.data.map((item) => item.id));
+        setSelected((current) => new Set([...current].filter((id) => visibleIds.has(id))));
         setTotal(json.meta.total);
         setTotalPages(json.meta.totalPages);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : tc('networkError'));
+        if (!cancelled) {
+          setItems([]);
+          setError(err instanceof Error ? err.message : tc('networkError'));
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -280,28 +376,41 @@ export function ArticleList() {
   }
 
   async function runSingle(action: BulkAction, item: ArticleListItem) {
+    if (pendingSingleRef.current.has(item.id)) return;
+    pendingSingleRef.current.add(item.id);
+    setPendingSingle(new Set(pendingSingleRef.current));
     if (action === 'delete') {
-      const res = await removeArticle(apiFetch, item.id);
+      try {
+        const res = await removeArticle(apiFetch, item.id);
+        if (!res.ok) {
+          notify(`HTTP ${res.status}`, 'err');
+          return;
+        }
+        setSelected((current) => {
+          const next = new Set(current);
+          next.delete(item.id);
+          return next;
+        });
+        reload();
+        return;
+      } finally {
+        pendingSingleRef.current.delete(item.id);
+        setPendingSingle(new Set(pendingSingleRef.current));
+      }
+    }
+    try {
+      const res = await transitionArticle(apiFetch, item.id, action, action === 'reject' ? {} : undefined);
       if (!res.ok) {
-        notify(`HTTP ${res.status}`, 'err');
+        const body = (await res.json().catch(() => null)) as { code?: string } | null;
+        notify(body?.code === 'invalid_transition' ? t('invalidTransition') : `HTTP ${res.status}`, 'err');
         return;
       }
-      setSelected((current) => {
-        const next = new Set(current);
-        next.delete(item.id);
-        return next;
-      });
+      if (action === 'reject') notify(t('rejectedOk'), 'ok');
       reload();
-      return;
+    } finally {
+      pendingSingleRef.current.delete(item.id);
+      setPendingSingle(new Set(pendingSingleRef.current));
     }
-    const res = await transitionArticle(apiFetch, item.id, action, action === 'reject' ? {} : undefined);
-    if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as { code?: string } | null;
-      notify(body?.code === 'invalid_transition' ? t('invalidTransition') : `HTTP ${res.status}`, 'err');
-      return;
-    }
-    if (action === 'reject') notify(t('rejectedOk'), 'ok');
-    reload();
   }
 
   function reload() {
@@ -439,7 +548,7 @@ export function ArticleList() {
         </div>
       </section>
 
-      {error && <ErrorState message={error} />}
+      {error && <ErrorState message={error} onRetry={reload} />}
 
       {selectedIds.length > 0 && (
         <section className="nh-card" aria-label={t('selected', { count: selectedIds.length })}>
@@ -508,7 +617,43 @@ export function ArticleList() {
       {loading ? (
         <Skeleton lines={6} />
       ) : items.length === 0 ? (
-        <EmptyState />
+        <EmptyState
+          action={
+            statusFilter !== 'all' ||
+            curationFilter !== 'all' ||
+            Boolean(categoryFilter) ||
+            Boolean(authorFilter) ||
+            Boolean(query) ||
+            sort !== 'publishedAt:desc' ? (
+              <button
+                className="nh-btn"
+                type="button"
+                onClick={() => {
+                  setStatusFilter('all');
+                  setCurationFilter('all');
+                  setCategoryFilter('');
+                  setAuthorFilter('');
+                  setQuery('');
+                  setQueryInput('');
+                  setSort('publishedAt:desc');
+                  setPage(1);
+                  setSelected(new Set());
+                  syncUrl({
+                    status: 'all',
+                    curation: 'all',
+                    category: '',
+                    author: '',
+                    q: '',
+                    sort: 'publishedAt:desc',
+                    page: 1,
+                  });
+                }}
+              >
+                {tc('clearFilters')}
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
         <>
           <Table label={t('title')}>
@@ -532,7 +677,12 @@ export function ArticleList() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.id} data-row={item.id} data-status={item.status}>
+                <tr
+                  key={item.id}
+                  data-row={item.id}
+                  data-status={item.status}
+                  className={selected.has(item.id) ? 'is-selected' : undefined}
+                >
                   <td>
                     <input
                       type="checkbox"
@@ -551,80 +701,101 @@ export function ArticleList() {
                       </div>
                     )}
                   </td>
-                  <td>{item.status}</td>
+                  <td>{statusCell(item.status)}</td>
                   <td>{item.categorySlug}</td>
                   <td>
-                    {item.isFeatured ? (
-                      <>
-                        <span aria-hidden="true">★</span>
-                        <span className="nh-sr-only">{t('fieldFeatured')}</span>{' '}
-                      </>
-                    ) : (
-                      ''
-                    )}
-                    {item.isBreaking ? (
-                      <>
-                        <span aria-hidden="true">●</span>
-                        <span className="nh-sr-only">{t('fieldBreaking')}</span>
-                      </>
-                    ) : (
-                      ''
-                    )}
+                    {item.isFeatured && <span className="nh-badge nh-badge-featured">{t('fieldFeatured')}</span>}{' '}
+                    {item.isBreaking && <span className="nh-badge nh-badge-breaking">{t('fieldBreaking')}</span>}
                   </td>
-                  <td className="nh-muted">{item.updatedAt ?? ''}</td>
+                  <td className="nh-muted" title={item.updatedAt ? toUtcLabel(item.updatedAt) : undefined}>
+                    {item.updatedAt ? toLocalLabel(item.updatedAt) : ''}
+                  </td>
                   <td>
-                    <div className="nh-row">
-                      <Link className="nh-btn" href={`/articles/${item.id}`}>
-                        {t('actionEdit')}
-                      </Link>
-                      {(isReviewer ? actionsFor(item.status).filter((a) => a !== 'delete') : actionsFor(item.status)).map((action) =>
-                        action === 'delete' || action === 'archive' || action === 'reject' ? (
+                    {(() => {
+                      const availableActions = isReviewer ? actionsFor(item.status).filter((a) => a !== 'delete') : actionsFor(item.status);
+                      const primaryAction = availableActions.find((action) => action === 'publish' || action === 'unpublish' || action === 'restore');
+                      const secondaryActions = availableActions.filter((action) => action !== primaryAction);
+                      const renderAction = (action: EditorialAction, menu = false) => {
+                        const label =
+                          action === 'delete'
+                            ? t('actionDelete')
+                            : action === 'reject'
+                              ? t('actionReject')
+                              : action === 'archive'
+                                ? t('actionArchive')
+                                : action === 'publish'
+                                  ? t('actionPublish')
+                                  : action === 'unpublish'
+                                    ? t('actionUnpublish')
+                                    : t('actionRestore');
+                        const destructive = action === 'delete';
+                        const needsConfirmation = action === 'delete' || action === 'archive' || action === 'reject';
+                        return needsConfirmation ? (
                           <button
                             key={action}
-                            className={action === 'delete' ? 'nh-btn danger' : 'nh-btn'}
+                            className={menu ? `nh-dropdown-option${destructive ? ' danger' : ''}` : destructive ? 'nh-btn danger' : 'nh-btn'}
                             type="button"
-                            onClick={() =>
+                            disabled={pendingSingle.has(item.id)}
+                            role={menu ? 'menuitem' : undefined}
+                            onClick={() => {
                               setConfirm({
                                 action,
                                 ids: [item.id],
-                                title:
-                                  action === 'delete'
-                                    ? t('deleteTitle')
-                                    : action === 'reject'
-                                      ? t('rejectTitle')
-                                      : t('archiveTitle'),
+                                title: action === 'delete' ? t('deleteTitle') : action === 'reject' ? t('rejectTitle') : t('archiveTitle'),
                                 message:
                                   action === 'delete'
                                     ? t('deleteMessage', { title: item.title })
                                     : action === 'reject'
                                       ? t('rejectMessage', { title: item.title })
                                       : t('archiveMessage', { title: item.title }),
-                              })
-                            }
+                              });
+                            }}
                           >
-                            {action === 'delete'
-                              ? t('actionDelete')
-                              : action === 'reject'
-                                ? t('actionReject')
-                                : t('actionArchive')}
+                            {label}
                           </button>
                         ) : (
-                          <button key={action} className="nh-btn" type="button" onClick={() => void runSingle(action, item)}>
-                            {action === 'publish'
-                              ? t('actionPublish')
-                              : action === 'unpublish'
-                                ? t('actionUnpublish')
-                                : t('actionRestore')}
+                          <button
+                            key={action}
+                            className={menu ? 'nh-dropdown-option' : 'nh-btn'}
+                            type="button"
+                            disabled={pendingSingle.has(item.id)}
+                            role={menu ? 'menuitem' : undefined}
+                            onClick={() => void runSingle(action, item)}
+                          >
+                            {label}
                           </button>
-                        ),
-                      )}
-                    </div>
+                        );
+                      };
+                      return (
+                        <div className="nh-row nh-row-actions">
+                          <Link className="nh-btn" href={`/articles/${item.id}`}>
+                            {t('actionEdit')}
+                          </Link>
+                          {primaryAction && renderAction(primaryAction)}
+                          {secondaryActions.length > 0 && (
+                            <RowActionsMenu label={t('colActions')}>
+                              {secondaryActions.map((action) => renderAction(action, true))}
+                            </RowActionsMenu>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
-          <Paginator page={page} totalPages={totalPages} total={total} limit={limit} onPage={(next) => { setPage(next); syncUrl({ page: next }); }} />
+          <Paginator
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            limit={limit}
+            onPage={(next) => {
+              setSelected(new Set());
+              setPage(next);
+              syncUrl({ page: next });
+            }}
+          />
         </>
       )}
 

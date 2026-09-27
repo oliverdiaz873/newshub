@@ -32,6 +32,13 @@ interface PublishedRow {
   fallback?: boolean;
 }
 
+interface RecentItem {
+  id: string;
+  kind: 'article' | 'opinion';
+  title: string;
+  firstPublishedAt: string | null;
+}
+
 interface WeekBucket {
   key: string;
   label: string;
@@ -72,13 +79,6 @@ function bucketizeWeeks(rows: Array<{ firstPublishedAt: string | null }>, kinds:
   return buckets;
 }
 
-interface CategoryItem {
-  id: string;
-  slug: string;
-  label: string;
-  articleCount: number;
-}
-
 async function totalFor(
   apiFetch: (path: string, init?: RequestInit) => Promise<Response>,
   path: string,
@@ -100,7 +100,7 @@ export function OverviewBoard() {
   const [error, setError] = useState<string | null>(null);
   const [counts, setCounts] = useState({ drafts: 0, published: 0, featured: 0, breaking: 0, review: 0 });
   const [queue, setQueue] = useState<QueueItem[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [recent, setRecent] = useState<RecentItem[]>([]);
   const [locale, setLocale] = useState({ es: 0, en: 0 });
   const [weeks, setWeeks] = useState<WeekBucket[]>([]);
   const [donut, setDonut] = useState({ esOnly: 0, esEn: 0 });
@@ -113,7 +113,7 @@ export function OverviewBoard() {
     if (!silent) setLoading(true);
     setError(null);
     try {
-      const [drafts, review, published, featured, breaking, opinionsReview, opinionsPublished, esTotal, enTotal, queueRes, opinionsQueueRes, planningQueueRes, catsRes, articlesPubRes, opinionsPubRes] =
+      const [drafts, review, published, featured, breaking, opinionsReview, opinionsPublished, esTotal, enTotal, queueRes, opinionsQueueRes, planningQueueRes, articlesPubRes, opinionsPubRes] =
         await Promise.all([
           totalFor(apiFetch, '/editorial/articles?limit=1&status=draft'),
           totalFor(apiFetch, '/editorial/articles?limit=1&status=review'),
@@ -127,16 +127,13 @@ export function OverviewBoard() {
           apiFetch('/editorial/articles?limit=5&status=review'),
           apiFetch('/editorial/opinions?limit=5&status=review'),
           apiFetch('/planning/review-queue'),
-          apiFetch('/editorial/categories?limit=20&locale=es'),
           apiFetch('/editorial/articles?limit=100&status=published&locale=en'),
           apiFetch('/editorial/opinions?limit=100&status=published&locale=en'),
         ]);
       if (!queueRes.ok) throw new Error(`HTTP ${queueRes.status} for review queue`);
       if (!opinionsQueueRes.ok) throw new Error(`HTTP ${opinionsQueueRes.status} for opinions queue`);
-      if (!catsRes.ok) throw new Error(`HTTP ${catsRes.status} for categories`);
       const queueJson = (await queueRes.json()) as { data: QueueItem[] };
       const opinionsQueueJson = (await opinionsQueueRes.json()) as { data: QueueItem[] };
-      const catsJson = (await catsRes.json()) as { data: CategoryItem[] };
       // Tier 1 aggregates (top-100 recent published per surface).
       setTopCapped(published + opinionsPublished > 200);
       if (articlesPubRes.ok && opinionsPubRes.ok) {
@@ -146,6 +143,13 @@ export function OverviewBoard() {
         const esOnly = [...aJson.data, ...oJson.data].filter((r) => r.fallback).length;
         const total = aJson.data.length + oJson.data.length;
         setDonut({ esOnly, esEn: total - esOnly });
+        // Recent published content (Tier 1, honest recency from the same payloads).
+        const combined: RecentItem[] = [
+          ...aJson.data.map((r) => ({ id: r.id, kind: 'article' as const, title: r.title, firstPublishedAt: r.firstPublishedAt })),
+          ...oJson.data.map((r) => ({ id: r.id, kind: 'opinion' as const, title: r.title, firstPublishedAt: r.firstPublishedAt })),
+        ];
+        combined.sort((a, b) => (b.firstPublishedAt ?? '').localeCompare(a.firstPublishedAt ?? ''));
+        setRecent(combined.slice(0, 8));
       }
       // Planning queue is best-effort: a failure never breaks the overview.
       let planningItems: QueueItem[] = [];
@@ -164,7 +168,6 @@ export function OverviewBoard() {
       ];
       merged.sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''));
       setQueue(merged.slice(0, 8));
-      setCategories(catsJson.data);
       setLocale({ es: esTotal, en: enTotal });
     } catch (err) {
       const message = err instanceof Error ? err.message : tc('networkError');
@@ -218,10 +221,32 @@ export function OverviewBoard() {
     { label: t('breaking'), value: counts.breaking, href: '/articles' },
   ];
 
+  function greetingKey(now = new Date()): 'greetMorning' | 'greetAfternoon' | 'greetEvening' {
+    const hour = now.getHours();
+    if (hour >= 5 && hour < 12) return 'greetMorning';
+    if (hour >= 12 && hour < 20) return 'greetAfternoon';
+    return 'greetEvening';
+  }
+
   return (
     <main>
       <Breadcrumbs trail={[{ label: 'Home' }]} />
-      <h1>{t('title')}</h1>
+      <div className="nh-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>{user?.displayName ? t(greetingKey(), { name: user.displayName }) : t('title')}</h1>
+          <p className="nh-muted">{t('headerSub')}</p>
+        </div>
+        <div className="nh-row">
+          <Link className="nh-btn" href="/articles">
+            {t('viewArticles')}
+          </Link>
+          {!isReviewer && (
+            <Link className="nh-btn primary" href="/articles/new">
+              {t('newArticle')}
+            </Link>
+          )}
+        </div>
+      </div>
       <p className="nh-muted">{t('subtitle')}</p>
       <p>
         <span className="nh-badge" title={t('tier1hint')}>
@@ -233,7 +258,10 @@ export function OverviewBoard() {
         {kpis.map((kpi) => (
           <Link key={kpi.label} href={kpi.href} className="nh-kpi" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span className="nh-muted">{kpi.label}</span>
-            <strong>{kpi.value}</strong>
+            <strong className="nh-kpi-value">{kpi.value}</strong>
+            <span className="nh-muted">
+              {kpi.value} {t('unit')}
+            </span>
           </Link>
         ))}
       </div>
@@ -287,7 +315,7 @@ export function OverviewBoard() {
           {queue.length === 0 ? (
             <EmptyState message={t('emptyQueue')} />
           ) : (
-            <ul>
+            <ul className="nh-queue">
               {queue.map((item) => (
                 <li key={`${item.kind}-${item.id}`}>
                   <Link
@@ -338,20 +366,33 @@ export function OverviewBoard() {
           </p>
           {(donut.esOnly + donut.esEn) > 0 && (
             <>
-              <div
-                aria-hidden="true"
-                className="nh-donut"
-                style={{
-                  background: `conic-gradient(var(--accent, #1d4ed8) 0 ${(donut.esEn / (donut.esOnly + donut.esEn)) * 100}%, var(--surface-2) 0 100%)`,
-                }}
-              />
+              <div className="nh-donut-wrap">
+                <div
+                  aria-hidden="true"
+                  className="nh-donut"
+                  style={{
+                    background: `conic-gradient(var(--accent, #1d4ed8) 0 ${(donut.esEn / (donut.esOnly + donut.esEn)) * 100}%, var(--surface-2) 0 100%)`,
+                  }}
+                >
+                  <span className="nh-donut-center" aria-hidden="true">
+                    {Math.round((donut.esEn / (donut.esOnly + donut.esEn)) * 100)}% EN
+                  </span>
+                </div>
+              </div>
               <ul className="nh-sr-only">
                 <li>{t('esOnly', { count: donut.esOnly })}</li>
                 <li>{t('esEn', { count: donut.esEn })}</li>
               </ul>
-              <p className="nh-muted" aria-hidden="true">
-                {t('esOnly', { count: donut.esOnly })} · {t('esEn', { count: donut.esEn })}
-              </p>
+              <ul className="nh-legend" aria-hidden="true">
+                <li>
+                  <span className="nh-dot nh-dot-muted" />
+                  {t('esOnly', { count: donut.esOnly })}
+                </li>
+                <li>
+                  <span className="nh-dot nh-dot-accent" />
+                  {t('esEn', { count: donut.esEn })}
+                </li>
+              </ul>
             </>
           )}
           <p className="nh-muted">{t('pendingEvents')}</p>
@@ -360,13 +401,19 @@ export function OverviewBoard() {
 
       <section className="nh-card" aria-label={t('activity')}>
         <h2>{t('activity')}</h2>
-        {categories.length === 0 ? (
-          <EmptyState />
+        {topCapped && <p className="nh-muted">{t('topNote')}</p>}
+        {recent.length === 0 ? (
+          <EmptyState message={t('weeklyEmpty')} />
         ) : (
-          <ul>
-            {categories.slice(0, 8).map((cat) => (
-              <li key={cat.id}>
-                {cat.label} ({cat.slug}): {cat.articleCount}
+          <ul className="nh-queue">
+            {recent.map((item) => (
+              <li key={`${item.kind}-${item.id}`}>
+                <Link href={item.kind === 'opinion' ? `/opinions/${item.id}` : `/articles/${item.id}`}>
+                  {item.title}
+                </Link>{' '}
+                {item.firstPublishedAt && (
+                  <span className="nh-muted">· {toRelativeLabel(item.firstPublishedAt, dashLocale)}</span>
+                )}
               </li>
             ))}
           </ul>

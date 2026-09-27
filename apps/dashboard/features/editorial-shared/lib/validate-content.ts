@@ -31,8 +31,9 @@ function empty(value: string): boolean {
 export function validateTranslationForm(
   form: TranslationForm,
   required: boolean,
-): Partial<Record<TranslationFieldKey, 'required' | 'slug'>> {
-  const errors: Partial<Record<TranslationFieldKey, 'required' | 'slug'>> = {};
+  validateSummary = false,
+): Partial<Record<TranslationFieldKey, 'required' | 'slug' | 'summaryMin' | 'summaryMax'>> {
+  const errors: Partial<Record<TranslationFieldKey, 'required' | 'slug' | 'summaryMin' | 'summaryMax'>> = {};
   if (required || !empty(form.slug) || !empty(form.title)) {
     if (empty(form.slug)) errors.slug = 'required';
     else if (!CONTENT_SLUG_PATTERN.test(form.slug.trim())) errors.slug = 'slug';
@@ -41,6 +42,10 @@ export function validateTranslationForm(
   if (required) {
     if (empty(form.summary)) errors.summary = 'required';
     if (empty(form.content)) errors.content = 'required';
+  }
+  if (validateSummary && !empty(form.summary)) {
+    if (form.summary.trim().length < 10) errors.summary = 'summaryMin';
+    else if (form.summary.trim().length > 2000) errors.summary = 'summaryMax';
   }
   return errors;
 }

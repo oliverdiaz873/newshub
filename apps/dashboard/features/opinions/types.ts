@@ -8,6 +8,7 @@ export interface OpinionListItem {
   slug: string;
   title: string;
   status: string;
+  author?: { slug: string; name: string } | null;
   scheduledAt?: string | null;
   updatedAt?: string;
 }

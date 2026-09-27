@@ -11,7 +11,8 @@ import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { ConfirmDialog } from '@/shared/components/Modal';
 import { EmptyState, ErrorState, Skeleton } from '@/shared/components/States';
 import { Paginator, Table } from '@/shared/components/Table';
-import { actionsFor, type EditorialAction } from '@/features/editorial-shared/lib/transitions';
+import { actionsFor, statusBadgeClass, statusLabelKey, type EditorialAction } from
+'@/features/editorial-shared/lib/transitions';
 import { toLocalLabel, toUtcLabel } from '@/features/editorial-shared/lib/schedule';
 import { getOpinionAuthors, listOpinions, removeOpinion, transitionOpinion } from '../services/opinionService';
 import type { OpinionAuthorOption, OpinionListItem } from '../types';
@@ -34,6 +35,11 @@ export function OpinionList() {
   const { notify } = useToast();
 
   const editorialLocale = previewLang === 'en-first' ? 'en' : 'es';
+
+  function statusCell(status: string) {
+    const key = statusLabelKey(status);
+    return <span className={statusBadgeClass(status)}>{key ? ta(key) : status}</span>;
+  }
 
   const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') ?? 'all');
   const [authorFilter, setAuthorFilter] = useState(() => searchParams.get('author') ?? '');
@@ -92,6 +98,11 @@ export function OpinionList() {
   function resetPage(patch: Parameters<typeof syncUrl>[0]) {
     syncUrl({ ...patch, page: 1 });
     setPage(1);
+  }
+
+  function reload() {
+    // Re-trigger the single list fetch without touching URL params.
+    setReloadToken((token) => token + 1);
   }
 
   useEffect(() => {
@@ -189,7 +200,6 @@ export function OpinionList() {
         notify(`HTTP ${res.status}`, 'err');
         return;
       }
-      notify(t('saved'), 'ok');
       setReloadToken((token) => token + 1);
       return;
     }
@@ -315,12 +325,35 @@ export function OpinionList() {
         </div>
       </section>
 
-      {error && <ErrorState message={error} />}
+      {error && <ErrorState message={error} onRetry={reload} />}
 
       {loading ? (
         <Skeleton lines={6} />
       ) : items.length === 0 ? (
-        <EmptyState />
+        <EmptyState
+          action={
+            statusFilter !== 'all' ||
+            Boolean(authorFilter) ||
+            Boolean(query) ||
+            sort !== 'publishedAt:desc' ? (
+              <button
+                className="nh-btn"
+                type="button"
+                onClick={() => {
+                  setStatusFilter('all');
+                  setAuthorFilter('');
+                  setQuery('');
+                  setQueryInput('');
+                  setSort('publishedAt:desc');
+                  setPage(1);
+                  syncUrl({ status: 'all', author: '', q: '', sort: 'publishedAt:desc', page: 1 });
+                }}
+              >
+                {tc('clearFilters')}
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
         <>
           <Table label={t('title')}>
@@ -328,6 +361,7 @@ export function OpinionList() {
               <tr>
                 <th>{t('colTitle')}</th>
                 <th>{t('colStatus')}</th>
+                <th>{t('colAuthor')}</th>
                 <th>{t('colUpdated')}</th>
                 <th>{t('colActions')}</th>
               </tr>
@@ -345,8 +379,11 @@ export function OpinionList() {
                       </div>
                     )}
                   </td>
-                  <td>{item.status}</td>
-                  <td className="nh-muted">{item.updatedAt ?? ''}</td>
+                  <td>{statusCell(item.status)}</td>
+                  <td className="nh-muted">{item.author?.name ?? ''}</td>
+                  <td className="nh-muted" title={item.updatedAt ? toUtcLabel(item.updatedAt) : undefined}>
+                    {item.updatedAt ? toLocalLabel(item.updatedAt) : ''}
+                  </td>
                   <td>
                     <div className="nh-row">
                       <Link className="nh-btn" href={`/opinions/${item.id}`}>
