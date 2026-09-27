@@ -10,6 +10,7 @@ import { SeoChecklist } from '@/features/editorial-shared/components/SeoChecklis
 import { LocaleTabs } from '@/features/editorial-shared/components/LocaleTabs';
 import { HistoryPanel } from '@/features/editorial-shared/components/HistoryPanel';
 import { ScheduleSection } from '@/features/editorial-shared/components/ScheduleSection';
+import { toLocalLabel } from '@/features/editorial-shared/lib/schedule';
 import { ErrorState } from '@/shared/components/States';
 import { MediaPicker } from '@/features/media';
 import { useDirtyGuard } from '@/shared/lib/dirty';
@@ -49,6 +50,11 @@ function errorCode(body: unknown): string | null {
   return null;
 }
 
+async function readProblem(res: Response): Promise<{ code: string | null }> {
+  const body = (await res.json().catch(() => null)) as { code?: unknown } | null;
+  return { code: typeof body?.code === 'string' ? body.code : null };
+}
+
 /**
  * Shared article editor (create + edit). Validation always runs before any
  * dirty-state rebaseline; failed Save/Publish keeps the dirty flag.
@@ -76,6 +82,7 @@ export function ArticleEditor({
   onDeleted: () => void;
 }) {
   const t = useTranslations('articles');
+  const tc = useTranslations('common');
   const th = useTranslations('history');
   const { apiFetch, user } = useAuth();
   const { notify } = useToast();
@@ -86,11 +93,12 @@ export function ArticleEditor({
   const [form, setForm] = useState<ArticleFormValue>(initial);
   const [liveStatus, setLiveStatus] = useState(status ?? 'draft');
   const [tab, setTab] = useState<'es' | 'en'>('es');
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, 'required' | 'slug'>>>({});
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, 'required' | 'slug' | 'summaryMin' | 'summaryMax'>>>({});
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<'archive' | 'delete' | 'discard' | 'unpublish' | 'reject' | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -100,6 +108,36 @@ export function ArticleEditor({
 
   const { dirty, markClean } = useDirtyGuard(form);
   const published = liveStatus === 'published';
+
+  function apiErrorMessage(status: number, code: string | null): string {
+    if (code === 'slug_taken') return t('slugTaken');
+    if (code === 'invalid_transition') return t('invalidTransition');
+    if (code === 'forbidden') return tc('insufficientRole');
+    if (code === 'unauthorized') return tc('sessionRequired');
+    if (code === 'not_found') return t('articleNotFound');
+    if (code === 'validation_failed') return t('apiValidationFailed');
+    if (code === 'rate_limited') return t('rateLimited');
+    if (code === 'internal_error' || code === 'service_unavailable') return t('serverError');
+    if (code === 'bad_request' || code === 'conflict') return t('requestRejected');
+    return tc('httpError', { status });
+  }
+
+  useEffect(() => {
+    if (!dirty) return;
+    const onDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      const link = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || url.href === window.location.href) return;
+      event.preventDefault();
+      setPendingNavigation(`${url.pathname}${url.search}${url.hash}`);
+      setConfirm('discard');
+    };
+    document.addEventListener('click', onDocumentClick, true);
+    return () => document.removeEventListener('click', onDocumentClick, true);
+  }, [dirty]);
 
   const set = useCallback(<K extends keyof ArticleFormValue>(key: K, next: ArticleFormValue[K]) => {
     setForm((current) => ({ ...current, [key]: next }));
@@ -154,7 +192,10 @@ export function ArticleEditor({
   function fieldMessage(key: FieldKey): string | null {
     const err = touched ? fieldErrors[key] : undefined;
     if (!err) return null;
-    return err === 'slug' ? t('invalidSlug') : t('required');
+    if (err === 'slug') return t('invalidSlug');
+    if (err === 'summaryMin') return t('summaryMin');
+    if (err === 'summaryMax') return t('summaryMax');
+    return t('required');
   }
 
   async function persist(action: 'create' | 'save' | 'review'): Promise<string | null> {
@@ -170,12 +211,12 @@ export function ArticleEditor({
           translations: buildTranslations(form),
         });
         if (!res.ok) {
-          const code = errorCode(await res.json().catch(() => null));
+          const { code } = await readProblem(res);
           if (code === 'slug_taken') {
             setFieldErrors({ 'es.slug': 'slug' });
             document.getElementById('ae-es-slug')?.focus();
           } else {
-            setLoadError(code === 'invalid_transition' ? t('invalidTransition') : `HTTP ${res.status}`);
+            setLoadError(apiErrorMessage(res.status, code));
           }
           return null;
         }
@@ -196,12 +237,12 @@ export function ArticleEditor({
       if (action === 'review') body.status = 'review';
       const res = await updateArticle(apiFetch, articleId, body);
       if (!res.ok) {
-        const code = errorCode(await res.json().catch(() => null));
+        const { code } = await readProblem(res);
         if (code === 'slug_taken') {
           setFieldErrors({ 'es.slug': 'slug' });
           document.getElementById('ae-es-slug')?.focus();
         } else {
-          setLoadError(code === 'invalid_transition' ? t('invalidTransition') : `HTTP ${res.status}`);
+          setLoadError(apiErrorMessage(res.status, code));
         }
         return null;
       }
@@ -209,6 +250,9 @@ export function ArticleEditor({
       if (action === 'review') setLiveStatus('review');
       notify(t('saved'), 'ok');
       return articleId;
+    } catch {
+      setLoadError(tc('networkError'));
+      return null;
     } finally {
       setBusy(false);
     }
@@ -336,6 +380,23 @@ export function ArticleEditor({
         <HistoryPanel kind="article" id={articleId} onRestored={() => onSaved(articleId)} />
       ) : (
         <>
+          {mode === 'create' && canEdit && (
+            <div className="nh-editor-create-action">
+              <button
+                className="nh-btn primary"
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  void persist('create').then((id) => {
+                    if (id) onSaved(id);
+                  });
+                }}
+              >
+                {t('create')}
+              </button>
+            </div>
+          )}
+
           <div className="nh-form-grid">
           {tab === 'es' ? (
         <section className="nh-card" role="tabpanel" id="ae-locale-panel" aria-label={t('tabEs')}>
@@ -425,8 +486,26 @@ export function ArticleEditor({
             {t('fieldFeatured')}
           </label>
         </div>
+        <SeoChecklist
+          signals={{
+            esTitle: form.es.title,
+            esSummary: form.es.summary,
+            coverMediaId: form.coverMediaId || null,
+            hasEn: form.en.title.trim().length > 0,
+            coverAlt: undefined,
+          }}
+        />
       </section>
       </div>
+
+      {(firstPublishedAt || updatedAt) && (
+        <div className="nh-card nh-editorial-meta">
+          <p className="nh-muted">
+            {firstPublishedAt && <span>{t('seoFirstPublished', { date: toLocalLabel(firstPublishedAt) })} </span>}
+            {updatedAt && <span>{t('seoLastUpdated', { date: toLocalLabel(updatedAt) })}</span>}
+          </p>
+        </div>
+      )}
 
       {mode === 'edit' && published && (
         <div className="nh-card" role="note">
@@ -447,35 +526,8 @@ export function ArticleEditor({
         />
       )}
 
-      <SeoChecklist
-        signals={{
-          esTitle: form.es.title,
-          esSummary: form.es.summary,
-          coverMediaId: form.coverMediaId || null,
-          hasEn: form.en.title.trim().length > 0,
-          firstPublishedAt: firstPublishedAt ?? null,
-          updatedAt: updatedAt ?? null,
-          scheduledAt: scheduledAt ?? null,
-        }}
-      />
-
       <div className="nh-row">
-        {mode === 'create' ? (
-          canEdit ? (
-            <button
-              className="nh-btn primary"
-              type="button"
-              disabled={busy}
-              onClick={() => {
-                void persist('create').then((id) => {
-                  if (id) onSaved(id);
-                });
-              }}
-            >
-              {t('create')}
-            </button>
-          ) : null
-        ) : (
+        {mode !== 'create' && (
           !published && (
             <>
               {canEdit && (
@@ -548,16 +600,6 @@ export function ArticleEditor({
             </>
           )
         )}
-        <button
-          className="nh-btn"
-          type="button"
-          onClick={() => {
-            if (dirty) setConfirm('discard');
-            else router.push('/articles');
-          }}
-        >
-          {'← /articles'}
-        </button>
       </div>
         </>
       )}
@@ -660,8 +702,16 @@ export function ArticleEditor({
           title={t('discardTitle')}
           message={t('discardMessage')}
           confirmLabel={t('leave')}
-          onConfirm={() => router.push('/articles')}
-          onCancel={() => setConfirm(null)}
+          onConfirm={() => {
+            const destination = pendingNavigation ?? '/articles';
+            setPendingNavigation(null);
+            setConfirm(null);
+            router.push(destination);
+          }}
+          onCancel={() => {
+            setPendingNavigation(null);
+            setConfirm(null);
+          }}
         />
       )}
     </div>
