@@ -18,12 +18,15 @@ test('categories CRUD with duplicate guard', async ({ page }) => {
   await page.getByLabel('Slug (es)').fill(SLUG);
   await page.getByLabel('Nombre (es)').fill('Duplicada');
   await page.getByRole('button', { name: 'Crear' }).click();
-  // Duplicate slugs surface as a field error on esSlug (invalidSlug),
-  // not as the former standalone slugTaken text.
-  await expect(page.locator('#cat-esSlug-err')).toHaveText('Solo minúsculas, números y guiones.');
+  // Duplicate slugs surface as a dedicated field error on esSlug (slugTaken),
+  // distinct from the pattern error (invalidSlug). Inc 2.
+  await expect(page.locator('#cat-esSlug-err')).toHaveText('Ese slug ya existe para el idioma.');
 
   const row = page.getByRole('row', { name: /E2E Cat/ });
   await row.getByRole('button', { name: 'Editar' }).click();
+  // Inc 3: the duplicate attempt above left unsaved input, so the dirty guard
+  // asks before seeding the edit form.
+  await page.getByRole('dialog').getByRole('button', { name: 'Salir' }).click();
   await page.getByLabel('Nombre (es)').fill('E2E Cat Editada');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByRole('cell', { name: 'E2E Cat Editada' })).toBeVisible();

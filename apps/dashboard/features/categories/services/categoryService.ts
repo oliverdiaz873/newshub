@@ -8,9 +8,9 @@ import type { CategoryPayload } from '../types';
  * Raw Response return; error handling stays at the call sites.
  */
 
-/** GET /editorial/categories?locale=&limit=100 — catalog for locale. */
-export function listCategories(apiFetch: ApiFetch, locale: string): Promise<Response> {
-  return apiFetch(`/editorial/categories?locale=${locale}&limit=100`);
+/** GET /editorial/categories?locale=&limit=100&page= — catalog page for locale. */
+export function listCategories(apiFetch: ApiFetch, locale: string, page = 1): Promise<Response> {
+  return apiFetch(`/editorial/categories?locale=${locale}&limit=100&page=${page}`);
 }
 
 /** POST /categories?locale=es — create. */
