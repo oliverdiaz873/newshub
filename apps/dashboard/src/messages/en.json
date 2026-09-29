@@ -172,6 +172,7 @@
     "bulkDelete": "Delete",
     "bulkSummary": "{ok} succeeded, {failed} failed",
     "bulkFailedCodes": "Failed: {codes}",
+    "confirm": "Confirm",
     "deleteTitle": "Delete article",
     "deleteMessage": "Delete “{title}”? This cannot be undone.",
     "deleteBulkTitle": "Delete articles",
