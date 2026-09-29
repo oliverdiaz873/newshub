@@ -119,7 +119,7 @@ export function Sidebar({
             </span>
           )}
           {showCount && (
-            <span className="nh-count" aria-label={`${label}: ${count}`}>
+            <span className="nh-count" aria-hidden="true">
               {count > 99 ? '99+' : count}
             </span>
           )}
