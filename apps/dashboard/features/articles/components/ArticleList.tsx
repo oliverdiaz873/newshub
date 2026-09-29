@@ -715,6 +715,11 @@ export function ArticleList() {
                       const availableActions = isReviewer ? actionsFor(item.status).filter((a) => a !== 'delete') : actionsFor(item.status);
                       const primaryAction = availableActions.find((action) => action === 'publish' || action === 'unpublish' || action === 'restore');
                       const secondaryActions = availableActions.filter((action) => action !== primaryAction);
+                      // Single delete stays a direct row action (with confirm dialog):
+                      // it is available in every status and row flows rely on
+                      // one-click access. The overflow menu keeps the rest.
+                      const menuActions = secondaryActions.filter((action) => action !== 'delete');
+                      const showDelete = availableActions.includes('delete');
                       const renderAction = (action: EditorialAction, menu = false) => {
                         const label =
                           action === 'delete'
@@ -772,9 +777,10 @@ export function ArticleList() {
                             {t('actionEdit')}
                           </Link>
                           {primaryAction && renderAction(primaryAction)}
-                          {secondaryActions.length > 0 && (
+                          {showDelete && renderAction('delete')}
+                          {menuActions.length > 0 && (
                             <RowActionsMenu label={t('colActions')}>
-                              {secondaryActions.map((action) => renderAction(action, true))}
+                              {menuActions.map((action) => renderAction(action, true))}
                             </RowActionsMenu>
                           )}
                         </div>
