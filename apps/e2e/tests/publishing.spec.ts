@@ -124,10 +124,11 @@ test('archive and restore cycle', async ({ page }) => {
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   await dialog.locator('button.danger').click();
-  await expect(row.getByRole('cell', { name: 'archived' })).toBeVisible();
+  // Exact match: title cells also contain the word "Archivado".
+  await expect(row.getByRole('cell', { name: 'Archivado', exact: true })).toBeVisible();
 
   await row.getByRole('button', { name: 'Restaurar' }).click();
-  await expect(row.getByRole('cell', { name: 'draft' })).toBeVisible();
+  await expect(row.getByRole('cell', { name: 'Borrador', exact: true })).toBeVisible();
 
   await row.getByRole('button', { name: 'Eliminar' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Eliminar' }).click();
