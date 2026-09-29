@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -153,9 +153,10 @@ export function ArticleList() {
     setSort(searchParams.get('sort') ?? 'publishedAt:desc');
     setPage(nextPage);
     setLimit(nextLimit);
-    const contextChanged = previousUrlContextRef.current !== null && previousUrlContextRef.current !== urlContext;
     const urlSelection = new Set(rawSelection ? rawSelection.split(',').filter(Boolean) : []);
-    setSelected(contextChanged && urlSelection.size === 0 ? new Set() : urlSelection);
+    // Selection survives filter/sort/page (documented contract): only adopt
+    // the URL selection when the param is present, never wipe local state.
+    if (rawSelection !== null) setSelected(urlSelection);
     previousUrlContextRef.current = urlContext;
     hydratedUrlRef.current = true;
   }, [searchParams]);
@@ -211,7 +212,8 @@ export function ArticleList() {
   );
 
   function resetPage(patch: Parameters<typeof syncUrl>[0]) {
-    setSelected(new Set());
+    // Intentionally preserves selection: filter/sort/search changes must not
+    // destroy bulk selection (documented contract).
     syncUrl({ ...patch, page: 1 });
     setPage(1);
   }
@@ -308,8 +310,6 @@ export function ArticleList() {
           meta: { total: number; totalPages: number };
         };
         setItems(json.data);
-        const visibleIds = new Set(json.data.map((item) => item.id));
-        setSelected((current) => new Set([...current].filter((id) => visibleIds.has(id))));
         setTotal(json.meta.total);
         setTotalPages(json.meta.totalPages);
       } catch (err) {
@@ -802,7 +802,7 @@ export function ArticleList() {
             total={total}
             limit={limit}
             onPage={(next) => {
-              setSelected(new Set());
+              // Preserve selection across pages (documented contract).
               setPage(next);
               syncUrl({ page: next });
             }}
