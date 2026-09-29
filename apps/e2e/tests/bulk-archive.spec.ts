@@ -61,7 +61,8 @@ test('bulk archive archives the selected articles', async ({ page }) => {
 
     for (const title of titles) {
       const row = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
-      await expect(row.getByRole('cell', { name: 'archived' })).toBeVisible({ timeout: 30_000 });
+      // Status cells are localized (statusLabelKey): ES renders "Archivado".
+      await expect(row.getByRole('cell', { name: 'Archivado' })).toBeVisible({ timeout: 30_000 });
     }
   } finally {
     // Restore to draft first (mirrors the single-item flow), then delete.
