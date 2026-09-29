@@ -11,7 +11,9 @@ async function loginAsRole(page: Page, role: { email: string; password: string }
 }
 
 async function gotoPlanning(page: Page) {
-  await page.getByRole('link', { name: 'Planificación' }).click();
+  // Canonical product nav: group "Planificación" with links
+  // "Plan editorial" (/planning) + "Programados" (/scheduled).
+  await page.getByRole('link', { name: 'Plan editorial' }).click();
   await expect(page).toHaveURL('http://localhost:3212/planning');
 }
 
