@@ -15,7 +15,10 @@ export const EMPTY_CATEGORY_FORM: CategoryForm = {
 /** Field errors keyed by form field; empty record means valid. */
 export function validateCategoryForm(form: CategoryForm): CategoryFormError {
   const errors: CategoryFormError = {};
-  if (form.sort.trim() !== '' && !/^-?\d+$/.test(form.sort.trim())) errors.sort = 'number';
+  const sortTrimmed = form.sort.trim();
+  // Inc 1: API enforces sort >= 0 (Min(0)). Reject negatives client-side so a
+  // negative never reaches the API as a generic HTTP error.
+  if (sortTrimmed !== '' && (!/^-?\d+$/.test(sortTrimmed) || Number(sortTrimmed) < 0)) errors.sort = 'number';
   if (!form.esSlug.trim()) errors.esSlug = 'required';
   else if (!CONTENT_SLUG_PATTERN.test(form.esSlug.trim())) errors.esSlug = 'slug';
   if (!form.esLabel.trim()) errors.esLabel = 'required';
