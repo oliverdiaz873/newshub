@@ -78,12 +78,12 @@ test('editor submits review, reviewer approves, content becomes published', asyn
   await expect(page).toHaveURL('http://localhost:3212/articles');
   await filterReviewQueue(page);
   const reviewRow = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
-  await expect(reviewRow.getByRole('cell', { name: 'review' })).toBeVisible();
+  await expect(reviewRow.getByRole('cell', { name: 'Revisión' })).toBeVisible();
   await reviewRow.getByRole('button', { name: 'Publicar' }).click();
   // Approving leaves the review filter set, so reset it before asserting.
   await page.getByLabel('Estado').first().selectOption('all');
   const publishedRow = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
-  await expect(publishedRow.getByRole('cell', { name: 'published' })).toBeVisible();
+  await expect(publishedRow.getByRole('cell', { name: 'Publicado' })).toBeVisible();
 
   await cleanupArticle(articleId, true);
 });
