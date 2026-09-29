@@ -171,6 +171,7 @@
     "bulkDelete": "Eliminar",
     "bulkSummary": "{ok} correctos, {failed} fallidos",
     "bulkFailedCodes": "Fallidos: {codes}",
+    "confirm": "Confirmar",
     "deleteTitle": "Eliminar artículo",
     "deleteMessage": "¿Eliminar «{title}»? No se puede deshacer.",
     "deleteBulkTitle": "Eliminar artículos",

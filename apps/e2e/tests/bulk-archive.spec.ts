@@ -55,9 +55,8 @@ test('bulk archive archives the selected articles', async ({ page }) => {
     const bar = page.getByRole('region', { name: /seleccionados/ });
     await expect(bar.getByText('2 seleccionados')).toBeVisible();
     await bar.getByRole('button', { name: 'Archivar' }).click();
-    // Product finding (documented, not fixed here): the bulk confirm button
-    // renders the untranslated key "articles.confirm" instead of a label.
-    await page.getByRole('dialog').getByRole('button', { name: 'articles.confirm' }).click();
+    // The bulk confirm button uses the translated label (articles.confirm).
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
 
     for (const title of titles) {
       const row = page.getByRole('row', { name: new RegExp(title.slice(0, 20)) });
