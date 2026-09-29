@@ -715,6 +715,15 @@ export function ArticleList() {
                       const availableActions = isReviewer ? actionsFor(item.status).filter((a) => a !== 'delete') : actionsFor(item.status);
                       const primaryAction = availableActions.find((action) => action === 'publish' || action === 'unpublish' || action === 'restore');
                       const secondaryActions = availableActions.filter((action) => action !== primaryAction);
+                      // Single delete and archive stay direct row actions (with
+                      // confirm dialog): both are available across statuses and
+                      // row flows rely on one-click access. The overflow menu
+                      // keeps the remaining secondary actions.
+                      const menuActions = secondaryActions.filter(
+                        (action) => action !== 'delete' && action !== 'archive',
+                      );
+                      const showDelete = availableActions.includes('delete');
+                      const showArchive = availableActions.includes('archive');
                       const renderAction = (action: EditorialAction, menu = false) => {
                         const label =
                           action === 'delete'
@@ -772,9 +781,11 @@ export function ArticleList() {
                             {t('actionEdit')}
                           </Link>
                           {primaryAction && renderAction(primaryAction)}
-                          {secondaryActions.length > 0 && (
+                          {showDelete && renderAction('delete')}
+                          {showArchive && renderAction('archive')}
+                          {menuActions.length > 0 && (
                             <RowActionsMenu label={t('colActions')}>
-                              {secondaryActions.map((action) => renderAction(action, true))}
+                              {menuActions.map((action) => renderAction(action, true))}
                             </RowActionsMenu>
                           )}
                         </div>
