@@ -319,6 +319,9 @@ export function ArticleEditor({
       id,
       value: form[locale][key],
       disabled: busy || published || isReviewer,
+      // Deterministic accessible name: the visible required marker (`*`)
+      // leaks into some engines' name computation, breaking exact matches.
+      'aria-label': label,
       onChange: (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
       ) => setTr(locale, key, event.target.value),
