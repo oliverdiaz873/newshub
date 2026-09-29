@@ -137,6 +137,15 @@ jobs:
           sudo -u postgres createdb newshub_e2e
 
       - run: npm ci
+      # The e2e webServers boot api/dashboard/storefront dev servers, so their
+      # own dependencies (tsx, next) must be installed too (tsx: not found
+      # otherwise). No product change; mirrors each app's job install.
+      - run: npm ci
+        working-directory: apps/api
+      - run: npm ci
+        working-directory: apps/dashboard
+      - run: npm ci
+        working-directory: apps/storefront
       - run: npm run lint
       - run: npm run type-check
       - run: npx playwright install --with-deps chromium
