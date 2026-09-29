@@ -195,6 +195,9 @@ export function AuthorManager() {
           id={id}
           value={form[key]}
           onChange={set(key)}
+          // Deterministic accessible name: the visible required marker (`*`)
+          // leaks into some engines' name computation, breaking exact matches.
+          aria-label={label}
           aria-invalid={message ? true : undefined}
           aria-describedby={message ? `${id}-err` : undefined}
           className={message ? 'invalid' : undefined}
