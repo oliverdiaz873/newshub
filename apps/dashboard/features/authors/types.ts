@@ -16,7 +16,7 @@ export interface AuthorForm {
   enBio: string;
 }
 
-export type AuthorFormError = Partial<Record<'slug' | 'esName' | 'enName', 'required' | 'slug'>>;
+export type AuthorFormError = Partial<Record<'slug' | 'esName' | 'enName', 'required' | 'slug' | 'taken'>>;
 
 export interface AuthorPayload {
   slug: string;
