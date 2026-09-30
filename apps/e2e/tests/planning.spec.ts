@@ -134,12 +134,19 @@ test('calendar shows due items and navigates months', async ({ page }) => {
   const token = await apiToken(page);
   const me = await apiMe(page, token);
   const title = `E2E Cal largo ${RUN}`;
-  await apiCreateAssignment(page, token, title, me, new Date(Date.now() + 24 * 3600_000).toISOString());
+  const due = new Date(Date.now() + 24 * 3600_000);
+  await apiCreateAssignment(page, token, title, me, due.toISOString());
 
   await gotoPlanning(page);
   await page.getByRole('button', { name: 'Calendario' }).click();
   const calendar = page.getByRole('region', { name: 'Calendario' });
   await expect(calendar.getByRole('list')).toBeVisible();
+  // The calendar fetches the displayed month only, so a +24h due date can
+  // fall in the next month on month-end runs (e.g. Sep 30 -> Oct 1).
+  // Navigate there first instead of assuming the item is visible.
+  if (due.getMonth() !== new Date().getMonth()) {
+    await page.getByRole('button', { name: 'Mes siguiente' }).click();
+  }
   await expect(page.getByText(title).first()).toBeVisible();
   await page.getByRole('button', { name: 'Mes siguiente' }).click();
   await page.getByRole('button', { name: 'Hoy' }).click();
