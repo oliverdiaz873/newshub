@@ -7,6 +7,10 @@ export interface MediaOption {
   mime: string;
   width: number | null;
   height: number | null;
+  /** Client-provided filename; NULL for historical assets that predate it. */
+  originalFilename: string | null;
+  /** File size in bytes; NULL when unknown. */
+  bytes: number | null;
 }
 
 /** Manager row: option plus creation date. */

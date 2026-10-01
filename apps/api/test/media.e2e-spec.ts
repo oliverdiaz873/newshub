@@ -92,6 +92,13 @@ describe('F5 media (e2e)', () => {
       .expect(201);
     expect(up.body).toMatchObject({ mime: 'image/png', width: 1, height: 1 });
     expect(up.body.url).toContain(`/api/v1/media/${up.body.id}/content`);
+    // PR2A contract: original filename + size are persisted and returned.
+    expect(up.body).toMatchObject({ originalFilename: 'pixel.png', bytes: PNG.length });
+    const listed = await request(app.getHttpServer())
+      .get('/api/v1/media?limit=5')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(listed.body.data[0]).toMatchObject({ id: up.body.id, originalFilename: 'pixel.png', bytes: PNG.length });
     const bad = await request(app.getHttpServer())
       .post('/api/v1/media')
       .set('Authorization', auth)
