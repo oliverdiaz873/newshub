@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { memoryStorage } from 'multer';
 import { MediaService, MAX_FILE_BYTES } from './media.service';
-import { ListQueryDto } from '../../common/dto/list-query.dto';
+import { MediaQueryDto } from '../../common/dto/list-query.dto';
 import { DtoPipe } from '../../common/http/validation';
 import { CurrentUser, Roles } from '../auth/decorators';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -33,7 +33,7 @@ export class MediaController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'editor', 'reviewer')
-  list(@Query(new DtoPipe(ListQueryDto)) query: ListQueryDto) {
+  list(@Query(new DtoPipe(MediaQueryDto)) query: MediaQueryDto) {
     return this.media.list(query);
   }
 

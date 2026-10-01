@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { fetchApiToken, useApiSession } from '../fixtures/auth';
+import { useApiSession } from '../fixtures/auth';
 
 // Unique per run (see articles.spec.ts): fixed titles risk strict-mode
 // collisions in list cells, whose accessible name appends the slug.
@@ -12,35 +12,16 @@ const PNG = Buffer.from(
   'base64',
 );
 
-const API = 'http://localhost:3211/api/v1';
-
-async function apiToken(): Promise<string> {
-  return fetchApiToken();
-}
-
-/** Newest-first media id right after our upload (only uploader in the run). */
-async function newestMediaId(token: string): Promise<string> {
-  const res = await fetch(`${API}/media?limit=5`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`API media list failed: ${res.status}`);
-  const body = (await res.json()) as { data: Array<{ id: string }> };
-  if (body.data.length === 0) throw new Error('API media list is empty after upload');
-  return body.data[0].id;
-}
-
 test('media upload, cover assignment and protected delete', async ({ page }) => {
   await useApiSession(page);
-  const token = await apiToken();
   await page.goto('/media');
   // The upload control is #media-file (label 'Archivo') since the
   // MediaManager migration; the former #file input is gone.
   await page.locator('#media-file').setInputFiles({ name: 'e2e.png', mimeType: 'image/png', buffer: PNG });
   await page.getByRole('button', { name: 'Subir' }).click();
   await expect(page.getByText('Imagen subida.')).toBeVisible();
-  // Target ours by id (newest-first list); the card also shows the filename.
-  const mediaId = await newestMediaId(token);
-  await page.locator('#media-q').fill(mediaId);
+  // PR2B: server-side search by filename (partial match).
+  await page.locator('#media-q').fill('e2e');
   await expect(page.locator('.nh-media-card')).toHaveCount(1);
   // PR2A: the persisted original filename is shown on the card.
   await expect(page.locator('.nh-media-card').getByText('e2e.png')).toBeVisible();
@@ -55,7 +36,7 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await page.getByLabel('Título', { exact: true }).first().fill(TITLE);
   await page.getByLabel('Resumen', { exact: true }).first().fill('Resumen suficientemente largo para la validacion.');
   await page.getByLabel(/Contenido/, { exact: true }).first().fill('Cuerpo con portada.');
-  await page.locator('#media-picker-q').fill(mediaId);
+  await page.locator('#media-picker-q').fill('e2e.png');
   await page.locator('.nh-media-cell').first().click();
   await expect(page.locator('.nh-media-cell.selected')).toHaveCount(1);
   await page.getByRole('button', { name: 'Crear', exact: true }).click();
@@ -67,7 +48,7 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await expect(page.getByRole('row', { name: new RegExp(TITLE) })).toBeVisible();
 
   await page.goto('/media');
-  await page.locator('#media-q').fill(mediaId);
+  await page.locator('#media-q').fill('e2e.png');
   const row = page.locator('.nh-media-card').first();
   await row.getByRole('button', { name: 'Eliminar' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Eliminar' }).click();
@@ -87,7 +68,7 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await expect(page.getByRole('row', { name: new RegExp(TITLE) })).toHaveCount(0);
 
   await page.goto('/media');
-  await page.locator('#media-q').fill(mediaId);
+  await page.locator('#media-q').fill('e2e.png');
   const freed = page.locator('.nh-media-card').first();
   await freed.getByRole('button', { name: 'Eliminar' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Eliminar' }).click();

@@ -51,6 +51,7 @@ export function MediaManager() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+  const [queryInput, setQueryInput] = useState(() => searchParams.get('q') ?? '');
   const [page, setPage] = useState(() => Number(searchParams.get('page') ?? 1) || 1);
   const [limit, setLimit] = useState(() => {
     const fromUrl = Number(searchParams.get('limit') ?? 0);
@@ -89,13 +90,12 @@ export function MediaManager() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const state = JSON.parse(paramsKey) as { page: number; limit: number };
+      const state = JSON.parse(paramsKey) as { query: string; page: number; limit: number };
       setLoading(true);
       setError(null);
       try {
-        // Server pagination only: the API has no media search, so `q`
-        // stays a local filter applied below (see searchHint).
-        const res = await listMedia(apiFetch, state.page, state.limit);
+        // Server search + pagination: `q` matches originalFilename OR mime.
+        const res = await listMedia(apiFetch, state.page, state.limit, state.query);
         if (cancelled) return;
         if (res.status === 401) {
           setError(tc('sessionRequired'));
@@ -124,14 +124,19 @@ export function MediaManager() {
     };
   }, [preview]);
 
-  const filtered = query.trim()
-    ? items.filter((row) => `${row.mime} ${row.id}`.toLowerCase().includes(query.trim().toLowerCase()))
-    : items;
-  // The `q` filter is page-local (no server search): while filtering, the
-  // pager reflects the visible subset instead of the server totals.
-  const filtering = query.trim().length > 0;
-  const viewTotal = filtering ? filtered.length : total;
-  const viewPages = filtering ? 1 : totalPages;
+  // Debounced search input (300ms, Articles pattern): typing updates the
+  // input only; committing resets to page 1 and refetches server-side.
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      if (queryInput !== query) {
+        setQuery(queryInput);
+        setPage(1);
+        syncUrl({ q: queryInput, page: 1 });
+      }
+    }, 300);
+    return () => window.clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryInput]);
 
   function pick(next: File | null) {
     if (preview) URL.revokeObjectURL(preview);
@@ -230,12 +235,8 @@ export function MediaManager() {
             id="media-q"
             type="search"
             placeholder={t('searchPlaceholder')}
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setPage(1);
-              syncUrl({ q: event.target.value, page: 1 });
-            }}
+            value={queryInput}
+            onChange={(event) => setQueryInput(event.target.value)}
           />
           <span className="nh-muted">{t('searchHint')}</span>
         </div>
@@ -267,12 +268,12 @@ export function MediaManager() {
 
         {loading ? (
           <Skeleton lines={6} />
-        ) : filtered.length === 0 ? (
+        ) : items.length === 0 ? (
           <EmptyState message={t('empty')} />
         ) : (
           <>
             <div className="nh-media-grid nh-media-manager">
-              {filtered.map((row) => (
+              {items.map((row) => (
                 <article key={row.id} className="nh-media-card" aria-label={mediaLabel(row)}>
                   <MediaThumb item={row} width={240} height={150} />
                   <div className="nh-media-meta">
@@ -300,17 +301,15 @@ export function MediaManager() {
               ))}
             </div>
             <Paginator
-              page={filtering ? 1 : page}
-              totalPages={viewPages}
-              total={viewTotal}
+              page={page}
+              totalPages={totalPages}
+              total={total}
               limit={limit}
               onPage={(next) => {
-                if (filtering) return;
                 setPage(next);
                 syncUrl({ page: next });
               }}
             />
-            {filtering && <p className="nh-muted">{t('filteredCount', { count: filtered.length })}</p>}
           </>
         )}
       </section>

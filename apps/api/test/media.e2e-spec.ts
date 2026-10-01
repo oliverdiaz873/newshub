@@ -172,4 +172,82 @@ describe('F5 media (e2e)', () => {
       .set('Authorization', auth)
       .expect(204);
   });
+
+  it('searches by filename or mime with filtered pagination', async () => {
+    const at = await token();
+    const auth = `Bearer ${at}`;
+    const upA = await request(app.getHttpServer())
+      .post('/api/v1/media')
+      .set('Authorization', auth)
+      .attach('file', PNG, { filename: 'pageme-alpha.png', contentType: 'image/png' })
+      .expect(201);
+    const upB = await request(app.getHttpServer())
+      .post('/api/v1/media')
+      .set('Authorization', auth)
+      .attach('file', PNG, { filename: 'pageme-beta.png', contentType: 'image/png' })
+      .expect(201);
+    // Historical-style row: NULL filename is only findable via mime.
+    const nullRow = await prisma.mediaAsset.create({
+      data: { storageKey: `zz/${Date.now()}-null.png`, mime: 'image/png', originalFilename: null, bytes: null },
+    });
+
+    // A. partial filename
+    const byName = await request(app.getHttpServer())
+      .get('/api/v1/media?q=pageme-alpha')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(byName.body.data.map((r: { id: string }) => r.id)).toEqual([upA.body.id]);
+    expect(byName.body.meta).toMatchObject({ total: 1, totalPages: 1 });
+
+    // B + C. mime match and case-insensitivity
+    const byMime = await request(app.getHttpServer())
+      .get('/api/v1/media?q=image/png&limit=100')
+      .set('Authorization', auth)
+      .expect(200);
+    const mimeIds = byMime.body.data.map((r: { id: string }) => r.id);
+    expect(mimeIds).toEqual(expect.arrayContaining([upA.body.id, upB.body.id, nullRow.id]));
+    const upper = await request(app.getHttpServer())
+      .get('/api/v1/media?q=PAGEME-ALPHA')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(upper.body.data.map((r: { id: string }) => r.id)).toEqual([upA.body.id]);
+
+    // D. NULL filename never matches by name
+    const noName = await request(app.getHttpServer())
+      .get('/api/v1/media?q=pageme')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(noName.body.data.map((r: { id: string }) => r.id)).not.toContain(nullRow.id);
+
+    // E. filtered pagination: totals reflect the search, page 2 holds the older row
+    const page2 = await request(app.getHttpServer())
+      .get('/api/v1/media?q=pageme&limit=1&page=2')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(page2.body.meta).toMatchObject({ total: 2, totalPages: 2 });
+    expect(page2.body.data.map((r: { id: string }) => r.id)).toEqual([upA.body.id]);
+
+    // F. empty q behaves like no filter
+    const unfiltered = await request(app.getHttpServer())
+      .get('/api/v1/media?limit=100')
+      .set('Authorization', auth)
+      .expect(200);
+    const emptyQ = await request(app.getHttpServer())
+      .get('/api/v1/media?limit=100&q=')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(emptyQ.body.meta.total).toBe(unfiltered.body.meta.total);
+
+    // G. unknown q yields empty data with helper-consistent meta
+    const unknown = await request(app.getHttpServer())
+      .get('/api/v1/media?q=definitely-does-not-exist-123')
+      .set('Authorization', auth)
+      .expect(200);
+    expect(unknown.body.data).toEqual([]);
+    expect(unknown.body.meta).toMatchObject({ total: 0, totalPages: 1 });
+
+    await request(app.getHttpServer()).delete(`/api/v1/media/${upA.body.id}`).set('Authorization', auth).expect(204);
+    await request(app.getHttpServer()).delete(`/api/v1/media/${upB.body.id}`).set('Authorization', auth).expect(204);
+    await prisma.mediaAsset.delete({ where: { id: nullRow.id } });
+  });
 });

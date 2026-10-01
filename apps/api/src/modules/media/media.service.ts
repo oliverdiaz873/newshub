@@ -70,10 +70,12 @@ export class MediaService {
     };
   }
 
-  async list(query: { page?: number; limit?: number }) {
+  async list(query: { page?: number; limit?: number; q?: string }) {
     const { page, limit } = normalizePagination(query.page, query.limit);
-    const total = await this.media.countAll();
-    const rows = await this.media.list((page - 1) * limit, limit);
+    // Empty/whitespace q means "no search" (same as omitting it).
+    const q = query.q?.trim() ? query.q.trim() : undefined;
+    const total = await this.media.countAll(q);
+    const rows = await this.media.list((page - 1) * limit, limit, q);
     return { data: rows.map((row) => this.shape(row)), meta: buildMeta(page, limit, total) };
   }
 

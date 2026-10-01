@@ -15,16 +15,32 @@ export class MediaRepository {
     return this.prisma.mediaAsset.findUnique({ where: { id } });
   }
 
-  list(skip: number, take: number) {
+  /**
+   * Server-side search (PR2B): `q` matches originalFilename OR mime
+   * (case-insensitive contains). NULL filenames simply never match the
+   * filename branch; storageKey is deliberately never searched.
+   */
+  private searchWhere(q?: string) {
+    if (!q) return {};
+    return {
+      OR: [
+        { originalFilename: { contains: q, mode: 'insensitive' as const } },
+        { mime: { contains: q, mode: 'insensitive' as const } },
+      ],
+    };
+  }
+
+  list(skip: number, take: number, q?: string) {
     return this.prisma.mediaAsset.findMany({
+      where: this.searchWhere(q),
       orderBy: { createdAt: 'desc' },
       skip,
       take,
     });
   }
 
-  countAll() {
-    return this.prisma.mediaAsset.count();
+  countAll(q?: string) {
+    return this.prisma.mediaAsset.count({ where: this.searchWhere(q) });
   }
 
   create(input: {
