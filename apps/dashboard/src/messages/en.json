@@ -285,7 +285,9 @@
     "remove": "Remove",
     "tooLarge": "File exceeds the 5 MB limit.",
     "badFormat": "Format not allowed. Use JPEG, PNG, WebP or AVIF.",
-    "empty": "No media yet. Upload an image to begin."
+    "empty": "No media yet. Upload an image to begin.",
+    "showMore": "Show more",
+    "showingCount": "{shown} of {total}"
   },
   "media": {    "title": "Media",
     "subtitle": "JPEG, PNG, WebP or AVIF · max 5 MB. Covers in use cannot be deleted.",

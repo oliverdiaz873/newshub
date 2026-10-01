@@ -6,7 +6,7 @@ import { resolveMediaUrl } from '../lib/media-url';
 /**
  * Shared media thumbnail cell (manager grid + picker grid).
  * Presentational only: selection/upload/delete behavior lives with the
- * callers, so MediaPicker conduct is frozen (including its slice cap).
+ * callers. The picker paginates its grid locally ("show more").
  */
 export function MediaThumb({ item, width = 120, height = 80 }: { item: MediaOption; width?: number; height?: number }) {
   return (
