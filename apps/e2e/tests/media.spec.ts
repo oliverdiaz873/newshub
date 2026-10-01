@@ -38,12 +38,12 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await page.locator('#media-file').setInputFiles({ name: 'e2e.png', mimeType: 'image/png', buffer: PNG });
   await page.getByRole('button', { name: 'Subir' }).click();
   await expect(page.getByText('Imagen subida.')).toBeVisible();
-  // Target ours by id (newest-first list); the card also shows the filename.
-  const mediaId = await newestMediaId(token);
-  await page.locator('#media-q').fill(mediaId);
+  // PR2B: server-side search by filename (partial match) in MediaManager.
+  await page.locator('#media-q').fill('e2e');
   await expect(page.locator('.nh-media-card')).toHaveCount(1);
   // PR2A: the persisted original filename is shown on the card.
   await expect(page.locator('.nh-media-card').getByText('e2e.png')).toBeVisible();
+  const mediaId = await newestMediaId(token);
 
   // Article creation lives on /articles/new; cover is assigned through
   // the shared MediaPicker grid (the 'Portada (opcional)' select is gone).
@@ -55,6 +55,7 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await page.getByLabel('Título', { exact: true }).first().fill(TITLE);
   await page.getByLabel('Resumen', { exact: true }).first().fill('Resumen suficientemente largo para la validacion.');
   await page.getByLabel(/Contenido/, { exact: true }).first().fill('Cuerpo con portada.');
+  // MediaPicker keeps its local `id + mime` filter (no filename search).
   await page.locator('#media-picker-q').fill(mediaId);
   await page.locator('.nh-media-cell').first().click();
   await expect(page.locator('.nh-media-cell.selected')).toHaveCount(1);
@@ -67,7 +68,7 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await expect(page.getByRole('row', { name: new RegExp(TITLE) })).toBeVisible();
 
   await page.goto('/media');
-  await page.locator('#media-q').fill(mediaId);
+  await page.locator('#media-q').fill('e2e.png');
   const row = page.locator('.nh-media-card').first();
   await row.getByRole('button', { name: 'Eliminar' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Eliminar' }).click();
@@ -87,7 +88,7 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await expect(page.getByRole('row', { name: new RegExp(TITLE) })).toHaveCount(0);
 
   await page.goto('/media');
-  await page.locator('#media-q').fill(mediaId);
+  await page.locator('#media-q').fill('e2e.png');
   const freed = page.locator('.nh-media-card').first();
   await freed.getByRole('button', { name: 'Eliminar' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Eliminar' }).click();

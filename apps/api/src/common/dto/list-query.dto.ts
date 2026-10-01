@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 import { DEFAULT_LIMIT, MAX_LIMIT } from '../../common/pagination';
 
 const toInt = ({ value }: { value: unknown }) => {
@@ -74,4 +74,12 @@ export class OpinionsQueryDto extends ListQueryDto {
   @IsOptional()
   @IsIn(['publishedAt:desc', 'publishedAt:asc'])
   sort?: 'publishedAt:desc' | 'publishedAt:asc';
+}
+
+/** Media manager search: optional `q` over originalFilename OR mime. */
+export class MediaQueryDto extends ListQueryDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  q?: string;
 }

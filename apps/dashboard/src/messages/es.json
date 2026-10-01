@@ -299,9 +299,9 @@
     "uploaded": "Imagen subida.",
     "tooLarge": "El archivo supera el límite de 5 MB.",
     "badFormat": "Formato no permitido. Usa JPEG, PNG, WebP o AVIF.",
-    "searchLabel": "Filtrar media",
-    "searchPlaceholder": "Filtrar por formato o id…",
-    "searchHint": "Filtro local por formato o id (el API no tiene búsqueda de media).",
+    "searchLabel": "Buscar en media",
+    "searchPlaceholder": "Buscar por nombre o formato…",
+    "searchHint": "Busca en todo el catálogo por nombre de archivo o formato.",
     "perPage": "Por página",
     "copy": "Copiar URL",
     "copied": "URL copiada.",
@@ -312,8 +312,7 @@
     "deleted": "Imagen eliminada.",
     "inUse": "No se puede eliminar: está asignada como portada. Desvincúlala del contenido primero.",
     "empty": "Aún no hay imágenes.",
-    "preview": "Vista previa",
-    "filteredCount": "{count} visibles (filtro local en esta página)."
+    "preview": "Vista previa"
   },
   "scheduling": {
     "title": "Programados",

@@ -9,9 +9,11 @@ import type { ApiFetch } from '@/shared/api/auth';
  * sites (unchanged behavior). No Repository/Adapter/Facade patterns.
  */
 
-/** GET /media?page=&limit= — server-paginated manager list. */
-export function listMedia(apiFetch: ApiFetch, page: number, limit: number): Promise<Response> {
-  return apiFetch(`/media?page=${page}&limit=${limit}`);
+/** GET /media?page=&limit=&q= — server-paginated + server-searched list. */
+export function listMedia(apiFetch: ApiFetch, page: number, limit: number, q?: string): Promise<Response> {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (q?.trim()) params.set('q', q.trim());
+  return apiFetch(`/media?${params.toString()}`);
 }
 
 /** GET /media?limit=100 — picker option list (single fetch by design). */

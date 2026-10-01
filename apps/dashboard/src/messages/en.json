@@ -299,9 +299,9 @@
     "uploaded": "Image uploaded.",
     "tooLarge": "File exceeds the 5 MB limit.",
     "badFormat": "Format not allowed. Use JPEG, PNG, WebP or AVIF.",
-    "searchLabel": "Filter media",
-    "searchPlaceholder": "Filter by format or id…",
-    "searchHint": "Local filter by format or id (the API has no media search).",
+    "searchLabel": "Search media",
+    "searchPlaceholder": "Search by name or format…",
+    "searchHint": "Searches the whole catalog by filename or format.",
     "perPage": "Per page",
     "copy": "Copy URL",
     "copied": "URL copied.",
@@ -312,8 +312,7 @@
     "deleted": "Image deleted.",
     "inUse": "Cannot delete: it is used as a cover. Detach it from the content first.",
     "empty": "No images yet.",
-    "preview": "Preview",
-    "filteredCount": "{count} shown (local filter on this page)."
+    "preview": "Preview"
   },
   "scheduling": {
     "title": "Scheduled",
