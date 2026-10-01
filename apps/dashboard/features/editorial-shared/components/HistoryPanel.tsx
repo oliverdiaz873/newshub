@@ -28,10 +28,13 @@ interface RevisionRow {
 export function HistoryPanel({
   kind,
   id,
+  canRestore,
   onRestored,
 }: {
   kind: 'article' | 'opinion';
   id: string;
+  /** Reviewers read history but never restore: the button is not rendered. */
+  canRestore: boolean;
   onRestored: () => void;
 }) {
   const t = useTranslations('history');
@@ -134,14 +137,16 @@ export function HistoryPanel({
                     {t('diff')}
                   </button>
                 )}
-                <button
-                  className="nh-btn"
-                  type="button"
-                  disabled={busy}
-                  onClick={() => setRestoreTarget(row)}
-                >
-                  {t('restore')}
-                </button>
+                {canRestore && (
+                  <button
+                    className="nh-btn"
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setRestoreTarget(row)}
+                  >
+                    {t('restore')}
+                  </button>
+                )}
                 <Link
                   className="nh-btn"
                   href={`/audit-log?entityType=${kind}&entityId=${id}`}

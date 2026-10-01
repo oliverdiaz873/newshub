@@ -380,7 +380,7 @@ export function ArticleEditor({
       )}
 
       {mode === 'edit' && articleId && showHistory ? (
-        <HistoryPanel kind="article" id={articleId} onRestored={() => onSaved(articleId)} />
+        <HistoryPanel kind="article" id={articleId} canRestore={!isReviewer} onRestored={() => onSaved(articleId)} />
       ) : (
         <>
           {mode === 'create' && canEdit && (
