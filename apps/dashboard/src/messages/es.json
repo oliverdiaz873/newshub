@@ -284,7 +284,9 @@
     "remove": "Quitar",
     "tooLarge": "El archivo supera el límite de 5 MB.",
     "badFormat": "Formato no permitido. Usa JPEG, PNG, WebP o AVIF.",
-    "empty": "Aún no hay media. Sube una imagen para empezar."
+    "empty": "Aún no hay media. Sube una imagen para empezar.",
+    "showMore": "Mostrar más",
+    "showingCount": "{shown} de {total}"
   },
   "media": {
     "title": "Media",

@@ -12,6 +12,8 @@ import { resolveMediaUrl } from '../lib/media-url';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
+/** Initial and incremental page size for the local option grid. */
+const PAGE_SIZE = 24;
 
 /**
  * Shared cover picker (Articles now, Opinions in Increment 3).
@@ -33,6 +35,7 @@ export function MediaPicker({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -69,6 +72,7 @@ export function MediaPicker({
   const filtered = query.trim()
     ? items.filter((item) => `${item.id} ${item.mime}`.toLowerCase().includes(query.trim().toLowerCase()))
     : items;
+  const visible = filtered.slice(0, visibleCount);
 
   async function upload(file: File) {
     if (file.size > MAX_FILE_BYTES) {
@@ -93,6 +97,7 @@ export function MediaPicker({
       }
       const created = (await res.json()) as MediaOption;
       setItems((current) => [created, ...current]);
+      setVisibleCount(PAGE_SIZE);
       onChange(created.id);
       notify(t('uploaded'), 'ok');
     } catch {
@@ -153,7 +158,10 @@ export function MediaPicker({
           id="media-picker-q"
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setVisibleCount(PAGE_SIZE);
+          }}
         />
       </div>
       {loading ? (
@@ -163,20 +171,34 @@ export function MediaPicker({
       ) : filtered.length === 0 ? (
         <EmptyState message={t('empty')} />
       ) : (
-        <div className="nh-media-grid" role="group" aria-label={t('title')}>
-          {filtered.slice(0, 24).map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={item.id === value}
-              className={item.id === value ? 'nh-media-cell selected' : 'nh-media-cell'}
-              onClick={() => onChange(item.id === value ? null : item.id)}
-              title={mediaLabel(item)}
-            >
-              <MediaThumb item={item} />
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="nh-media-grid" role="group" aria-label={t('title')}>
+            {visible.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={item.id === value}
+                className={item.id === value ? 'nh-media-cell selected' : 'nh-media-cell'}
+                onClick={() => onChange(item.id === value ? null : item.id)}
+                title={mediaLabel(item)}
+              >
+                <MediaThumb item={item} />
+              </button>
+            ))}
+          </div>
+          <div className="nh-row" style={{ marginTop: 8 }}>
+            {visibleCount < filtered.length && (
+              <button
+                className="nh-btn"
+                type="button"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              >
+                {t('showMore')}
+              </button>
+            )}
+            <span className="nh-muted">{t('showingCount', { shown: visible.length, total: filtered.length })}</span>
+          </div>
+        </>
       )}
     </div>
   );

@@ -1194,7 +1194,7 @@ body {
 }
 
 .nh-media-grid.nh-media-manager {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
   margin-top: 12px;
 }
@@ -1203,10 +1203,12 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 10px;
+  padding: 0;
   display: grid;
   gap: 8px;
   align-content: start;
+  overflow: hidden;
+  transition: box-shadow 180ms ease, transform 180ms ease;
 }
 
 .nh-media-card img {
@@ -1800,12 +1802,6 @@ body {
   margin-bottom: 2px;
 }
 
-.nh-media-card {
-  overflow: hidden;
-  padding: 0;
-  transition: box-shadow 180ms ease, transform 180ms ease;
-}
-
 .nh-media-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
@@ -1830,10 +1826,6 @@ body {
 .nh-media-card .nh-row {
   padding-bottom: 10px;
   gap: 6px;
-}
-
-.nh-media-grid.nh-media-manager {
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 @media (prefers-reduced-motion: reduce) {
