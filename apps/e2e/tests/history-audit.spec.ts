@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { fetchApiToken, useApiSession } from '../fixtures/auth';
+import { fetchApiToken, REVIEWER, useApiSession } from '../fixtures/auth';
 
 const API = 'http://localhost:3211/api/v1';
 const DASHBOARD = 'http://localhost:3212';
@@ -73,6 +73,60 @@ test('article history shows versions, diff and audit trail', async ({ page }) =>
 
   const unpub = await fetch(`${API}/articles/${id}/unpublish`, { method: 'POST', headers });
   if (!unpub.ok) throw new Error(`cleanup unpublish failed: ${unpub.status}`);
+  const del = await fetch(`${API}/articles/${id}`, { method: 'DELETE', headers });
+  if (!del.ok) throw new Error(`cleanup delete failed: ${del.status}`);
+});
+
+/**
+ * D4: reviewers read History (versions + diff) but the Restore action is
+ * not rendered for them. Absence is asserted in the DOM (count 0), not
+ * via `disabled`.
+ */
+test('reviewer reads history without restore action', async ({ page }) => {
+  const token = await fetchApiToken();
+  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const cats = (await (
+    await fetch(`${API}/categories?locale=es&limit=100`, { headers })
+  ).json()) as { data: Array<{ id: string }> };
+  const slug = `e2e-hist-rev-${RUN}`;
+  const created = (await (
+    await fetch(`${API}/articles`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        categoryId: cats.data[0].id,
+        translations: [
+          {
+            locale: 'es',
+            slug,
+            title: `E2E Historial reviewer largo ${RUN}`,
+            summary: 'Resumen suficientemente largo para la validacion.',
+            content: ['Cuerpo para historial.'],
+          },
+        ],
+      }),
+    })
+  ).json()) as { id: string };
+  const id = created.id;
+
+  const reviewRes = await fetch(`${API}/articles/${id}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({ status: 'review' }),
+  });
+  if (!reviewRes.ok) throw new Error(`submit-for-review failed: ${reviewRes.status}`);
+
+  await useApiSession(page, REVIEWER);
+  await page.goto(`${DASHBOARD}/articles/${id}`, { waitUntil: 'domcontentloaded' });
+  await page.getByRole('button', { name: 'Historial' }).click();
+  // Two versions are listed (create + review transition).
+  await expect(page.getByText(/Versión 2/)).toBeVisible({ timeout: 30_000 });
+  // Restore is not rendered at all for reviewers.
+  await expect(page.getByRole('button', { name: 'Restaurar esta versión' })).toHaveCount(0);
+  // Reading (view + diff) still works.
+  await page.getByRole('button', { name: 'Comparar con anterior' }).first().click();
+  await expect(page.getByRole('heading', { name: /Cambios desde/ })).toBeVisible();
+
   const del = await fetch(`${API}/articles/${id}`, { method: 'DELETE', headers });
   if (!del.ok) throw new Error(`cleanup delete failed: ${del.status}`);
 });

@@ -348,7 +348,7 @@ export function OpinionEditor({
       )}
 
       {mode === 'edit' && opinionId && showHistory ? (
-        <HistoryPanel kind="opinion" id={opinionId} onRestored={() => onSaved(opinionId)} />
+        <HistoryPanel kind="opinion" id={opinionId} canRestore={!isReviewer} onRestored={() => onSaved(opinionId)} />
       ) : (
         <>
           <div className="nh-form-grid">
