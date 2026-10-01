@@ -32,6 +32,8 @@ export class MediaRepository {
     mime: string;
     width: number | null;
     height: number | null;
+    originalFilename: string | null;
+    bytes: number | null;
     createdById: string;
   }, tx?: Prisma.TransactionClient) {
     return (tx ?? this.prisma).mediaAsset.create({ data: input });

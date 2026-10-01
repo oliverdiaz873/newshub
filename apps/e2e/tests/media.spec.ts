@@ -38,10 +38,12 @@ test('media upload, cover assignment and protected delete', async ({ page }) => 
   await page.locator('#media-file').setInputFiles({ name: 'e2e.png', mimeType: 'image/png', buffer: PNG });
   await page.getByRole('button', { name: 'Subir' }).click();
   await expect(page.getByText('Imagen subida.')).toBeVisible();
-  // Cards show no filename, so target ours by id (newest-first list).
+  // Target ours by id (newest-first list); the card also shows the filename.
   const mediaId = await newestMediaId(token);
   await page.locator('#media-q').fill(mediaId);
   await expect(page.locator('.nh-media-card')).toHaveCount(1);
+  // PR2A: the persisted original filename is shown on the card.
+  await expect(page.locator('.nh-media-card').getByText('e2e.png')).toBeVisible();
 
   // Article creation lives on /articles/new; cover is assigned through
   // the shared MediaPicker grid (the 'Portada (opcional)' select is gone).

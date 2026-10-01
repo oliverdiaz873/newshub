@@ -23,6 +23,21 @@ export function MediaThumb({ item, width = 120, height = 80 }: { item: MediaOpti
 }
 
 export function mediaLabel(item: MediaOption): string {
+  const name = item.originalFilename ?? item.mime;
   const dims = item.width && item.height ? ` · ${item.width}×${item.height}` : '';
-  return `${item.mime}${dims}`;
+  return `${name}${dims}`;
+}
+
+/** Human display name with MIME fallback (never renders null/undefined). */
+export function mediaFilename(item: MediaOption): string {
+  return item.originalFilename ?? item.mime;
+}
+
+/** Compact size label; empty string when unknown (caller omits it). */
+export function formatBytes(bytes: number | null): string {
+  if (bytes === null || !Number.isFinite(bytes) || bytes < 0) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${Math.round(kb)} KB`;
+  return `${(kb / 1024).toFixed(1)} MB`;
 }

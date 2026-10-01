@@ -8,6 +8,8 @@ import { coverUrl } from './cover-url';
 import { buildMeta, normalizePagination } from '../../common/pagination';
 
 export const MAX_FILE_BYTES = 5 * 1024 * 1024;
+/** Max persisted display length for client-provided filenames. */
+const MAX_FILENAME_CHARS = 255;
 const FORMAT_TO_MIME: Record<string, string> = {
   jpeg: 'image/jpeg',
   png: 'image/png',
@@ -27,7 +29,21 @@ export interface MediaView {
   mime: string;
   width: number | null;
   height: number | null;
+  originalFilename: string | null;
+  bytes: number | null;
   createdAt: string;
+}
+
+/**
+ * Display-only filename metadata. The client-provided name is never a
+ * storage key, path, identifier, or access mechanism: directory parts are
+ * stripped, length is capped, and empty results become NULL (same as
+ * historical assets that predate this field).
+ */
+function sanitizeFilename(name: string): string | null {
+  const base = name.split(/[\\/]/).pop()?.trim() ?? '';
+  if (!base) return null;
+  return base.slice(0, MAX_FILENAME_CHARS);
 }
 
 @Injectable()
@@ -41,13 +57,15 @@ export class MediaService {
     @Inject(AuditService) private readonly audit: AuditService,
   ) {}
 
-  shape(row: { id: string; storageKey: string; mime: string; width: number | null; height: number | null; createdAt: Date }): MediaView {
+  shape(row: { id: string; storageKey: string; mime: string; width: number | null; height: number | null; originalFilename: string | null; bytes: number | null; createdAt: Date }): MediaView {
     return {
       id: row.id,
       url: coverUrl({ id: row.id, storageKey: row.storageKey }),
       mime: row.mime,
       width: row.width,
       height: row.height,
+      originalFilename: row.originalFilename,
+      bytes: row.bytes,
       createdAt: row.createdAt.toISOString(),
     };
   }
@@ -86,6 +104,8 @@ export class MediaService {
           mime,
           width: meta.width ?? null,
           height: meta.height ?? null,
+          originalFilename: sanitizeFilename(file.originalname),
+          bytes: file.size,
           createdById: userId,
         }, tx);
         await this.audit.record({

@@ -165,8 +165,11 @@ async function main() {
 
   const mediaByPath = new Map<string, string>();
   for (const path of imagePaths) {
+    // Legacy storefront-relative keys carry their basename as the only
+    // trustworthy human name; bytes stay NULL (no reliable source).
+    const originalFilename = path.split('/').pop()?.trim() || null;
     const row = await prisma.mediaAsset.create({
-      data: { storageKey: path, mime: mimeOf(path), createdById: admin.id },
+      data: { storageKey: path, mime: mimeOf(path), originalFilename, createdById: admin.id },
     });
     mediaByPath.set(path, row.id);
   }

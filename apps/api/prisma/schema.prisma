@@ -196,16 +196,18 @@ model OpinionTranslation {
 }
 
 model MediaAsset {
-  id          String    @id @default(uuid()) @db.Uuid
-  storageKey  String    @unique @map("storage_key")
-  mime        String
-  width       Int?
-  height      Int?
-  createdById String?   @map("created_by") @db.Uuid
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  createdBy   User?     @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  articles    Article[]
-  opinions    Opinion[]
+  id               String    @id @default(uuid()) @db.Uuid
+  storageKey       String    @unique @map("storage_key")
+  mime             String
+  width            Int?
+  height           Int?
+  originalFilename String?   @map("original_filename")
+  bytes            Int?
+  createdById      String?   @map("created_by") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  createdBy        User?     @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  articles         Article[]
+  opinions         Opinion[]
 
   @@map("media_assets")
 }
