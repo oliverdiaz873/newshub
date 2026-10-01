@@ -2,6 +2,7 @@ import { ConflictException, Inject, Injectable, NotFoundException, Unprocessable
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RevisionsService, type RevisionSnapshot } from '../history/revisions.service';
+import { snapshotsEqual } from '../history/snapshot-equal';
 import { AuditService } from '../history/audit.service';
 import { SyndicationService } from '../syndication/syndication.service';
 import { NotificationsService, type NotificationType } from '../notifications/notifications.service';
@@ -322,13 +323,18 @@ export class OpinionsService {
         if (!after?.translations.some((t) => t.locale === DEFAULT_LOCALE)) {
           throw new UnprocessableEntityException('Spanish translation is required.');
         }
-        await this.recordHistory(tx, {
-          entityId: id,
-          actorId: userId,
-          cause: 'edit',
-          snapshot: this.snapshotOpinion(after),
-          action: 'update',
-        });
+        // D1: an identical PATCH (no effective change) succeeds without
+        // recording a revision or audit event.
+        const snapshot = this.snapshotOpinion(after);
+        if (!snapshotsEqual(this.snapshotOpinion(existing), snapshot)) {
+          await this.recordHistory(tx, {
+            entityId: id,
+            actorId: userId,
+            cause: 'edit',
+            snapshot,
+            action: 'update',
+          });
+        }
       });
     } catch (err) {
       throw this.asSlugConflict(err);

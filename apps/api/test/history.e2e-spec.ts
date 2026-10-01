@@ -525,7 +525,7 @@ describe('history: revisions + audit (e2e)', () => {
     expect(es?.title).toBe('Titulo suficiente para hist-arch');
   });
 
-  it('records a revision for an identical PATCH (pre-D1 freeze)', async () => {
+  it('skips revision and audit for an identical PATCH (D1)', async () => {
     const auth = `Bearer ${await token()}`;
     const created = await request(app.getHttpServer())
       .post('/api/v1/articles')
@@ -533,22 +533,37 @@ describe('history: revisions + audit (e2e)', () => {
       .send({ categoryId, translations: [esDoc('hist-nop')] })
       .expect(201);
     const id = created.body.id as string;
-    // First review, then the exact same PATCH again: nothing changes.
+    // Real change: draft -> review versions.
     await request(app.getHttpServer())
       .patch(`/api/v1/articles/${id}`)
       .set('Authorization', auth)
       .send({ status: 'review' })
       .expect(200);
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([2, 1]);
+    // Status-identical PATCH: 200, no new version, no new audit event.
     await request(app.getHttpServer())
       .patch(`/api/v1/articles/${id}`)
       .set('Authorization', auth)
       .send({ status: 'review' })
       .expect(200);
-
-    // BEFORE D1: the no-change PATCH still versions (and audits).
-    const rows = await revisions(auth, id);
-    expect(rows.map((r) => r.version)).toEqual([3, 2, 1]);
-    const trail = await audit(auth, `?entityType=article&entityId=${id}&action=update`);
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([2, 1]);
+    // Content-identical PATCH: same title/summary as current.
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ translations: [esDoc('hist-nop')] })
+      .expect(200);
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([2, 1]);
+    let trail = await audit(auth, `?entityType=article&entityId=${id}&action=update`);
+    expect(trail).toHaveLength(1);
+    // Real content change still versions and audits.
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ translations: [esDoc('hist-nop', 'Titulo cambiado suficiente largo')] })
+      .expect(200);
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([3, 2, 1]);
+    trail = await audit(auth, `?entityType=article&entityId=${id}&action=update`);
     expect(trail).toHaveLength(2);
 
     // Same contract for opinions.
@@ -558,6 +573,15 @@ describe('history: revisions + audit (e2e)', () => {
       .send({ authorId, translations: [esDoc('hist-nop-op')] })
       .expect(201);
     const opId = op.body.id as string;
+    const opRevisions = async () =>
+      (await request(app.getHttpServer()).get(`/api/v1/opinions/${opId}/revisions`).set('Authorization', auth).expect(200))
+        .body.data as Array<{ version: number }>;
+    await request(app.getHttpServer())
+      .patch(`/api/v1/opinions/${opId}`)
+      .set('Authorization', auth)
+      .send({ status: 'review' })
+      .expect(200);
+    expect((await opRevisions()).map((r) => r.version)).toEqual([2, 1]);
     await request(app.getHttpServer())
       .patch(`/api/v1/opinions/${opId}`)
       .set('Authorization', auth)
@@ -566,13 +590,17 @@ describe('history: revisions + audit (e2e)', () => {
     await request(app.getHttpServer())
       .patch(`/api/v1/opinions/${opId}`)
       .set('Authorization', auth)
-      .send({ status: 'review' })
+      .send({ translations: [esDoc('hist-nop-op')] })
       .expect(200);
-    const opRes = await request(app.getHttpServer())
-      .get(`/api/v1/opinions/${opId}/revisions`)
+    expect((await opRevisions()).map((r) => r.version)).toEqual([2, 1]);
+    const opTrail = await audit(auth, `?entityType=opinion&entityId=${opId}&action=update`);
+    expect(opTrail).toHaveLength(1);
+    await request(app.getHttpServer())
+      .patch(`/api/v1/opinions/${opId}`)
       .set('Authorization', auth)
+      .send({ translations: [esDoc('hist-nop-op', 'Titulo cambiado opinion largo')] })
       .expect(200);
-    expect((opRes.body.data as Array<{ version: number }>).map((r) => r.version)).toEqual([3, 2, 1]);
+    expect((await opRevisions()).map((r) => r.version)).toEqual([3, 2, 1]);
   });
 
   it('audits failed logins without an actor', async () => {
