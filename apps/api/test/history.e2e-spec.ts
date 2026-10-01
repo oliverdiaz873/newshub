@@ -525,6 +525,57 @@ describe('history: revisions + audit (e2e)', () => {
     expect(es?.title).toBe('Titulo suficiente para hist-arch');
   });
 
+  it('restores archived opinions preserving their status (D5 parity)', async () => {
+    const auth = `Bearer ${await token()}`;
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/opinions')
+      .set('Authorization', auth)
+      .send({ authorId, translations: [esDoc('hist-arch-op')] })
+      .expect(201);
+    const id = created.body.id as string;
+    await request(app.getHttpServer())
+      .post(`/api/v1/opinions/${id}/archive`)
+      .set('Authorization', auth)
+      .expect(200);
+    const archived = await prisma.opinion.findUnique({ where: { id }, select: { status: true } });
+    expect(archived?.status).toBe('archived');
+
+    const restored = await request(app.getHttpServer())
+      .post(`/api/v1/opinions/${id}/revisions/1/restore`)
+      .set('Authorization', auth)
+      .expect(200);
+    expect(restored.body.version).toBe(3);
+
+    // Status comes from the live row, never from the snapshot.
+    const after = await prisma.opinion.findUnique({ where: { id }, select: { status: true } });
+    expect(after?.status).toBe('archived');
+
+    // New version appended; the original revision is untouched.
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/opinions/${id}/revisions`)
+      .set('Authorization', auth)
+      .expect(200);
+    const rows = res.body.data as Array<{ version: number; cause: string }>;
+    expect(rows.map((r) => r.version)).toEqual([3, 2, 1]);
+    expect(rows[0].cause).toBe('restore');
+    const v1 = await request(app.getHttpServer())
+      .get(`/api/v1/opinions/${id}/revisions/1`)
+      .set('Authorization', auth)
+      .expect(200);
+    expect(v1.body.snapshot.translations[0].title).toBe('Titulo suficiente para hist-arch-op');
+    const read = await request(app.getHttpServer())
+      .get(`/api/v1/editorial/opinions/${id}`)
+      .set('Authorization', auth)
+      .expect(200);
+    const es = (read.body.translations as Array<{ locale: string; title: string }>).find((t) => t.locale === 'es');
+    expect(es?.title).toBe('Titulo suficiente para hist-arch-op');
+
+    // The restore is audited as a new version, not a rewrite.
+    const trail = await audit(auth, `?entityType=opinion&entityId=${id}&action=revision.restore`);
+    expect(trail).toHaveLength(1);
+    expect(trail[0].metadata).toMatchObject({ restoredVersion: 1, version: 3 });
+  });
+
   it('skips revision and audit for an identical PATCH (D1)', async () => {
     const auth = `Bearer ${await token()}`;
     const created = await request(app.getHttpServer())
