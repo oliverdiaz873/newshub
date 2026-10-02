@@ -39,13 +39,30 @@ const ACTIONS = [
   'media.upload',
   'media.delete',
   'media.delete_blocked',
+  'assign',
+  'start',
+  'submit',
+  'complete',
+  'cancel',
+  'reopen',
+  'notify.due-soon',
+  'notify.overdue',
+  'webhook.subscribe',
+  'webhook.update',
+  'webhook.rotate',
+  'webhook.unsubscribe',
+  'webhook.ping',
 ];
 
-const ENTITY_TYPES = ['article', 'opinion', 'media', 'user'];
+const ENTITY_TYPES = ['article', 'opinion', 'media', 'user', 'planning', 'webhook'];
 
 export function AuditBoard() {
   const t = useTranslations('audit');
   const tc = useTranslations('common');
+  // Translated filter labels; raw codes stay the identifiers and the
+  // fallback so an unmapped code is still selectable and visible.
+  const actionLabels = t.raw('actionLabels') as Record<string, string>;
+  const entityTypeLabels = t.raw('entityTypeLabels') as Record<string, string>;
   const searchParams = useSearchParams();
   const { apiFetch } = useAuth();
 
@@ -116,7 +133,7 @@ export function AuditBoard() {
               <option value="">{t('allActions')}</option>
               {ACTIONS.map((a) => (
                 <option key={a} value={a}>
-                  {a}
+                  {actionLabels[a] ?? a}
                 </option>
               ))}
             </select>
@@ -127,7 +144,7 @@ export function AuditBoard() {
               <option value="">{t('allTypes')}</option>
               {ENTITY_TYPES.map((e) => (
                 <option key={e} value={e}>
-                  {e}
+                  {entityTypeLabels[e] ?? e}
                 </option>
               ))}
             </select>

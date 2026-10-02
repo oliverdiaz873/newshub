@@ -130,3 +130,30 @@ test('reviewer reads history without restore action', async ({ page }) => {
   const del = await fetch(`${API}/articles/${id}`, { method: 'DELETE', headers });
   if (!del.ok) throw new Error(`cleanup delete failed: ${del.status}`);
 });
+
+/**
+ * P2-2: the audit filter catalog exposes every backend action/entity
+ * type with translated labels (no data dependency: options only).
+ */
+test('audit log filter catalog exposes planning and webhook options', async ({ page }) => {
+  await useApiSession(page);
+  await page.goto(`${DASHBOARD}/audit-log`, { waitUntil: 'domcontentloaded' });
+  const action = page.getByLabel('Acción', { exact: true });
+  await expect(action).toBeVisible({ timeout: 30_000 });
+  for (const label of [
+    'Enviar a revisión',
+    'Aviso de vencimiento',
+    'Aviso de atraso',
+    'Suscribir webhook',
+    'Actualizar webhook',
+    'Rotar secreto',
+    'Desuscribir webhook',
+    'Probar webhook',
+  ]) {
+    await expect(action.locator('option', { hasText: label })).toHaveCount(1);
+  }
+  const entityType = page.getByLabel('Tipo', { exact: true });
+  for (const label of ['Planificación', 'Webhook']) {
+    await expect(entityType.locator('option', { hasText: label })).toHaveCount(1);
+  }
+});

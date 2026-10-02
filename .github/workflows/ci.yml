@@ -46,6 +46,7 @@ jobs:
 
       - run: npm ci
       - run: node ../../scripts/audit-gate.mjs
+      - run: node ../../scripts/audit-filter-guard.mjs
       - run: npm run lint
       - run: npm run type-check
       - run: npm run build
