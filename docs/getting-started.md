@@ -17,7 +17,8 @@ all four `node_modules/` trees already exist.
 
 - Node.js 22+ and npm (uses each app's committed `package-lock.json`).
 - PostgreSQL 17+ with three databases: `newshub_dev`, `newshub_test`,
-  `newshub_e2e` (see Database).
+  `newshub_e2e` (see Database). The local setup uses a user-space instance
+  on the non-default port `5433` (see `apps/api/.env.example`).
 - No global tools required; Playwright browsers install via `npx`.
 
 ## Installation
@@ -39,8 +40,13 @@ Copy each `.env.example` to its local file and adjust hosts/ports:
 |---|---|---|
 | api | `apps/api/.env` | `DATABASE_URL` (dev DB), `TEST_DATABASE_URL` (jest e2e), `PORT=3001`, `JWT_SECRET`, `DASHBOARD_URL`, `STOREFRONT_URL`, `API_PUBLIC_URL` |
 | storefront | `apps/storefront/.env.local` | `NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1` |
-| dashboard | `apps/dashboard/.env.local` | `NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1` |
-| e2e | `apps/e2e/.env` | `E2E_API_URL`, `E2E_*_PASSWORD`, `E2E_JWT_SECRET` (no fallback) |
+| dashboard | `apps/dashboard/.env.local` | `NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1`, `NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3000` |
+| e2e | `apps/e2e/.env.e2e` (gitignored, exported) | `E2E_DATABASE_URL`, `E2E_*_EMAIL`/`E2E_*_PASSWORD`, `E2E_JWT_SECRET` (required, no fallback), optional `E2E_API_URL` |
+
+`DASHBOARD_URL` is the CORS origin the API allows for cookie-based
+refresh (`apps/api/src/main.ts`). Its default is
+`http://localhost:3212` (the E2E dashboard), so local dashboard
+development on `:3002` must override it to `http://localhost:3002`.
 
 ## Development
 
@@ -64,7 +70,7 @@ Port map (dev vs E2E are intentionally different):
 
 ```bash
 cd apps/api
-npx prisma migrate deploy   # apply migrations (14 up to date)
+npx prisma migrate deploy   # apply migrations (15 up to date)
 npx prisma generate         # regenerate Prisma Client
 npm run prisma:seed         # seed dev data (tsx prisma/seed.ts)
 ```
