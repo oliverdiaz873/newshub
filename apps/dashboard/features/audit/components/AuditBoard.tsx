@@ -39,13 +39,69 @@ const ACTIONS = [
   'media.upload',
   'media.delete',
   'media.delete_blocked',
+  'assign',
+  'start',
+  'submit',
+  'complete',
+  'cancel',
+  'reopen',
+  'notify.due-soon',
+  'notify.overdue',
+  'webhook.subscribe',
+  'webhook.update',
+  'webhook.rotate',
+  'webhook.unsubscribe',
+  'webhook.ping',
 ];
 
-const ENTITY_TYPES = ['article', 'opinion', 'media', 'user'];
+const ENTITY_TYPES = ['article', 'opinion', 'media', 'user', 'planning', 'webhook'];
 
 export function AuditBoard() {
   const t = useTranslations('audit');
   const tc = useTranslations('common');
+  // Translated filter labels keyed by code (flat keys: dots/dashes are
+  // invalid in message keys). Raw codes stay the option values and the
+  // fallback so an unmapped code is still selectable and visible.
+  const actionLabels: Record<string, string> = {
+    create: t('action_create'),
+    update: t('action_update'),
+    delete: t('action_delete'),
+    publish: t('action_publish'),
+    unpublish: t('action_unpublish'),
+    archive: t('action_archive'),
+    restore: t('action_restore'),
+    reject: t('action_reject'),
+    'schedule.set': t('action_schedule_set'),
+    'schedule.clear': t('action_schedule_clear'),
+    'revision.restore': t('action_revision_restore'),
+    login: t('action_login'),
+    logout: t('action_logout'),
+    'login.failed': t('action_login_failed'),
+    'media.upload': t('action_media_upload'),
+    'media.delete': t('action_media_delete'),
+    'media.delete_blocked': t('action_media_delete_blocked'),
+    assign: t('action_assign'),
+    start: t('action_start'),
+    submit: t('action_submit'),
+    complete: t('action_complete'),
+    cancel: t('action_cancel'),
+    reopen: t('action_reopen'),
+    'notify.due-soon': t('action_notify_due_soon'),
+    'notify.overdue': t('action_notify_overdue'),
+    'webhook.subscribe': t('action_webhook_subscribe'),
+    'webhook.update': t('action_webhook_update'),
+    'webhook.rotate': t('action_webhook_rotate'),
+    'webhook.unsubscribe': t('action_webhook_unsubscribe'),
+    'webhook.ping': t('action_webhook_ping'),
+  };
+  const entityTypeLabels: Record<string, string> = {
+    article: t('type_article'),
+    opinion: t('type_opinion'),
+    media: t('type_media'),
+    user: t('type_user'),
+    planning: t('type_planning'),
+    webhook: t('type_webhook'),
+  };
   const searchParams = useSearchParams();
   const { apiFetch } = useAuth();
 
@@ -116,7 +172,7 @@ export function AuditBoard() {
               <option value="">{t('allActions')}</option>
               {ACTIONS.map((a) => (
                 <option key={a} value={a}>
-                  {a}
+                  {actionLabels[a] ?? a}
                 </option>
               ))}
             </select>
@@ -127,7 +183,7 @@ export function AuditBoard() {
               <option value="">{t('allTypes')}</option>
               {ENTITY_TYPES.map((e) => (
                 <option key={e} value={e}>
-                  {e}
+                  {entityTypeLabels[e] ?? e}
                 </option>
               ))}
             </select>

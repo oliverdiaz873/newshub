@@ -130,3 +130,35 @@ test('reviewer reads history without restore action', async ({ page }) => {
   const del = await fetch(`${API}/articles/${id}`, { method: 'DELETE', headers });
   if (!del.ok) throw new Error(`cleanup delete failed: ${del.status}`);
 });
+
+/**
+ * P2-2: the audit filter catalog exposes every backend action/entity
+ * type with translated labels (no data dependency: options only).
+ */
+test('audit log filter catalog exposes planning and webhook options', async ({ page }) => {
+  await useApiSession(page);
+  await page.goto(`${DASHBOARD}/audit-log`, { waitUntil: 'domcontentloaded' });
+  // Board rendered (proves page + locale); the filter selects follow.
+  await expect(page.getByRole('heading', { name: 'Auditoría' })).toBeVisible({ timeout: 30_000 });
+  const selects = page.getByRole('combobox');
+  await expect(selects).toHaveCount(2);
+  const action = selects.first();
+  for (const label of [
+    'Enviar a revisión',
+    'Aviso de vencimiento',
+    'Aviso de atraso',
+    'Suscribir webhook',
+    'Actualizar webhook',
+    'Rotar secreto',
+    'Desuscribir webhook',
+    'Probar webhook',
+  ]) {
+    // Anchored regex: exact option text ('Suscribir webhook' is a
+    // substring of 'Desuscribir webhook', so plain hasText matches two).
+    await expect(action.locator('option', { hasText: new RegExp(`^${label}$`) })).toHaveCount(1);
+  }
+  const entityType = selects.nth(1);
+  for (const label of ['Planificación', 'Webhook']) {
+    await expect(entityType.locator('option', { hasText: new RegExp(`^${label}$`) })).toHaveCount(1);
+  }
+});
