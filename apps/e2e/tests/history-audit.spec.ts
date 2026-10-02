@@ -138,8 +138,11 @@ test('reviewer reads history without restore action', async ({ page }) => {
 test('audit log filter catalog exposes planning and webhook options', async ({ page }) => {
   await useApiSession(page);
   await page.goto(`${DASHBOARD}/audit-log`, { waitUntil: 'domcontentloaded' });
-  const action = page.getByLabel('Acción', { exact: true });
-  await expect(action).toBeVisible({ timeout: 30_000 });
+  // Board rendered (proves page + locale); the filter selects follow.
+  await expect(page.getByRole('heading', { name: 'Auditoría' })).toBeVisible({ timeout: 30_000 });
+  const selects = page.getByRole('combobox');
+  await expect(selects).toHaveCount(2);
+  const action = selects.first();
   for (const label of [
     'Enviar a revisión',
     'Aviso de vencimiento',
@@ -152,7 +155,7 @@ test('audit log filter catalog exposes planning and webhook options', async ({ p
   ]) {
     await expect(action.locator('option', { hasText: label })).toHaveCount(1);
   }
-  const entityType = page.getByLabel('Tipo', { exact: true });
+  const entityType = selects.nth(1);
   for (const label of ['Planificación', 'Webhook']) {
     await expect(entityType.locator('option', { hasText: label })).toHaveCount(1);
   }
