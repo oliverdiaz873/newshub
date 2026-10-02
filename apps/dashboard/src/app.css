@@ -187,9 +187,11 @@ body {
 
 .nh-sidebar-brand strong {
   flex: 1;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.15rem;
-  letter-spacing: -0.01em;
+  font-family: 'Domine', Georgia, serif;
+  font-size: 1.4375rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  margin: 0;
 }
 
 .nh-sidebar-group {
