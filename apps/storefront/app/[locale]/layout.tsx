@@ -59,12 +59,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     icons: {
       icon: [
-        { url: '/favicon16x16.jpg', sizes: '16x16', type: 'image/jpeg' },
-        { url: '/favicon32x32.jpg', sizes: '32x32', type: 'image/jpeg' },
-        { url: '/favicon48x48.jpg', sizes: '48x48', type: 'image/jpeg' },
+        { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+        { url: '/favicon.ico', sizes: 'any' },
       ],
-      shortcut: { url: '/favicon32x32.jpg', type: 'image/jpeg' },
-      apple: { url: '/favicon48x48.jpg', sizes: '48x48', type: 'image/jpeg' },
+      shortcut: { url: '/favicon.ico', type: 'image/x-icon' },
+      apple: { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
     },
     openGraph: {
       type: 'website',
