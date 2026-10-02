@@ -25,6 +25,11 @@ below are the remaining known debts.
 - `Priority: Unclassified` - no historical priority; needs a future
   decision before any work.
 - `Deferred` / `STALE` / `RISK` are descriptive states, not rankings.
+- `Known flaky` - timing-sensitive test issue, handled by rerun policy
+  (see rule 6); never fixed by blind spec tweaks.
+
+IDs are permanent and never reused: gaps in the numbering (TD-018/019,
+TD-022…TD-029) are unused numbers, not deleted entries.
 
 ## Active Technical Debt
 
