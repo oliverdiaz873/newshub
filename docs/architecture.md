@@ -63,10 +63,11 @@ Dev on `:3002` (E2E serves it on `:3212`).
 ## Storefront (`apps/storefront`)
 
 Next.js `16` App Router bilingual (015, `es` default via `next-intl`) public
-site, **API-first**: pages fetch `GET {NEXT_PUBLIC_API_URL}/api/v1`
-(`next.revalidate: 60`); `src/data/` holds only TypeScript types under
-ADR-012 quarantine (boundary enforced, deletion gate F6 pending). Home is
-API-only — fetch failure reaches the error boundary, never stale local data.
+site, **API-first**: pages fetch `NEXT_PUBLIC_API_URL` (already includes
+`/api/v1`; `next.revalidate: 60`); `src/data/` holds only TypeScript types under
+ADR-012 quarantine (boundary enforced, deletion gate F6 pending). When the
+variable is unset, the storefront renders from the local static data layer
+(development fallback); fetch failures otherwise reach the error boundary.
 Detail routes keep `notFound()` semantics; `next/image` uses remote patterns
 derived from the API URL.
 
@@ -100,7 +101,7 @@ Playwright MCP exists solely as exploration/debugging infrastructure
 
 PostgreSQL is the persistence source of truth; Prisma mirrors it
 (`prisma migrate deploy`, `prisma generate`, `tsx prisma/seed.ts`;
-14 migrations applied). Documented end to end in `apps/api/docs/`:
+ 15 migrations applied). Documented end to end in `apps/api/docs/`:
 business rules (BR-001…BR-023), conceptual/logical/physical models,
 retention policy (BR-023: terminal webhook deliveries 30 days, actives
 never). Locales are data (`locales` table); content translations are weak
