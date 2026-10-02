@@ -1,6 +1,15 @@
 # Planning (P1 — newsroom)
 
+Status: IMPLEMENTED (model + API + board + calendar + review queue).
+Sections below are the original proposal, kept as design history.
+
 ## 1. Status
+
+Implemented as `PlanningItem` (`apps/api/prisma/schema.prisma`) with
+CRUD + transitions (`assign/start/submit/complete/cancel/reopen`) +
+calendar + review-queue endpoints, `/planning` board/form/calendar
+views, and assignment/due notifications. The `MISSING` paragraph
+below is the original pre-implementation finding.
 
 Everywhere `MISSING` (no model/service/route; grep `assign` returns zero content hits). Mockup has no planning surface (only hardcoded review queue on Home). Dashboard has none. This doc defines the target so Increment planning has a spec.
 

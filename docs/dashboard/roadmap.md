@@ -47,32 +47,29 @@ Order below is the proposal after audit (highest unblock-value first; P1 backend
 - Risks retired: executor choice (poll, no queue infra), DST (UTC + round-trip), ES-missing at execution (defensive check + retry).
 - DoD: §6 of `scheduling.md` satisfied (see doc for the review-only + no-error-field amendments).
 
-## Increment 6 — Revisions + Audit Log (P1)
+## Increment 6 — Revisions + Audit Log (P1) — DONE
 
 - Objective: version history + immutable audit trail (combined: both are append-only event systems sharing conventions).
-- Scope: `revisions` + `audit_events` migrations, emitters on all writes/transitions/schedule/media/auth events, History tab (view/diff/restore-as-new-version), `/audit-log` with filters + entity trail. Deps: Inc 1-2 (emitter points), Inc 5 (schedule events).
-- Risks: snapshot size, retention, performance. Gates: immutability tests, restore-creates-new-version test, index review.
-- DoD: §§5/4 of `revisions.md`/`audit-log.md`.
+- Shipped: `revisions` + `audit_events` migrations, emitters on writes/transitions/schedule/media/auth events, History tab (view/diff/restore-as-new-version), `/audit-log` with filters + entity trail. Deps: Inc 1-2 (emitter points), Inc 5 (schedule events).
+- DoD: §§5/4 of `revisions.md`/`audit-log.md` satisfied.
 
-## Increment 7 — Review / approval + Notifications (P1)
+## Increment 7 — Review / approval + Notifications (P1) — DONE
 
-- Objective: two-step approval (if adopted) + notification inbox.
-- Scope: reviewer role semantics, approve/reject with reason, inbox + unread badge + preferences, event wiring (review/publish/schedule/assign). Deps: Inc 2, 5-6.
-- API/DB: notifications tables + endpoints; possible guard updates for reviewer. Risks: channel creep — inbox first, mail/push deferred.
+- Objective: two-step approval + notification inbox.
+- Shipped: reviewer role semantics on reads/transitions, `reject` with reason persisted + notified, inbox + unread badge + preferences, event wiring (review/publish/schedule/assign). Deps: Inc 2, 5-6.
 - DoD: `notifications.md` §4; rejection reason persisted + notified.
 
-## Increment 8 — Planning (P1)
+## Increment 8 — Planning (P1) — DONE
 
 - Objective: implement `planning.md` (pitches/assignments/calendar/workload).
-- Scope: `planning_items` model + CRUD + transitions + calendar query, `/planning` views, assignment notifications, review-queue unification. Deps: Inc 5-7.
-- Risks: premature normalization; calendar complexity. Gates: scope to list+calendar first, board P2.
+- Shipped: `planning_items` model + CRUD + transitions + calendar query, `/planning` views, assignment notifications, review-queue unification. Deps: Inc 5-7.
 - DoD: assign→accept→draft-link flow; overdue surfacing; empty states.
 
-## Increment 9 — Analytics Tier 1 + SEO completeness (P1)
+## Increment 9 — Analytics Tier 1 + SEO completeness (P1) — DONE (Tier 1)
 
 - Objective: honest computed analytics + completeness meter without new infra.
-- Scope: Overview KPIs from list endpoints (documented Tier 1), category counts, locale coverage, activity, SEO meter (`UI/UX ONLY`). Deps: Inc 1-3.
-- Risks: metric misinterpretation — mitigate with source-tier labels. `OPEN DECISION`: chart lib (CSS/SVG default).
+- Shipped: Overview KPIs from list endpoints (documented Tier 1), category counts, locale coverage, activity, SEO meter (`UI/UX ONLY`). Deps: Inc 1-3.
+- Open: chart lib (CSS/SVG default); Tier 2 events still require backend.
 - DoD: every metric labeled Tier 1; no fabricated trends.
 
 ## Increment 10 — Advanced newsroom (P2+)

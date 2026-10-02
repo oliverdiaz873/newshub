@@ -10,7 +10,11 @@
 > with **no error columns and no fifth status**; audit/notification
 > persistence deferred to Inc 6/7.
 
-Deep module. Concept only — fully `MISSING` in API + DB. Verified: grep `schedul|cron|queue|bull` in `apps/api/src` returns only a `publishing workflow` comment; `publishedAt` is output-only set to `now()` on transition; DTOs (`content-write.dto.ts`) carry no schedule field.
+Deep module. Implemented as built (see header). The `MISSING` paragraph
+below is the original pre-implementation finding, kept as design
+history: grep `schedul|cron|queue|bull` in `apps/api/src` returned
+only a `publishing workflow` comment at the time; `publishedAt` was
+output-only; DTOs carried no schedule field.
 
 ## 1. Definitions
 

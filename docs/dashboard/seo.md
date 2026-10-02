@@ -13,8 +13,8 @@
 | Description (`summary`) | EXISTS | Required ES; length hint |
 | Slug | EXISTS (unique per locale) | Format-enforced + `slug_taken` surfacing; uniqueness check affordance |
 | Locale + translation status | EXISTS (`es` required, fallback flag) | ES/EN presence badges + missing-EN nudge (no blocking) |
-| Image / OG image | `coverMediaId` + `coverAlt` EXISTS | Preview with alt-required nudge; dimensions check via media metadata |
-| Publish date / updated date | `publishedAt` (first, immutable) + `updatedAt` EXISTS | Display First published + Last updated separately; scheduled date shown once scheduling lands |
+| Image / OG image | `coverMediaId` EXISTS; `coverAlt` exists in DB but dashboard shows it neutral (unmanaged) | Preview (alt shown as `–` when absent, not required); dimensions check via media metadata |
+| Publish date / updated date | `publishedAt` (first, immutable) + `updatedAt` EXISTS | Display First published + Last updated separately; scheduled date shown via `ScheduleSection` |
 | Canonical | MISSING concept | `OPEN DECISION`: derived from slug (proposal) vs editable field; no custom canonical in P0 |
 | Structured-data considerations | none in dashboard | Checklist hints (type coverage by category) — `UI/UX ONLY`, P1 |
 | Content completeness | none | Completeness meter (title/summary/cover/alt/EN present) computed client-side from existing fields — `UI/UX ONLY`, no backend |
