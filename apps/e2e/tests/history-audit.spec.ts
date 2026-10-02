@@ -153,10 +153,12 @@ test('audit log filter catalog exposes planning and webhook options', async ({ p
     'Desuscribir webhook',
     'Probar webhook',
   ]) {
-    await expect(action.locator('option', { hasText: label })).toHaveCount(1);
+    // Anchored regex: exact option text ('Suscribir webhook' is a
+    // substring of 'Desuscribir webhook', so plain hasText matches two).
+    await expect(action.locator('option', { hasText: new RegExp(`^${label}$`) })).toHaveCount(1);
   }
   const entityType = selects.nth(1);
   for (const label of ['Planificación', 'Webhook']) {
-    await expect(entityType.locator('option', { hasText: label })).toHaveCount(1);
+    await expect(entityType.locator('option', { hasText: new RegExp(`^${label}$`) })).toHaveCount(1);
   }
 });
