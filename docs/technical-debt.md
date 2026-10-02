@@ -357,6 +357,65 @@ below are the remaining known debts.
 - Notes:
   Do not "fix" without a decision.
 
+### TD-017 - Professional Breaking News System (future feature)
+
+- Area: Editorial Infrastructure (future feature, not a defect)
+- Priority: P2
+- Status: Deferred (document now; build when active development resumes)
+- Scope: Dashboard + API + Storefront + E2E
+- Introduced by: N/A (deferred feature, never implemented)
+- Related PR/commit: none
+- Evidence (current state vs missing workflow):
+  - EXISTS as presentation only: storefront
+    `features/news/components/BreakingNewsBanner/` (marquee fed by an
+    article list; labels "ÚLTIMA HORA"/"BREAKING NEWS") and a
+    per-article `isBreaking` boolean (`schema.prisma`,
+    API filters/DTOs, dashboard checkboxes, revision snapshots).
+  - MISSING as an editorial system: no alert entity/table, no explicit
+    editorial activation/deactivation, no expiry, no priority, no
+    deterministic ordering of multiple alerts, no RBAC-gated
+    management UI, no audit trail, no dedicated endpoint, no freshness
+    strategy, no E2E.
+  - The current banner is therefore a display surface over article
+    flags, not a managed newsroom capability. References to large news
+    organizations (e.g. CNN/Fox News patterns) are UX/workflow
+    references only; nothing is copied from them.
+- Current impact:
+  Editors cannot publish, prioritize, expire, or audit breaking alerts
+  as first-class objects; "breaking" is only a per-article flag.
+- Why deferred:
+  A correct implementation spans editorial model + API + dashboard +
+  permissions + scheduling + audit + storefront freshness + E2E. A
+  visual-only patch would entrench the wrong model, so this waits for
+  a dedicated feature increment.
+- Future action (requirements to evaluate at design time, not a build
+  list): alert creation; explicit editorial activate/deactivate;
+  optional article association (including alert-without-article);
+  ES/EN; editorial priority; publication state; scheduling; expiry;
+  role permissions; auditability; deterministic multi-alert order;
+  API as data source; loading/empty/error states; responsive;
+  accessibility; deterministic E2E.
+- Notes:
+  - Keep `Article` and `Breaking News Alert` conceptually separate: an
+    article may back an alert, but breaking state must not be assumed
+    from article existence alone.
+  - Conceptual lifecycle only: editor activates → API validates →
+    alert active → storefront receives → surface updates → alert
+    expires/is deactivated/replaced → audit recorded.
+  - Freshness mechanism (cache revalidation, polling, SSE,
+    WebSockets) must be chosen at design time from expected update
+    frequency, required latency, traffic, and operational complexity;
+    no technology is pre-selected.
+  - Future acceptance: dashboard-managed; documented API contract;
+    fully API-driven storefront; server-side permissions; auditable
+    activation; deterministic expiry; defined/tested ES/EN;
+    deterministic ordering; loading/empty/error states; documented
+    update strategy; relevant E2E; zero hardcoded breaking content in
+    production.
+  - Integrations to review before building: Articles, Planning,
+    Scheduling, History, Audit Log, Auth/RBAC, storefront
+    caching/revalidation, ES/EN localization, E2E.
+
 ## Deferred Improvements (volume/evidence-gated)
 
 - TD-001 (panel pagination), TD-012 (picker scale): implement only
