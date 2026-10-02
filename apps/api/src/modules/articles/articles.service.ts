@@ -554,6 +554,29 @@ export class ArticlesService {
           message: `Cannot restore a published article. Unpublish it first.`,
         });
       }
+      // P2-1: snapshot relations may no longer exist (author/cover removed,
+      // category replaced and deleted). Fail closed with a domain error
+      // instead of hitting the DB foreign key with an opaque 500. The FK
+      // stays as backstop for a concurrent delete racing this check.
+      // Dangling relations are never sanitized to null: restore must either
+      // apply the snapshot faithfully or refuse.
+      const missing: Array<{ relation: string; id: string }> = [];
+      if (snap.categoryId != null && !(await this.categories.exists(snap.categoryId))) {
+        missing.push({ relation: 'category', id: snap.categoryId });
+      }
+      if (snap.authorId != null && !(await this.authors.exists(snap.authorId))) {
+        missing.push({ relation: 'author', id: snap.authorId });
+      }
+      if (snap.coverMediaId != null && !(await this.media.findById(snap.coverMediaId))) {
+        missing.push({ relation: 'cover', id: snap.coverMediaId });
+      }
+      if (missing.length > 0) {
+        throw new UnprocessableEntityException({
+          code: 'restore_relation_invalid',
+          error: 'Unprocessable Entity',
+          message: `Cannot restore revision ${version}: related ${missing.map((m) => `${m.relation} ${m.id}`).join(', ')} no longer exist.`,
+        });
+      }
       for (const t of snap.translations) {
         await this.articles.upsertTranslation(id, {
           locale: t.locale,

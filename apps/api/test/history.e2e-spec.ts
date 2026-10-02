@@ -25,6 +25,12 @@ function esDoc(slug: string, title = `Titulo suficiente para ${slug}`) {
   };
 }
 
+// 1x1 transparent PNG (mirrors media.e2e-spec.ts).
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64',
+);
+
 async function fixture() {
   await prisma.$executeRawUnsafe(
     'TRUNCATE "users", "authors", "categories", "articles", "opinions", "media_assets", "user_credentials", "refresh_tokens", "revisions", "audit_events" RESTART IDENTITY CASCADE',
@@ -752,5 +758,191 @@ describe('history: revisions + audit (e2e)', () => {
       .set('Authorization', auth)
       .expect(200);
     expect(missing.body.data).toEqual([]);
+  });
+
+  it('rejects restore when the snapshot author no longer exists (422)', async () => {
+    const auth = `Bearer ${await token()}`;
+    const author = await request(app.getHttpServer())
+      .post('/api/v1/authors')
+      .set('Authorization', auth)
+      .send({ slug: 'hist-fantasma', translations: [{ locale: 'es', name: 'Fantasma' }] })
+      .expect(201);
+    const authorId = author.body.id as string;
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/articles')
+      .set('Authorization', auth)
+      .send({ categoryId, authorId, translations: [esDoc('hist-no-author')] })
+      .expect(201);
+    const id = created.body.id as string;
+    // Deleting the author nulls the live reference (SET NULL); v1 still points at it.
+    await request(app.getHttpServer()).delete(`/api/v1/authors/${authorId}`).set('Authorization', auth).expect(204);
+    const live = await prisma.article.findUnique({ where: { id }, select: { authorId: true } });
+    expect(live?.authorId).toBeNull();
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/v1/articles/${id}/revisions/1/restore`)
+      .set('Authorization', auth)
+      .expect(422);
+    expect(res.body.code).toBe('restore_relation_invalid');
+    expect(res.body.detail as string).toContain('author');
+    expect(res.body.detail as string).toContain(authorId);
+
+    // Rejected restore records nothing and changes nothing.
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([1]);
+    const trail = await audit(auth, `?entityType=article&entityId=${id}&action=revision.restore`);
+    expect(trail).toHaveLength(0);
+
+    await request(app.getHttpServer()).delete(`/api/v1/articles/${id}`).set('Authorization', auth).expect(204);
+  });
+
+  it('rejects restore when the snapshot cover no longer exists (422)', async () => {
+    const auth = `Bearer ${await token()}`;
+    const up = await request(app.getHttpServer())
+      .post('/api/v1/media')
+      .set('Authorization', auth)
+      .attach('file', PNG, { filename: 'hist-cover.png', contentType: 'image/png' })
+      .expect(201);
+    const mid = up.body.id as string;
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/articles')
+      .set('Authorization', auth)
+      .send({ categoryId, coverMediaId: mid, translations: [esDoc('hist-no-cover')] })
+      .expect(201);
+    const id = created.body.id as string;
+    // Unlink first (linked media cannot be deleted), then remove the file.
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ coverMediaId: null })
+      .expect(200);
+    await request(app.getHttpServer()).delete(`/api/v1/media/${mid}`).set('Authorization', auth).expect(204);
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/v1/articles/${id}/revisions/1/restore`)
+      .set('Authorization', auth)
+      .expect(422);
+    expect(res.body.code).toBe('restore_relation_invalid');
+    expect(res.body.detail as string).toContain('cover');
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([2, 1]);
+
+    await request(app.getHttpServer()).delete(`/api/v1/articles/${id}`).set('Authorization', auth).expect(204);
+  });
+
+  it('rejects restore when the snapshot category no longer exists (422)', async () => {
+    const auth = `Bearer ${await token()}`;
+    const mkCat = async (slug: string) =>
+      (await request(app.getHttpServer())
+        .post('/api/v1/categories')
+        .set('Authorization', auth)
+        .send({ translations: [{ locale: 'es', slug, label: slug }] })
+        .expect(201)).body.id as string;
+    const catOld = await mkCat('hist-vieja');
+    const catNew = await mkCat('hist-nueva');
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/articles')
+      .set('Authorization', auth)
+      .send({ categoryId: catOld, translations: [esDoc('hist-no-cat')] })
+      .expect(201);
+    const id = created.body.id as string;
+    // Move away so the old category becomes deletable (Restrict otherwise).
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ categoryId: catNew })
+      .expect(200);
+    await request(app.getHttpServer()).delete(`/api/v1/categories/${catOld}`).set('Authorization', auth).expect(204);
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/v1/articles/${id}/revisions/1/restore`)
+      .set('Authorization', auth)
+      .expect(422);
+    expect(res.body.code).toBe('restore_relation_invalid');
+    expect(res.body.detail as string).toContain('category');
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([2, 1]);
+
+    await request(app.getHttpServer()).delete(`/api/v1/articles/${id}`).set('Authorization', auth).expect(204);
+    await request(app.getHttpServer()).delete(`/api/v1/categories/${catNew}`).set('Authorization', auth).expect(204);
+  });
+
+  it('reports every missing relation, not just the first (422)', async () => {
+    const auth = `Bearer ${await token()}`;
+    const author = await request(app.getHttpServer())
+      .post('/api/v1/authors')
+      .set('Authorization', auth)
+      .send({ slug: 'hist-doble', translations: [{ locale: 'es', name: 'Doble' }] })
+      .expect(201);
+    const authorId = author.body.id as string;
+    const up = await request(app.getHttpServer())
+      .post('/api/v1/media')
+      .set('Authorization', auth)
+      .attach('file', PNG, { filename: 'hist-doble.png', contentType: 'image/png' })
+      .expect(201);
+    const mid = up.body.id as string;
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/articles')
+      .set('Authorization', auth)
+      .send({ categoryId, authorId, coverMediaId: mid, translations: [esDoc('hist-doble')] })
+      .expect(201);
+    const id = created.body.id as string;
+    await request(app.getHttpServer())
+      .patch(`/api/v1/articles/${id}`)
+      .set('Authorization', auth)
+      .send({ authorId, coverMediaId: null })
+      .expect(200);
+    await request(app.getHttpServer()).delete(`/api/v1/authors/${authorId}`).set('Authorization', auth).expect(204);
+    await request(app.getHttpServer()).delete(`/api/v1/media/${mid}`).set('Authorization', auth).expect(204);
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/v1/articles/${id}/revisions/1/restore`)
+      .set('Authorization', auth)
+      .expect(422);
+    expect(res.body.code).toBe('restore_relation_invalid');
+    expect(res.body.detail as string).toContain('author');
+    expect(res.body.detail as string).toContain('cover');
+    expect(res.body.detail as string).toContain(authorId);
+    expect(res.body.detail as string).toContain(mid);
+    expect((await revisions(auth, id)).map((r) => r.version)).toEqual([2, 1]);
+
+    await request(app.getHttpServer()).delete(`/api/v1/articles/${id}`).set('Authorization', auth).expect(204);
+  });
+
+  it('rejects opinion restore when the snapshot author no longer exists (422 parity)', async () => {
+    const auth = `Bearer ${await token()}`;
+    const author = await request(app.getHttpServer())
+      .post('/api/v1/authors')
+      .set('Authorization', auth)
+      .send({ slug: 'hist-op-fantasma', translations: [{ locale: 'es', name: 'Fantasma Op' }] })
+      .expect(201);
+    const ghostId = author.body.id as string;
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/opinions')
+      .set('Authorization', auth)
+      .send({ authorId: ghostId, translations: [esDoc('hist-op-no-author')] })
+      .expect(201);
+    const id = created.body.id as string;
+    // Reassign so the ghost author becomes deletable (opinions Restrict).
+    await request(app.getHttpServer())
+      .patch(`/api/v1/opinions/${id}`)
+      .set('Authorization', auth)
+      .send({ authorId })
+      .expect(200);
+    await request(app.getHttpServer()).delete(`/api/v1/authors/${ghostId}`).set('Authorization', auth).expect(204);
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/v1/opinions/${id}/revisions/1/restore`)
+      .set('Authorization', auth)
+      .expect(422);
+    expect(res.body.code).toBe('restore_relation_invalid');
+    expect(res.body.detail as string).toContain('author');
+
+    const list = await request(app.getHttpServer())
+      .get(`/api/v1/opinions/${id}/revisions`)
+      .set('Authorization', auth)
+      .expect(200);
+    expect((list.body.data as Array<{ version: number }>).map((r) => r.version)).toEqual([2, 1]);
+    const trail = await audit(auth, `?entityType=opinion&entityId=${id}&action=revision.restore`);
+    expect(trail).toHaveLength(0);
+
+    await request(app.getHttpServer()).delete(`/api/v1/opinions/${id}`).set('Authorization', auth).expect(204);
   });
 });
