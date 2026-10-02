@@ -135,7 +135,7 @@ export function Sidebar({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo-sidebar.png" alt="" width={40} height={40} />
         </span>
-        <strong>Newshub</strong>
+        <strong>NewsHub</strong>
         <button
           className="nh-icon-btn side-toggle"
           type="button"
