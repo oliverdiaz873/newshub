@@ -149,6 +149,75 @@ report('dashboard actions with no backend emitter', extraActions);
 report('backend entity types missing from dashboard catalog', missingTypes);
 report('dashboard entity types with no backend emitter', extraTypes);
 
+// Label coverage (P2-2 approval: codes stay identifiers, users see
+// translated text). Convention: flat keys `action_<code>` / `type_<code>`
+// with dots/dashes sanitized to underscores (dots are invalid in
+// next-intl message keys). Every catalog value needs its key in both
+// locales; the board falls back to the raw code at runtime.
+const labelKey = (prefix, code) => `${prefix}_${code.replace(/[.-]/g, '_')}`;
+const MESSAGES = join(ROOT, 'apps', 'dashboard', 'src', 'messages');
+const esAudit = JSON.parse(readFileSync(join(MESSAGES, 'es.json'), 'utf8')).audit;
+const enAudit = JSON.parse(readFileSync(join(MESSAGES, 'en.json'), 'utf8')).audit;
+for (const locale of ['es', 'en']) {
+  const audit = locale === 'es' ? esAudit : enAudit;
+  for (const a of [...dashboardActions].sort()) {
+    if (typeof audit[labelKey('action', a)] !== 'string') {
+      failed = true;
+      console.error(`missing ${locale} label: audit.${labelKey('action', a)} (action '${a}')`);
+    }
+  }
+  for (const e of [...dashboardTypes].sort()) {
+    if (typeof audit[labelKey('type', e)] !== 'string') {
+      failed = true;
+      console.error(`missing ${locale} label: audit.${labelKey('type', e)} (entity type '${e}')`);
+    }
+  }
+}
+// The board must reference exactly the conventional keys (a typo in a
+// t('...') literal would silently fall back to the raw code at runtime).
+{
+  const used = new Set();
+  const re = /t\('(action_[a-z_]+|type_[a-z_]+)'\)/g;
+  let m;
+  while ((m = re.exec(board)) !== null) used.add(m[1]);
+  const expected = new Set([
+    ...[...dashboardActions].map((a) => labelKey('action', a)),
+    ...[...dashboardTypes].map((e) => labelKey('type', e)),
+  ]);
+  for (const key of [...expected].sort()) {
+    if (!used.has(key)) {
+      failed = true;
+      console.error(`board never renders label key: audit.${key}`);
+    }
+  }
+  for (const key of [...used].sort()) {
+    if (!expected.has(key) && (key.startsWith('action_') || key.startsWith('type_'))) {
+      failed = true;
+      console.error(`board references unexpected label key: audit.${key}`);
+    }
+  }
+}
+
+// Message key syntax: next-intl rejects '.' in keys at runtime (it
+// expresses nesting). Build/lint do not catch it, so guard it here.
+function dottedKeys(node, path, out) {
+  if (node !== null && typeof node === 'object') {
+    for (const [key, value] of Object.entries(node)) {
+      if (key.includes('.')) out.push(path ? `${path}.${key}` : key);
+      dottedKeys(value, path ? `${path}.${key}` : key, out);
+    }
+  }
+  return out;
+}
+for (const locale of ['es', 'en']) {
+  const messages = JSON.parse(readFileSync(join(MESSAGES, `${locale}.json`), 'utf8'));
+  const bad = dottedKeys(messages, '', []);
+  if (bad.length > 0) {
+    failed = true;
+    console.error(`dotted message keys in ${locale}.json (invalid at next-intl runtime): ${bad.join(', ')}`);
+  }
+}
+
 if (failed) {
   console.error('audit-filter-guard: DRIFT DETECTED');
   process.exit(1);
