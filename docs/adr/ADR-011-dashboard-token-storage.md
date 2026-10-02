@@ -4,7 +4,7 @@ Status: Accepted
 Date-Proposed: 2026-09-09
 Date-Accepted: 2026-09-09
 Owner/Deciders: Oliver (Arch) + agent (draft)
-Refs: ADR-010 (auth mechanism), `apps/dashboard/src/lib/auth.tsx`
+Refs: ADR-010 (auth mechanism), `apps/dashboard/shared/api/auth.tsx`
 
 ## Context
 
