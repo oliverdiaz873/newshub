@@ -656,6 +656,7 @@
     "type_user": "Usuario",
     "type_planning": "Planificación",
     "type_webhook": "Webhook",
+    "system": "sistema",
     "entityId": "ID de entidad",
     "actorId": "ID de actor",
     "from": "Desde",

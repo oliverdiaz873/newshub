@@ -197,6 +197,24 @@ for (const locale of ['es', 'en']) {
     }
   }
 }
+// Every t('...') key the board renders (any namespace section it owns)
+// must exist in both locales: deleting a key breaks the page at runtime,
+// which build/lint do not catch.
+{
+  const used = new Set();
+  const re = /(?<![\w.])t\('([A-Za-z0-9_]+)'\)/g;
+  let m;
+  while ((m = re.exec(board)) !== null) used.add(m[1]);
+  for (const locale of ['es', 'en']) {
+    const audit = locale === 'es' ? esAudit : enAudit;
+    for (const key of [...used].sort()) {
+      if (typeof audit[key] !== 'string') {
+        failed = true;
+        console.error(`board renders missing ${locale} key: audit.${key}`);
+      }
+    }
+  }
+}
 
 // Message key syntax: next-intl rejects '.' in keys at runtime (it
 // expresses nesting). Build/lint do not catch it, so guard it here.
