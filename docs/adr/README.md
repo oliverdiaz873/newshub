@@ -10,6 +10,9 @@ Decision log for Newshub. Source templates live in
 | ADR-011 | Dashboard access-token storage & silent restore | Accepted | 2026-09-09 | — |
 | ADR-012 | Editorial single source of truth | Proposed | 2026-09-10 | — |
 | ADR-013 | Authors keeps inline create/edit (no `/authors/new`) | Proposed | 2026-09-30 | — |
+| ADR-014 | History skips no-op PATCH | Proposed | 2026-10-01 | — |
+| ADR-015 | Revision restore on archived content preserves status | Proposed | 2026-10-01 | — |
+| ADR-016 | Revision restore rejects dangling snapshot relations (422) | Proposed | 2026-10-01 | — |
 
 ## Status Legend
 
