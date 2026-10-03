@@ -69,6 +69,20 @@ Run the gates for every app touched (from its own directory):
 
 ## Language
 
-Technical repository documentation stays in English. Keep names,
-IDs (`BR-XXX`, `TD-XXX`, `ADR-NNN`), and conventions as-is; never
-renumber historical IDs.
+Repository technical documentation is written in English. The
+STANDARD covers: Architecture, ADRs, Source of Truth, Security,
+Deployment, Feature specifications, Technical Debt, Business Rules.
+
+LEGACY exception: the following pre-existing Spanish documents are
+accepted as legacy and must not be translated for consistency alone:
+
+- `apps/api/docs/*` (business rules and data-model notes)
+- `apps/e2e/docs/*` (E2E coverage and MCP notes)
+- `docs/dashboard/feature-architecture.md` and
+  `docs/storefront/feature-architecture.md` (migration-era rulebooks)
+
+New documents follow the STANDARD. Personal working notes kept
+outside the repository may use any language.
+
+Keep names, IDs (`BR-XXX`, `TD-XXX`, `ADR-NNN`), and conventions
+as-is; never renumber historical IDs.
