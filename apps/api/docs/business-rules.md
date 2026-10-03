@@ -15,7 +15,7 @@ Regla de evidencia:
 - Una regla solo se documenta como `BR-XXX` si hay evidencia suficiente en `schema.prisma`, migraciones SQL, repositories, services, controllers, DTOs, guards o configuración relevante.
 - El código y la base de datos son evidencia primaria. Cuando la documentación contradice al código, se documenta la discrepancia (caso real: `docs/architecture.md`, `docs/folder-structure.md` y `docs/getting-started.md` describen un monolito Next.js sin backend/DB; el código real es un monorepo con `apps/api` NestJS + Postgres + Prisma; la documentación vigente real está en `docs/adr/ADR-012-*`, `docs/features/*`, `docs/dashboard/*`, `docs/storefront/*`).
 - No se convierte cada validación trivial de DTO (formato de email, longitud mínima) en regla de negocio. `email con formato válido` es validación; `email no duplicable` sí es regla.
-- Numeración `BR-001…BR-022` estable. Las candidatas iniciales se confirmaron contra evidencia: se agrupó `BR-003` en variantes, se reclasificó `BR-009` como restricción de dominio de soporte, se eliminó la candidata `BR-023` (timestamps) como regla independiente por no existir una regla que exija esos campos por sí mismos (ver §7), y se verificó la semántica exacta de notificaciones (BR-019) y webhooks (BR-020) antes de afirmarlas.
+- Numeración `BR-001…BR-023` estable. Las candidatas iniciales se confirmaron contra evidencia: se agrupó `BR-003` en variantes, se reclasificó `BR-009` como restricción de dominio de soporte, se descartó `timestamps` como regla independiente sin asignarle ID (no existía regla que exigiera esos campos por sí mismos, ver §7), y el ID `BR-023` corresponde a retención de deliveries (R-1, `syndication-retention.md`). Se verificó la semántica exacta de notificaciones (BR-019) y webhooks (BR-020) antes de afirmarlas.
 - Estados posibles por regla: `Cumple` (existe y hay garantía adecuada con evidencia), `Parcial` (existe pero la garantía es incompleta), `Riesgo` (diseño intencional con pérdida aceptada o carrera documentada), `N/A` (dominio no implementado), `Necesita investigación` (evidencia insuficiente, no se afirma inexistencia).
 
 ### Nota de vigencia (serie física 2026-09-22)
@@ -248,9 +248,9 @@ Decisión (precisión aprobada): estos CHECKs son **restricciones de dominio/sop
 
 ## 7. Gaps y riesgos
 
-### Cumple (22 reglas)
+### Cumple (23 reglas)
 
-BR-001…BR-022 con evidencia citada. Garantizadas por PostgreSQL: BR-001…BR-008 (parcial), BR-011, BR-016 (unicidad), BR-020 (unicidad), BR-021. Garantizadas principalmente por NestJS: BR-010, BR-012…BR-015, BR-017…BR-019. Multicapa (BD + API): BR-001…BR-003, BR-005…BR-008, BR-013…BR-014, BR-016, BR-020…BR-021.
+BR-001…BR-023 con evidencia citada. Garantizadas por PostgreSQL: BR-001…BR-008 (parcial), BR-011, BR-016 (unicidad), BR-020 (unicidad), BR-021. Garantizadas principalmente por NestJS: BR-010, BR-012…BR-015, BR-017…BR-019, BR-022, BR-023. Multicapa (BD + API): BR-001…BR-003, BR-005…BR-008, BR-013…BR-014, BR-016, BR-020…BR-021.
 
 ### Parcial
 
