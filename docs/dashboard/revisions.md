@@ -1,6 +1,13 @@
 # Revisions (version history)
 
-Deep module. Concept only — no backend exists. `MISSING` API + DB. Overwrites today are in-place (`articles.repository.ts:275-313`, `opinions.repository.ts:222-253`).
+Status: IMPLEMENTED (as built; see ADR-014/015/016). Sections below
+are the original proposal, kept as design history.
+
+Deep module. Backend exists: `model Revision`
+(`apps/api/prisma/schema.prisma`), `GET :id/revisions`,
+`POST :id/revisions/:version/restore` (new version, never rewrite),
+UI `HistoryPanel` with list + View/Diff/Restore. Diff is computed
+client-side from snapshots (no `diff` column in DB).
 
 ## 1. What must be knowable
 
@@ -24,6 +31,6 @@ For every material change: what changed (field-level diff: slug/title/summary/co
 
 No auto-restore on conflict, no branching, no per-locale version forks (version covers whole entity incl. both locales). Concurrent-edit handling stays last-write-wins until P2 collaboration (`OPEN DECISION`).
 
-## 5. DoD for future increment
+## 5. DoD for future increment (satisfied as built)
 
 Migration applied; create/update/transition covered by tests asserting revision rows; restore creates new version (history length +1, never mutates old rows); UI history tab with diff + confirm; audit log references revision ids.

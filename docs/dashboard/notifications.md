@@ -1,6 +1,15 @@
 # Notifications (P1)
 
+Status: IMPLEMENTED (inbox + unread badge + prefs; email/push still
+open). Sections below are the original proposal, kept as design
+history.
+
 ## 1. Status
+
+Implemented: in-app inbox (`/notifications`), unread badge
+(sidebar/topbar), `Notification`/`NotificationPref` models, event
+fan-out (review/publish/schedule/assign/due). The `MISSING` paragraph
+below is the original pre-implementation finding.
 
 `MISSING` everywhere (grep `notificat` returns zero). Mockup toasts are ephemeral UI confirmations, not a notification system. Dashboard has none. No mail/push/template infrastructure.
 

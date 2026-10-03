@@ -2,17 +2,17 @@
 
 ## 1. What the dashboard must be
 
-The Newshub Dashboard is the internal editorial CMS for Newshub: authenticated staff create, review, schedule, publish, archive, and measure news content in Spanish (`es`, required) and English (`en`, optional). It serves Admin, Editor, Author/Writer, and Reviewer roles (see `permissions.md`) and consumes the NestJS REST API (`/api/v1`) as its only application source. It is not a public site (storefront is separate) and must send `robots: noindex` (already `EXISTS` via `apps/dashboard/app/robots.ts` + `layout.tsx` metadata).
+The Newshub Dashboard is the internal editorial CMS for Newshub: authenticated staff create, review, schedule, publish, archive, and measure news content in Spanish (`es`, required) and English (`en`, optional). It serves Admin, Editor, and Reviewer roles (see `permissions.md`) and consumes the NestJS REST API (`/api/v1`) as its only application source. It is not a public site (storefront is separate) and must send `robots: noindex` (already `EXISTS` via `apps/dashboard/app/robots.ts` + `layout.tsx` metadata).
 
 ## 2. Scope by priority
 
 ### P0 — Editorial core (MVP)
 
-Dashboard/Overview, Articles, Opinions, Categories, Authors, Media, Search, Authentication, RBAC (admin/editor equivalence today, role model target defined), i18n (data `es+en`; UI ES-only today → EN/ES target), Theme (light/dark/system target), Responsive, Editorial workflow (`draft/review/published/archived` + transitions `publish/unpublish/archive/restore`), Breaking/Featured flags (articles only today), Scheduling (concept defined; `MISSING` in backend), Revisions/version history (concept defined; `MISSING`), Basic auditability (`createdBy/updatedBy`; full log `MISSING`).
+Dashboard/Overview, Articles, Opinions, Categories, Authors, Media, Search, Authentication, RBAC (`admin`/`editor` share content perms, `reviewer` on reads/transitions, no ownership), i18n (data `es+en`; UI ES-only today → EN/ES target), Theme (light/dark/system target), Responsive, Editorial workflow (`draft/review/published/archived` + transitions `publish/unpublish/archive/restore/reject`, publish review-only), Breaking/Featured flags (articles only today), Scheduling (concept defined; implemented), Revisions/version history (implemented), Basic auditability (implemented; full log at `/audit-log`).
 
 ### P1 — Newsroom
 
-Review/Approval queue, Editorial planning/assignments/calendar (`MISSING`), Notifications (`MISSING`), Audit Log (`MISSING`), Analytics v1 (computed counts first; event infra later), Content health/SEO controls (`UI/UX ONLY` + `API REQUIRED` for completeness signals), Distribution controls (scope-limited; full syndication is P2+).
+Review/Approval queue (implemented; reviewer semantics on reads/transitions), Editorial planning/assignments/calendar (implemented), Notifications (implemented: inbox + prefs), Audit Log (implemented at `/audit-log`), Analytics v1 (computed counts first; event infra later), Content health/SEO controls (`UI/UX ONLY` + `API REQUIRED` for completeness signals), Distribution controls (scaffold: feeds + webhooks; full syndication is P2+).
 
 ### P2 — Advanced newsroom
 
@@ -22,11 +22,11 @@ Live coverage/live blogs, advanced DAM (variants, focal point, alt library, CDN)
 
 Monetization, paywall, advanced personalization, complex workflow orchestration, external syndication infrastructure, advanced collaboration infrastructure. Not MVP requirements.
 
-## 3. Current state summary (evidence) — updated through Increment 5
+## 3. Current state summary (evidence) — updated through Increment 8
 
-- Dashboard: App Router shell (sidebar/drawer/collapse, topbar, breadcrumbs, `proxy.ts` + `RequireAuth`, `/forbidden`, `/settings`), `next-intl` EN/ES UI + separate editorial preview language, light/dark/system theme, responsive + a11y-hardened shared kit (`Table/Paginator/States/Modal/Toasts/MediaPicker/MediaCard/LocaleTabs`). Articles + opinions: server-wired lists (`q`/filters/`publishedAt` sort/pagination, bulk articles, scheduled badges) + `[id]`/`new` editors (validation-first, dirty-guard, unpublish-first, full transitions incl. `reject`, scheduling picker in review). Categories/authors: inline CRUD with article-grade validation. Media manager: grid + server pagination + client filter + upload + Copy-URL + `media_in_use`. Scheduled view (`/scheduled`) with countdown/overdue. Overview: Tier-1 KPIs + mixed review queue with quick actions.
-- API: Articles/Opinions/Categories/Media/Auth/Pagination/Scheduling `EXISTS`. Featured/Breaking `PARTIAL` (articles only). Search/Sorting/RBAC `PARTIAL`. Revisions/Audit/Notifications/Assignments/Analytics/Distribution `MISSING`.
-- DB: `schema.prisma` + `scheduled_at/by` columns and partial indexes on articles/opinions. No tables for revision/audit/notification/assignment/analytics/distribution.
+- Dashboard: App Router shell (sidebar/drawer/collapse, topbar, breadcrumbs, `proxy.ts` + `RequireAuth`, `/forbidden`, `/settings`), `next-intl` EN/ES UI + separate editorial preview language, light/dark/system theme, responsive + a11y-hardened shared kit (`Table/Paginator/States/Modal/Toasts/MediaPicker/MediaCard/LocaleTabs`). Articles + opinions: server-wired lists (`q`/filters/`publishedAt` sort/pagination, bulk articles, scheduled badges) + `[id]`/`new` editors (validation-first, dirty-guard, unpublish-first, full transitions incl. `reject`, scheduling picker in review). Categories/authors: inline CRUD with article-grade validation. Media manager: grid + server pagination + server `q` + upload + Copy-URL + `media_in_use`. Scheduled view (`/scheduled`) with countdown/overdue. Overview: Tier-1 KPIs + mixed review queue with quick actions. Planning board + calendar + review queue; notifications inbox + prefs; audit log with filters + entity trail.
+- API: Articles/Opinions/Categories/Media/Auth/Pagination/Scheduling/Revisions/Audit/Planning/Notifications `EXISTS`. Featured/Breaking `PARTIAL` (articles only). Search/Sorting/RBAC `PARTIAL` (server `q`/`publishedAt`; reviewer on reads/transitions).
+- DB: `schema.prisma` with `scheduled_at/by` + partial indexes, `revisions`, `audit_events`, `notifications` (+prefs), `planning_items`, `webhooks` (+deliveries) alongside content tables.
 - Mockup: full UX reference (unchanged, frozen). Behavior classified D-UX / SIM / API / NEW in `ui-ux-specification.md` and `gap-matrix.md`.
 
 ## 4. Target architecture
@@ -35,7 +35,7 @@ Monetization, paywall, advanced personalization, complex workflow orchestration,
 Dashboard → REST (/api/v1) → NestJS → Prisma → PostgreSQL
 ```
 
-Rules: no direct DB access from dashboard; no Prisma in dashboard; `GET /editorial/*` (any status, guarded `@Roles('admin','editor')`, `editorial.controller.ts`) for editing vs public published-only reads; absolute media URLs via `coverUrl`; `helmet`, CORS (dashboard+storefront), `ValidationPipe`, `ProblemExceptionFilter`, `CacheControlInterceptor` (`main.ts`) preserved. No GraphQL, microservices, Nx, or Turborepo without audited justification (`OPEN DECISION`: none currently justified).
+Rules: no direct DB access from dashboard; no Prisma in dashboard; `GET /editorial/*` (any status, guarded `@Roles('admin','editor','reviewer')`, `editorial.controller.ts`) for editing vs public published-only reads; absolute media URLs via `coverUrl`; `helmet`, CORS (dashboard+storefront), `ValidationPipe`, `ProblemExceptionFilter`, `CacheControlInterceptor` (`main.ts`) preserved. No GraphQL, microservices, Nx, or Turborepo without audited justification (`OPEN DECISION`: none currently justified).
 
 ## 5. Engineering requirements (from first increment)
 

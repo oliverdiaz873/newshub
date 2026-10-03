@@ -6,11 +6,11 @@ Mirrors articles minus curation. Mockup list + edit (`opinions.html`, `opinion-e
 
 ## 2. Behavior (target)
 
-- List: Title/slug + Status + Author + Languages + Updated + Actions; `q` (title/slug/author, client-today; server title/summary only) + `status` filter + `publishedAt` sort + server pagination. No bulk checkbox (preserve mockup decision — opinions volume and sensitivity favor row actions).
+- List: Title/slug + Status + Author + Languages + Updated + Actions; server `q` + `status` filter + `publishedAt` sort + server pagination. No bulk checkbox (preserve mockup decision — opinions volume and sensitivity favor row actions).
 - Editor (`/opinions/[id]`): tabs ES-required/EN-optional, `slug/title/summary/content`, side Author (required — `opinions.author RESTRICT` means delete blocked when opinions exist) + Cover (optional `No cover`) + Status + Unpublish/Archive (no breaking/category). Same `validate.js`+`dirty.js` wiring as articles; guest-byline note preserved from mockup.
 - Transitions: identical matrix to articles (`publish/unpublish/archive/restore`, `PATCH` draft→review only, 409 `invalid_transition`). Author required; category absent.
 - Delete: block with human copy when author-Restrict or cover-referenced analogues apply; confirm dialog always.
 
 ## 3. Gaps
 
-`API REQUIRED` only for: author-name search, extended sort, usage counts, scheduling/revisions (shared with articles). No opinion-specific backend needed for P0 migration. `OPEN DECISION`: whether opinions ever gain curation flags (proposal: no — keep opinions distinct from breaking/featured news flow).
+`API REQUIRED` only for: author-name search, extended sort, usage counts. Scheduling/revisions are shared with articles and already exist. No opinion-specific backend needed for P0 migration. `OPEN DECISION`: whether opinions ever gain curation flags (proposal: no — keep opinions distinct from breaking/featured news flow).

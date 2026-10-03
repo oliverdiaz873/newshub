@@ -4,10 +4,10 @@ Deep module. Target role model vs verified current implementation.
 
 ## 1. Current RBAC (verified, `EXISTS` core / `PARTIAL` model)
 
-- Guards: `JwtAuthGuard` (strict `Bearer`, 401) + `RolesGuard` (`ROLES_KEY`, 403 `Insufficient role`) on all writes, `GET /editorial/*`, `GET /media`, `GET /authors*` (`editorial.controller.ts:17-19`, `authors.controller.ts`, `media.controller.ts`). Public reads open (published-only by design).
-- Roles in use: `@Roles('admin','editor')`; `roles.guard.ts:9-10` documents `admin==editor` in MVP; no `viewer|contributor`, no admin-only route in use, no ownership check (any editor edits/deletes any content).
+- Guards: `JwtAuthGuard` (strict `Bearer`, 401) + `RolesGuard` (`ROLES_KEY`, 403 `Insufficient role`) on all writes, `GET /editorial/*`, `GET /media`, `GET /authors*`. Public reads open (published-only by design).
+- Roles in use: `@Roles('admin','editor')` on creation/deletion, plus `reviewer` on reads and transitions (`publish/unpublish/archive/restore/reject`, history reads) and admin-only webhook routes; no `viewer|contributor|author` roles, no ownership check (any editor edits/deletes any content).
 - Tokens: access JWT 15 min (`JWT_ACCESS_TTL_MIN`), opaque 48B hex refresh (sha256 stored, 7 d `REFRESH_TTL_DAYS`, rotation + reuse-detection `revokeFamily`, HttpOnly `path /api/v1/auth SameSite=lax Secure-in-prod`), argon2 passwords, throttling (global `1000/min`, login `10/min`, refresh `20/min`).
-- Dashboard: `AuthProvider` exposes `user/role` but no page gates on it; unauth renders `Sesión requerida` after 401; no `middleware.ts`, no `(auth)` group.
+- Dashboard: `AuthProvider` exposes `user/role`; anonymous routes render `Sesión requerida` after 401 and insufficient-role renders `/forbidden`; no `middleware.ts`, no `(auth)` group (routing hygiene lives in `proxy.ts`, which explicitly does not decide auth).
 
 ## 2. Target role model (conceptual; do not implement in this phase)
 

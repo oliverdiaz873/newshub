@@ -29,11 +29,14 @@ apps/dashboard/
 │   ├── auth/             # UI de login (LoginForm); la infra de sesión vive en shared/
 │   └── settings/         # sesión + API + prefs + preferencias UI
 ├── shared/
-│   ├── components/       # Shell, Sidebar, Topbar, Breadcrumbs, Table/Paginator,
-│   │                     # Modal/ConfirmDialog, States, Toasts, LoadingFallback,
+│   ├── components/       # Shell, Sidebar, Topbar, Breadcrumbs,
+│   │                     # Table (incl. Paginator), Modal (incl. ConfirmDialog),
+│   │                     # States, Toasts, LoadingFallback,
 │   │                     # RequireAuth (solo lo genuinamente reutilizable)
-│   ├── api/              # apiFetch, getApiBase, HTTP/error helpers (agnóstico)
-│   └── lib/              # theme, i18n providers, ui-prefs, dirty-guard, slug
+│   ├── api/              # apiFetch/getApiBase en auth.tsx + config.ts,
+│   │                     # HTTP/error helpers (agnóstico)
+│   └── lib/              # theme, i18n providers, ui-prefs, dirty-guard, slug,
+│                         # theme-script
 ├── src/                  # app.css + messages/ (en.json, es.json); sin código legacy
 └── proxy.ts              # routing hygiene (no decide autenticación)
 ```

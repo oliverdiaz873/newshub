@@ -25,7 +25,7 @@ Preserve the mockup's visual language, navigation, theme, i18n, responsive behav
 
 ## 4. Stack adaptation map
 
-- Vanilla `*.js` modules → React components/hooks: `sortable` → `SortableTh` + `useSortQuery`; `pagination.js` → `Paginator` (server `meta`); `bulk.js` → `useBulkSelection`; `dirty.js` → `useDirtyGuard`; `validate.js` → schema + field validators (same regex/messages); `i18n.js` → `next-intl`-or-equivalent (`OPEN DECISION`); `store.js` → server state + optimistic UI only where safe.
+- Vanilla `*.js` modules → React components/hooks: `sortable` → server `publishedAt` sort (no `SortableTh` component); `pagination.js` → server `meta` paginator; `bulk.js` → inline bulk selection in `ArticleList`; `dirty.js` → `useDirtyGuard`; `validate.js` → schema + field validators (same regex/messages); `i18n.js` → `next-intl` (decision closed); `store.js` → server state + optimistic UI only where safe.
 - `app/*.html` pages → App Router: `/`, `/login`, `/articles`, `/articles/[id]`, `/opinions`, `/opinions/[id]`, `/media`, `/categories`, `/authors`, `/settings`, plus P1 `/planning`, `/analytics`, `/notifications`, `/audit-log`. Inline `editing` state → `[id]` routes. `window.confirm()` → ported `#confirm-dlg` equivalent.
 - Styling: merge `assets/css/app.css` tokens into dashboard CSS system; add missing `@media` (380/820/1024px from mockup), dark surfaces, table scroll regions, skeleton/empty/error variants. Keep `.nh-*` class contract where tests reference it or codemod explicitly.
 
@@ -41,5 +41,5 @@ No content migration exists in this phase: mockup data is fictitious (`mock.js`)
 
 - Over-copying vanilla JS (behavioral bugs, a11y loss) — mitigate with component DoD + a11y checks.
 - Promising server search/sort beyond `q`/`publishedAt` limits — mitigate with honest UI copy + docs.
-- `limit=100` + double-fetch patterns persisting — mitigate by deleting in-page fetch forks in Increment 1.
+- `limit=100` + double-fetch patterns persisting — mitigated in Increment 1 for lists (server pagination); `limit=100` retained by design for picker option fetches (`listMediaOptions`, editorial categories).
 - Scope creep into P1 backends during migration — mitigate with increment gates (P0 migration never adds tables/endpoints).

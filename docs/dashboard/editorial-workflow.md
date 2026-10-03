@@ -1,6 +1,6 @@
 # Editorial Workflow
 
-Deep module. Normative workflow for articles and opinions. Backend matrix verified in `apps/api/src/common/transitions.ts` and enforced in `articles.service.ts:241-284`, `opinions.service.ts:204-248`.
+Deep module. Normative workflow for articles and opinions. Backend matrix verified in `apps/api/src/common/transitions.ts`.
 
 ## 1. States and flags
 
@@ -13,7 +13,7 @@ Content status (state machine) — one of:
 
 Editorial flags (orthogonal, not states):
 
-- `isFeatured`, `isBreaking` — articles only (`schema.prisma:94-95`). Never gate transitions; never render as status.
+- `isFeatured`, `isBreaking` — articles only (`Article` model in `schema.prisma`). Never gate transitions; never render as status.
 
 ## 2. Transition matrix (locked, do not extend without ADR)
 
@@ -21,14 +21,15 @@ From `resolveTransition(current, action)`:
 
 | Action | From → To | Idempotent no-op | Else |
 |---|---|---|---|
-| `publish` | `draft→published`, `review→published` | `published→200 unchanged` | 409 `invalid_transition` |
+| `publish` | `review→published` (publish is review-only) | `published→200 unchanged` | 409 `invalid_transition` |
 | `unpublish` | `published→draft` | `draft→200 unchanged` | 409 (e.g. from `review`/`archived`) |
 | `archive` | `published→archived`, `draft→archived` | `archived→200 unchanged` | 409 (e.g. from `review`) |
 | `restore` | `archived→draft` | — | 409 from any other state |
+| `reject` | `review→draft` (dedicated `POST :id/reject`, optional reason ≤500) | `draft→200 unchanged` | 409 from any other state |
 
 `PATCH` rule (current): only `draft` (no-op) / `review` from `draft`. Editing a `published` item via `PATCH` is rejected — the UI must route published edits through unpublish-first or a future revision flow, never silent overwrite expectations (see §4).
 
-Endpoints: `POST /articles/:id/publish|unpublish|archive|restore` and identical `/opinions/:id/*`. Editorial reads: `GET /editorial/articles[/:id]`, `GET /editorial/opinions[/:id]` (any status, guarded).
+Endpoints: `POST /articles/:id/publish|unpublish|archive|restore|reject` and identical `/opinions/:id/*`. Editorial reads: `GET /editorial/articles[/:id]`, `GET /editorial/opinions[/:id]` (any status, guarded).
 
 ## 3. Who can execute each transition (target; current in parentheses)
 
@@ -36,22 +37,22 @@ Endpoints: `POST /articles/:id/publish|unpublish|archive|restore` and identical 
 |---|---|---|---|---|
 | Create draft (`POST`) | yes | yes (current: yes) | yes, own items only (current: no such role; `OPEN DECISION` + `API REQUIRED` for ownership) | no |
 | Submit draft→review (`PATCH`) | yes | yes | yes, own | no |
-| Review→publish | yes | yes (current: yes) | no (proposes only) | yes (`API REQUIRED` to distinguish reviewer approval from editor publish if two-step approval required) |
-| Publish from draft | yes | yes (current allows; target keeps but logs; `OPEN DECISION` whether to require review-first for P1+) | no | no |
-| Unpublish published→draft | yes | yes | no (requests) | no (requests) |
-| Archive | yes | yes | no | no |
-| Restore archived→draft | yes | yes | own only (proposal) | no |
+| Review→publish | yes | yes | no (proposes only) | yes (two-step approval enforced: publish is review-only) |
+| Publish from draft | — (rejected, 409) | — (rejected, 409) | no | no |
+| Unpublish published→draft | yes | yes | no (requests) | yes |
+| Archive | yes | yes | no | yes |
+| Restore archived→draft | yes | yes | own only (proposal) | yes |
 | Reject review→draft | yes | yes | — (receives) | yes |
 
-Current backend: `@Roles('admin','editor')` on all writes + editorial reads; `admin==editor` (`roles.guard.ts:9-10`); no ownership, no viewer/contributor, no admin-only route in use. Target adds least-privilege without breaking current equivalence until ownership lands (see `permissions.md`).
+Current backend: `@Roles('admin','editor')` on creation/deletion/scheduling/restore, plus `reviewer` on reads, transitions (incl. `reject`), and history reads; no ownership, no viewer/contributor, admin-only webhook routes. Target adds least-privilege without breaking current equivalence until ownership lands (see `permissions.md`).
 
 ## 4. Rejection, published edits, unpublish, rollback
 
-- Rejection: `review→draft` via `unpublish` is not valid from `review` (matrix returns 409). Rejection today must be modeled as `PATCH` back to `draft` or a dedicated `reject` action — `OPEN DECISION` (`API REQUIRED` if new action). UI must not call `unpublish` on a `review` item. Rejection requires reason (P1, `DB REQUIRED` if persisted) and notification (see `notifications.md`).
-- Editing published content: forbidden via `PATCH` today. Target options: (a) unpublish→edit→republish (loses `published` visibility window; `publishedAt` preserved as first-published), or (b) revision draft overlay (see `revisions.md`, P1). Migration (Increment 1-2) implements (a) with explicit confirm copy; (b) is roadmap P1.
-- Scheduling: `publishedAt` is output-only (`now()` on transition). Future publish is `MISSING` — see `scheduling.md`. Never fake scheduling client-side.
-- Rollback: no version store today. Rollback = restore from revision once revisions exist; until then, only `restore archived→draft`. Never claim undo beyond idempotent no-ops.
-- Every action records actor via `updatedBy` today; immutable log is P1 (`audit-log.md`).
+- Rejection: dedicated `POST :id/reject` (`review→draft`), optional reason (≤500 chars, persisted in audit metadata + notification). UI must not call `unpublish` on a `review` item (matrix returns 409).
+- Editing published content: forbidden via `PATCH` today. Target options: (a) unpublish→edit→republish (loses `published` visibility window; `publishedAt` preserved as first-published), or (b) revision draft overlay (see `revisions.md`, implemented as restore-as-new-version for snapshots).
+- Scheduling: `scheduledAt` review-only scheduling with executor (`scheduling.md` implemented); `publishedAt` output-only on transition. Never fake scheduling client-side.
+- Rollback: version store exists (`revisions`); rollback = restore from revision as a new version (blocked while published). Never claim undo beyond idempotent no-ops.
+- Every action records actor via `updatedBy` plus immutable audit rows (see `audit-log.md`).
 
 ## 5. UI obligations
 

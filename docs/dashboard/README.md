@@ -18,9 +18,9 @@ This folder defines:
 | Surface | Path | Role in this documentation |
 |---|---|---|
 | Mockup (UX reference, frozen) | `C:\Users\dell\Desktop\newshub-dashboard-mockup` (`index, articles, article-edit, opinions, opinion-edit, categories, authors, media, settings, login.html` + `assets/js/mock.js`) | Visual and interaction reference. Never copy vanilla code literally; adapt patterns to Next.js + TypeScript. |
-| Real dashboard | `apps/dashboard` (Next.js 16, React 19, App Router, 11 source files) | Current implementation baseline. Audited as REAL / PARTIAL / MISSING. |
+| Real dashboard | `apps/dashboard` (Next.js 16, React 19, App Router) | Current implementation baseline. Audited as REAL / PARTIAL / MISSING. |
 | API | `apps/api` (NestJS modular monolith, `api/v1` prefix) | Application source of truth. Dashboard consumes it via REST; never PostgreSQL directly. |
-| DB | `apps/api/prisma/schema.prisma` (Data Model v2 locked, 12 models, UUID PKs, translation tables, JSONB content) | Persistence baseline. Gaps requiring migrations are tagged `DB REQUIRED`. |
+| DB | `apps/api/prisma/schema.prisma` (Data Model v2 locked, 20 models, UUID PKs, translation tables, JSONB content) | Persistence baseline. Gaps requiring migrations are tagged `DB REQUIRED`. |
 
 Architecture (locked):
 

@@ -41,7 +41,7 @@ Mockup: single pref `nh-mockup-locale` (default `en`), `?lang=` override, `data-
 
 ## 7. Media (D-UX grid/filter; thumbs SIM)
 
-Grid `#media-grid` (name/meta/tag, Copy URL toast, Delete confirm, `#media-q` name/tag debounce), cover-usage card (`3/6 linked`, `media_in_use` blocks delete). Ported (Inc 4): manager grid with real absolute-URL thumbs, Copy-URL (clipboard + fallback), client `q` filter with honest hint, input+preview upload mirroring server rules (`MAX_FILE_BYTES`, sharp MIME match, `media_in_use` 409); shared `MediaCard` with `MediaPicker`. Full spec in `media.md`.
+Grid `#media-grid` (name/meta/tag, Copy URL toast, Delete confirm, `#media-q` name/tag debounce), cover-usage card (`3/6 linked`, `media_in_use` blocks delete). Ported (Inc 4): manager grid with real absolute-URL thumbs, Copy-URL (clipboard + fallback), server `q` filter (filename OR mime), input+preview upload mirroring server rules (`MAX_FILE_BYTES`, sharp MIME match, `media_in_use` 409); shared `MediaCard` with `MediaPicker`. Full spec in `media.md`.
 
 ## 8. Home / KPIs (D-UX layout; numbers SIM)
 
