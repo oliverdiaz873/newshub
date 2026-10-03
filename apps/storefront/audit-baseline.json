@@ -1,3 +1,5 @@
 {
-  "accept": {}
+  "accept": {
+    "GHSA-VFJ7-8CJW-P6XM": "Build-time only: braces stack exhaustion via tailwindcss glob stack (chokidar/micromatch); no attacker-controlled patterns in build. Fix requires tailwindcss v3->v4 major migration (deferred)."
+  }
 }
